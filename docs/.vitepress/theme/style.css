@@ -1,107 +1,120 @@
 /**
- * Customize default theme styling by overriding CSS variables:
- * https://github.com/vuejs/vitepress/blob/main/src/client/theme-default/styles/vars.css
+ * Jian Lai Wiki — Xianxia Archive Aesthetic
+ * Dark jade, parchment, muted gold, readable typography
  */
 
-/**
- * Colors
- *
- * Each colors have exact same color scale system with 3 levels of solid
- * colors with different brightness, and 1 soft color.
- *
- * - `XXX-1`: The most solid color used mainly for colored text. It must
- *   satisfy the contrast ratio against when used on top of `XXX-soft`.
- *
- * - `XXX-2`: The color used mainly for hover state of the button.
- *
- * - `XXX-3`: The color for solid background, such as bg color of the button.
- *   It must satisfy the contrast ratio with pure white (#ffffff) text on
- *   top of it.
- *
- * - `XXX-soft`: The color used for subtle background such as custom container
- *   or badges. It must satisfy the contrast ratio when putting `XXX-1` colors
- *   on top of it.
- *
- *   The soft color must be semi transparent alpha channel. This is crucial
- *   because it allows adding multiple "soft" colors on top of each other
- *   to create a accent, such as when having inline code block inside
- *   custom containers.
- *
- * - `default`: The color used purely for subtle indication without any
- *   special meanings attached to it such as bg color for menu hover state.
- *
- * - `brand`: Used for primary brand colors, such as link text, button with
- *   brand theme, etc.
- *
- * - `tip`: Used to indicate useful information. The default theme uses the
- *   brand color for this by default.
- *
- * - `warning`: Used to indicate warning to the users. Used in custom
- *   container, badges, etc.
- *
- * - `danger`: Used to show error, or dangerous message to the users. Used
- *   in custom container, badges, etc.
- * -------------------------------------------------------------------------- */
+/* ========================================================================
+   Light Mode Colors
+   ======================================================================== */
 
 :root {
+  /* Brand: Jade green */
+  --vp-c-brand-1: #2d5a3f;
+  --vp-c-brand-2: #3a7252;
+  --vp-c-brand-3: #2d5a3f;
+  --vp-c-brand-soft: rgba(45, 90, 63, 0.12);
+
+  /* Default */
   --vp-c-default-1: var(--vp-c-gray-1);
   --vp-c-default-2: var(--vp-c-gray-2);
   --vp-c-default-3: var(--vp-c-gray-3);
   --vp-c-default-soft: var(--vp-c-gray-soft);
 
-  --vp-c-brand-1: var(--vp-c-indigo-1);
-  --vp-c-brand-2: var(--vp-c-indigo-2);
-  --vp-c-brand-3: var(--vp-c-indigo-3);
-  --vp-c-brand-soft: var(--vp-c-indigo-soft);
-
+  /* Tip: uses brand */
   --vp-c-tip-1: var(--vp-c-brand-1);
   --vp-c-tip-2: var(--vp-c-brand-2);
   --vp-c-tip-3: var(--vp-c-brand-3);
   --vp-c-tip-soft: var(--vp-c-brand-soft);
 
-  --vp-c-warning-1: var(--vp-c-yellow-1);
-  --vp-c-warning-2: var(--vp-c-yellow-2);
-  --vp-c-warning-3: var(--vp-c-yellow-3);
-  --vp-c-warning-soft: var(--vp-c-yellow-soft);
+  /* Warning: muted gold */
+  --vp-c-warning-1: #a6822e;
+  --vp-c-warning-2: #b8943f;
+  --vp-c-warning-3: #c9a84c;
+  --vp-c-warning-soft: rgba(201, 168, 76, 0.14);
 
+  /* Danger */
   --vp-c-danger-1: var(--vp-c-red-1);
   --vp-c-danger-2: var(--vp-c-red-2);
   --vp-c-danger-3: var(--vp-c-red-3);
   --vp-c-danger-soft: var(--vp-c-red-soft);
+
+  /* Parchment background */
+  --vp-c-bg: #f8f4ec;
+  --vp-c-bg-alt: #f0ebe0;
+  --vp-c-bg-elv: #ffffff;
+  --vp-c-bg-soft: #f0ebe0;
+
+  /* Typography */
+  --vp-font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Noto Sans SC', 'PingFang SC', sans-serif;
+  --vp-font-family-mono: 'Fira Code', 'JetBrains Mono', Consolas, monospace;
+
+  /* Custom: heading font */
+  --jl-font-heading: Georgia, 'Noto Serif SC', 'Source Han Serif SC', serif;
+
+  /* Custom: gold accent */
+  --jl-c-gold: #c9a84c;
+  --jl-c-gold-dim: #a6822e;
+  --jl-c-jade: #2d5a3f;
+  --jl-c-jade-light: #3a7252;
+  --jl-c-parchment: #f8f4ec;
+  --jl-c-ink: #2c2c2c;
 }
 
-/**
- * Component: Button
- * -------------------------------------------------------------------------- */
+/* ========================================================================
+   Dark Mode Colors
+   ======================================================================== */
+
+.dark {
+  --vp-c-brand-1: #6fcf97;
+  --vp-c-brand-2: #5ab882;
+  --vp-c-brand-3: #4aa370;
+  --vp-c-brand-soft: rgba(79, 163, 112, 0.16);
+
+  --vp-c-bg: #1a1f1c;
+  --vp-c-bg-alt: #151a17;
+  --vp-c-bg-elv: #222a25;
+  --vp-c-bg-soft: #222a25;
+
+  --jl-c-gold: #e0c068;
+  --jl-c-gold-dim: #c9a84c;
+  --jl-c-jade: #6fcf97;
+  --jl-c-jade-light: #8edcab;
+  --jl-c-parchment: #1a1f1c;
+  --jl-c-ink: #e0ddd5;
+}
+
+/* ========================================================================
+   Buttons
+   ======================================================================== */
 
 :root {
   --vp-button-brand-border: transparent;
-  --vp-button-brand-text: var(--vp-c-white);
+  --vp-button-brand-text: #ffffff;
   --vp-button-brand-bg: var(--vp-c-brand-3);
   --vp-button-brand-hover-border: transparent;
-  --vp-button-brand-hover-text: var(--vp-c-white);
+  --vp-button-brand-hover-text: #ffffff;
   --vp-button-brand-hover-bg: var(--vp-c-brand-2);
   --vp-button-brand-active-border: transparent;
-  --vp-button-brand-active-text: var(--vp-c-white);
+  --vp-button-brand-active-text: #ffffff;
   --vp-button-brand-active-bg: var(--vp-c-brand-1);
 }
 
-/**
- * Component: Home
- * -------------------------------------------------------------------------- */
+/* ========================================================================
+   Home Hero
+   ======================================================================== */
 
 :root {
   --vp-home-hero-name-color: transparent;
-  --vp-home-hero-name-background: -webkit-linear-gradient(
-    120deg,
-    #bd34fe 30%,
-    #41d1ff
+  --vp-home-hero-name-background: linear-gradient(
+    135deg,
+    #2d5a3f 0%,
+    #c9a84c 100%
   );
-
   --vp-home-hero-image-background-image: linear-gradient(
     -45deg,
-    #bd34fe 50%,
-    #47caff 50%
+    rgba(45, 90, 63, 0.4) 50%,
+    rgba(201, 168, 76, 0.4) 50%
   );
   --vp-home-hero-image-filter: blur(44px);
 }
@@ -118,9 +131,9 @@
   }
 }
 
-/**
- * Component: Custom Block
- * -------------------------------------------------------------------------- */
+/* ========================================================================
+   Custom Block
+   ======================================================================== */
 
 :root {
   --vp-custom-block-tip-border: transparent;
@@ -129,11 +142,60 @@
   --vp-custom-block-tip-code-bg: var(--vp-c-brand-soft);
 }
 
-/**
- * Component: Algolia
- * -------------------------------------------------------------------------- */
+/* ========================================================================
+   Typography Overrides
+   ======================================================================== */
+
+.vp-doc h1,
+.vp-doc h2,
+.vp-doc h3 {
+  font-family: var(--jl-font-heading);
+}
+
+.vp-doc h1 {
+  border-bottom: 2px solid var(--jl-c-gold);
+  padding-bottom: 0.3em;
+}
+
+.VPHero .name {
+  font-family: var(--jl-font-heading);
+}
+
+/* ========================================================================
+   Sidebar & Nav Refinements
+   ======================================================================== */
+
+.VPSidebar .group .title {
+  font-family: var(--jl-font-heading);
+  letter-spacing: 0.02em;
+}
+
+/* ========================================================================
+   Search
+   ======================================================================== */
 
 .DocSearch {
   --docsearch-primary-color: var(--vp-c-brand-1) !important;
 }
 
+/* ========================================================================
+   Feature Cards on Home
+   ======================================================================== */
+
+.VPFeature {
+  border: 1px solid var(--vp-c-brand-soft);
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.VPFeature:hover {
+  border-color: var(--jl-c-gold);
+  box-shadow: 0 2px 12px rgba(201, 168, 76, 0.15);
+}
+
+/* ========================================================================
+   Footer
+   ======================================================================== */
+
+.VPFooter {
+  border-top: 1px solid var(--vp-c-brand-soft);
+}
