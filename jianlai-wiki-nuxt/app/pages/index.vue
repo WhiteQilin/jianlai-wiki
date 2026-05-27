@@ -36,9 +36,9 @@
     <div class="main-content" id="archive">
       <div class="portal-grid">
         <ArchivePortal link="/characters" titleZh="人物志" titleEn="Characters" bgChar="人" />
-        <ArchivePortal link="/locations" titleZh="天下图志" titleEn="Locations" bgChar="地" />
+        <ArchivePortal link="/world" titleZh="天下图志" titleEn="World" bgChar="地" />
         <ArchivePortal link="/cultivation" titleZh="山上修行" titleEn="Cultivation" bgChar="修" />
-        <ArchivePortal link="/sword-techniques" titleZh="剑术与神通" titleEn="Swordsmanship" bgChar="剑" />
+        <ArchivePortal link="/swordsmanship" titleZh="剑术与神通" titleEn="Swordsmanship" bgChar="剑" />
         <ArchivePortal link="/factions" titleZh="宗门势力" titleEn="Factions" bgChar="宗" />
         <ArchivePortal link="/artifacts" titleZh="法宝器物" titleEn="Artifacts" bgChar="宝" />
         <ArchivePortal link="/timeline" titleZh="年表" titleEn="Timeline" bgChar="史" />

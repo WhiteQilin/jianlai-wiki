@@ -8,8 +8,9 @@
       
       <nav class="site-nav">
         <NuxtLink to="/characters">人物 Characters</NuxtLink>
-        <NuxtLink to="/locations">天下 World</NuxtLink>
+        <NuxtLink to="/world">天下 World</NuxtLink>
         <NuxtLink to="/cultivation">修行 Cultivation</NuxtLink>
+        <NuxtLink to="/swordsmanship">剑术 Swordsmanship</NuxtLink>
         <NuxtLink to="/factions">势力 Factions</NuxtLink>
         <NuxtLink to="/artifacts">法宝 Artifacts</NuxtLink>
       </nav>

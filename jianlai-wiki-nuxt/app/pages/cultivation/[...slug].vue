@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const route = useRoute()
-const section = route.path.split('/')[1] || 'characters'
-const sectionTitle = section.charAt(0).toUpperCase() + section.slice(1)
+const section = 'cultivation'
+const sectionTitle = 'Cultivation'
 
 const { data: page } = await useAsyncData(`page-${route.path}`, () => {
   return queryCollection('content').path(route.path).first()
@@ -12,7 +12,7 @@ if (!page.value) {
 }
 
 useSeoMeta({
-  title: `${page.value.title} | Jian Lai Wiki`
+  title: `${page.value?.title} | Jian Lai Wiki`
 })
 </script>
 
@@ -21,10 +21,10 @@ useSeoMeta({
     <div class="breadcrumb">
       <NuxtLink to="/">Home</NuxtLink> <span>/</span>
       <NuxtLink :to="`/${section}`">{{ sectionTitle }}</NuxtLink> <span>/</span>
-      <span class="current">{{ page.title }}</span>
+      <span class="current">{{ page?.title }}</span>
     </div>
 
-    <ContentRenderer :value="page" />
+    <ContentRenderer v-if="page" :value="page" />
   </div>
 </template>
 
