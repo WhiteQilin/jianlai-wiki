@@ -10,127 +10,152 @@ defineProps<{
 </script>
 
 <template>
-  <aside class="character-infobox" role="complementary" :aria-label="`${name} infobox`">
-    <div class="infobox-header">
-      <h3 class="infobox-name">{{ name }}</h3>
+  <aside class="dossier-box" role="complementary" :aria-label="`${name} dossier`">
+    <div class="dossier-header">
+      <h3 class="dossier-name">{{ name }}</h3>
     </div>
 
-    <div v-if="image" class="infobox-image">
+    <div v-if="image" class="dossier-image">
       <img :src="image" :alt="name" loading="lazy" />
     </div>
 
-    <table class="infobox-table">
-      <tbody>
-        <tr v-if="titles && titles.length">
-          <th>Titles</th>
-          <td>
-            <span v-for="(title, i) in titles" :key="i" class="infobox-tag">{{ title }}</span>
-          </td>
-        </tr>
-        <tr v-if="affiliation">
-          <th>Faction</th>
-          <td>{{ affiliation }}</td>
-        </tr>
-        <tr v-if="realm">
-          <th>Realm</th>
-          <td><span class="realm-value">{{ realm }}</span></td>
-        </tr>
-        <tr v-if="weapon">
-          <th>Weapon</th>
-          <td>{{ weapon }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="dossier-body">
+      <div v-if="titles && titles.length" class="dossier-row">
+        <span class="dossier-label">Titles</span>
+        <div class="dossier-values">
+          <span v-for="(title, i) in titles" :key="i" class="dossier-tag">{{ title }}</span>
+        </div>
+      </div>
+      <div v-if="affiliation" class="dossier-row">
+        <span class="dossier-label">Faction</span>
+        <span class="dossier-value">{{ affiliation }}</span>
+      </div>
+      <div v-if="realm" class="dossier-row">
+        <span class="dossier-label">Realm</span>
+        <span class="dossier-value realm">{{ realm }}</span>
+      </div>
+      <div v-if="weapon" class="dossier-row">
+        <span class="dossier-label">Weapon</span>
+        <span class="dossier-value">{{ weapon }}</span>
+      </div>
+    </div>
   </aside>
 </template>
 
 <style scoped>
-.character-infobox {
+.dossier-box {
   float: right;
-  width: 300px;
+  width: 320px;
   max-width: 100%;
-  margin: 0 0 1.5em 1.5em;
-  border: 1px solid var(--vp-c-brand-soft);
-  border-radius: 8px;
-  background: var(--vp-c-bg-alt);
-  overflow: hidden;
-  font-size: 0.9em;
+  margin: 0 0 2rem 2.5rem;
+  border: 1px solid var(--vp-c-border);
+  background: var(--vp-c-bg);
+  box-shadow: 12px 12px 0 var(--vp-c-bg-soft);
+  font-size: 0.95rem;
+  position: relative;
+  clear: right;
+}
+
+.dossier-box::after {
+  content: '';
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 20px;
+  height: 20px;
+  border-top: 2px solid var(--jl-c-seal-red);
+  border-right: 2px solid var(--jl-c-seal-red);
 }
 
 @media (max-width: 768px) {
-  .character-infobox {
+  .dossier-box {
     float: none;
     width: 100%;
-    margin: 1em 0;
+    margin: 2rem 0;
+    box-shadow: 8px 8px 0 var(--vp-c-bg-soft);
   }
 }
 
-.infobox-header {
-  background: var(--vp-c-brand-3);
-  padding: 0.75em 1em;
-  text-align: center;
+.dossier-header {
+  border-bottom: 1px solid var(--vp-c-border);
+  padding: 1.5rem 1.5rem 1rem;
+  position: relative;
 }
 
-.infobox-name {
+.dossier-name {
   margin: 0;
-  color: #ffffff;
+  color: var(--jl-c-ink);
   font-family: var(--jl-font-heading);
-  font-size: 1.2em;
-  font-weight: 600;
+  font-size: 1.6rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
 }
 
-.infobox-image {
-  text-align: center;
-  padding: 1em;
-  background: var(--vp-c-bg-soft);
+.dossier-image {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg-alt);
 }
 
-.infobox-image img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 4px;
-}
-
-.infobox-table {
+.dossier-image img {
   width: 100%;
-  border-collapse: collapse;
+  height: auto;
+  filter: grayscale(100%) contrast(1.1);
+  mix-blend-mode: multiply;
 }
 
-.infobox-table th,
-.infobox-table td {
-  padding: 0.5em 0.75em;
-  border-top: 1px solid var(--vp-c-divider);
-  text-align: left;
-  vertical-align: top;
+.dark .dossier-image img {
+  mix-blend-mode: screen;
 }
 
-.infobox-table th {
-  width: 5em;
+.dossier-body {
+  padding: 0.5rem 1.5rem 1.5rem;
+}
+
+.dossier-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0.85rem 0;
+  border-bottom: 1px dotted var(--vp-c-border);
+}
+
+.dossier-row:last-child {
+  border-bottom: none;
+}
+
+.dossier-label {
   font-weight: 600;
-  color: var(--jl-c-jade);
-  white-space: nowrap;
+  color: var(--vp-c-text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.75rem;
+  width: 80px;
+  flex-shrink: 0;
 }
 
-.dark .infobox-table th {
-  color: var(--jl-c-jade-light);
+.dossier-value {
+  color: var(--vp-c-text-1);
+  text-align: right;
+  font-weight: 500;
+  font-size: 0.9rem;
 }
 
-.infobox-tag {
-  display: inline-block;
-  background: var(--vp-c-brand-soft);
-  color: var(--vp-c-brand-1);
-  padding: 0.1em 0.5em;
-  border-radius: 3px;
-  margin: 0.1em 0.25em 0.1em 0;
-  font-size: 0.85em;
+.dossier-value.realm {
+  font-family: var(--jl-font-heading);
+  color: var(--jl-c-seal-red);
 }
 
-.realm-value {
-  color: var(--jl-c-gold-dim);
-  font-weight: 600;
+.dossier-values {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
 }
 
-.dark .realm-value {
-  color: var(--jl-c-gold);
+.dossier-tag {
+  font-family: var(--jl-font-heading);
+  color: var(--jl-c-ink);
+  font-size: 1rem;
 }
 </style>
