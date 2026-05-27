@@ -8,11 +8,12 @@ defineProps<{
 <template>
   <div class="hero-media">
     <div class="hero-background">
+      <slot name="background" />
       <video v-if="video" autoplay loop muted playsinline class="bg-video">
         <source :src="video" type="video/mp4" />
       </video>
       <img v-else-if="image" :src="image" alt="" class="bg-image" />
-      <div v-else class="bg-fallback animate-fade-up"></div>
+      <div v-else class="bg-fallback animate-fade-in-up"></div>
       
       <div class="bg-overlay"></div>
     </div>

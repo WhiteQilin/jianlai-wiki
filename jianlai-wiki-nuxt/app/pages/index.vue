@@ -5,33 +5,57 @@
 <template>
   <div class="home-archive">
     <HeroMedia>
-      <div class="hero-calligraphy-wrapper animate-fade-up">
-        <div class="hero-calligraphy">剑</div>
-      </div>
-      <div class="hero-title-group animate-fade-up" style="animation-delay: 0.2s;">
+      <template #background>
+        <div class="hero-calligraphy-wrapper">
+          <div class="hero-calligraphy">剑</div>
+        </div>
+      </template>
+
+      <div class="hero-title-group animate-fade-in-up" style="animation-delay: 0.2s;">
         <h1 class="hero-title-zh">剑来</h1>
-        <div class="hero-seal animate-pop-in" style="animation-delay: 0.8s;">剑来</div>
+        <div class="hero-seal animate-stamp" style="animation-delay: 0.8s;">剑来</div>
       </div>
       
-      <h2 class="hero-title-en animate-fade-up" style="animation-delay: 0.4s;">Sword, Come! Encyclopedia</h2>
-      <p class="hero-tagline animate-fade-up" style="animation-delay: 0.6s;">
-        An elegant compendium of characters, realms, locations, and legends.
+      <h2 class="hero-title-en animate-fade-in-up" style="animation-delay: 0.4s;">Sword, Come! Encyclopedia</h2>
+      <p class="hero-tagline animate-fade-in-up" style="animation-delay: 0.6s;">
+        A premium fandom archive of characters, realms, locations, and legends.
       </p>
 
-      <div class="hero-actions animate-fade-up" style="animation-delay: 0.8s;">
+      <div class="hero-actions animate-fade-in-up" style="animation-delay: 0.8s;">
         <a href="#archive" class="btn-primary hover-lift">Enter the Archive</a>
         <NuxtLink to="/characters" class="btn-secondary hover-lift">Browse Characters</NuxtLink>
       </div>
 
       <template #footer>
-        <div class="hero-meta-row animate-fade-up" style="animation-delay: 1s;">
+        <div class="hero-meta-row animate-fade-in-up" style="animation-delay: 1s;">
           <div class="meta-item"><span>Characters</span> Hundreds</div>
           <div class="meta-item"><span>Worlds</span> Boundless</div>
-          <div class="meta-item"><span>Cultivation</span> Fourteen Realms</div>
+          <div class="meta-item"><span>Cultivation</span> 14 Realms</div>
           <div class="meta-item"><span>Status</span> In Progress</div>
         </div>
       </template>
     </HeroMedia>
+
+    <div class="dashboard-section animate-fade-in-up" style="animation-delay: 1.2s;">
+      <div class="dashboard-grid">
+        <NuxtLink to="/characters" class="dashboard-card hover-lift">
+          <h4>Characters</h4>
+          <span class="stat">Profiles</span>
+        </NuxtLink>
+        <NuxtLink to="/world" class="dashboard-card hover-lift">
+          <h4>Worlds</h4>
+          <span class="stat">Atlas</span>
+        </NuxtLink>
+        <NuxtLink to="/cultivation" class="dashboard-card hover-lift">
+          <h4>Cultivation</h4>
+          <span class="stat">Realms</span>
+        </NuxtLink>
+        <NuxtLink to="/factions" class="dashboard-card hover-lift">
+          <h4>Factions</h4>
+          <span class="stat">Sects</span>
+        </NuxtLink>
+      </div>
+    </div>
 
     <div class="main-content" id="archive">
       <div class="portal-grid">
@@ -47,7 +71,7 @@
 
       <div class="editorial-section">
         <div class="editorial-header">
-          <h3 class="section-title">Featured Dossiers</h3>
+          <h3 class="section-title">Featured Characters</h3>
           <div class="title-line"></div>
         </div>
 
@@ -58,7 +82,7 @@
             nameZh="陈平安" 
             desc="The protagonist from Lizhu Blessed Land. A young man who walks his own path with a sword." 
             category="Character" 
-            status="To be improved" 
+            status="To be verified" 
           />
           <FeaturedDossier 
             link="/characters/ning-yao" 
@@ -66,7 +90,7 @@
             nameZh="宁姚" 
             desc="The peerless sword immortal of the Sword Qi Great Wall." 
             category="Character" 
-            status="To be improved" 
+            status="To be verified" 
           />
           <FeaturedDossier 
             link="/characters/qi-jingchun" 
@@ -74,7 +98,23 @@
             nameZh="齐静春" 
             desc="The Spring Breeze, a scholar of the highest order." 
             category="Character" 
-            status="To be improved" 
+            status="To be verified" 
+          />
+        </div>
+
+        <div class="editorial-header" style="margin-top: 6rem;">
+          <h3 class="section-title">Featured Lore</h3>
+          <div class="title-line"></div>
+        </div>
+
+        <div class="dossier-list">
+          <FeaturedDossier 
+            link="/world/sample" 
+            nameEn="Haoran Tianxia" 
+            nameZh="浩然天下" 
+            desc="The Great World of Haoran, home to Confucian scholars and mortal dynasties." 
+            category="World" 
+            status="To be verified" 
           />
         </div>
       </div>
@@ -104,11 +144,15 @@
 .hero-calligraphy {
   font-family: var(--font-heading);
   font-size: 45vw;
-  color: var(--c-text-1);
-  opacity: 0.03;
+  color: rgba(20, 20, 20, 0.03);
   pointer-events: none;
   user-select: none;
   line-height: 1;
+  white-space: nowrap;
+}
+
+.dark .hero-calligraphy {
+  color: rgba(255, 255, 255, 0.02);
 }
 
 .hero-title-group {
@@ -119,13 +163,14 @@
 
 .hero-title-zh {
   font-family: var(--font-heading);
-  font-size: 8rem;
+  font-size: 6rem;
   font-weight: 400;
   color: var(--c-ink);
   margin: 0;
   line-height: 1;
   letter-spacing: 0.1em;
   text-align: center;
+  white-space: nowrap;
 }
 .hero-title-zh::after {
   display: none;
@@ -186,24 +231,33 @@
 }
 
 .btn-primary {
-  background: var(--c-ink);
-  color: var(--c-bg);
+  background-color: var(--c-ink);
+  color: #ffffff;
   border: 1px solid var(--c-ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
-  background: var(--c-bg);
+  background-color: transparent;
   color: var(--c-ink);
 }
 
 .btn-secondary {
-  background: transparent;
+  background-color: transparent;
   color: var(--c-ink);
   border: 1px solid var(--c-border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
 }
 
 .btn-secondary:hover {
   border-color: var(--c-ink);
+  background-color: var(--c-bg-soft);
 }
 
 .hero-meta-row {
@@ -233,10 +287,49 @@
   letter-spacing: 0.1em;
 }
 
+.dashboard-section {
+  width: 100%;
+  background: var(--c-bg-soft);
+  border-bottom: 1px solid var(--c-border);
+  padding: 2rem;
+}
+
+.dashboard-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+}
+
+.dashboard-card {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  background: var(--c-bg);
+  border: 1px solid var(--c-border);
+  text-decoration: none;
+  display: block;
+}
+
+.dashboard-card h4 {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--c-text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0 0 0.5rem 0;
+}
+
+.dashboard-card .stat {
+  font-family: var(--font-heading);
+  font-size: 1.8rem;
+  color: var(--c-ink);
+}
+
 .main-content {
   max-width: 1200px;
   width: 100%;
-  padding: 6rem 2rem;
+  padding: 4rem 2rem 6rem;
 }
 
 .portal-grid {

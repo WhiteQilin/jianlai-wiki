@@ -17,14 +17,14 @@ useSeoMeta({
 </script>
 
 <template>
-  <div class="article-page mdc-content animate-fade-up">
+  <div class="article-page mdc-content animate-fade-in-up">
     <div class="breadcrumb">
       <NuxtLink to="/">Home</NuxtLink> <span>/</span>
       <NuxtLink :to="`/${section}`">{{ sectionTitle }}</NuxtLink> <span>/</span>
       <span class="current">{{ page?.title }}</span>
     </div>
 
-    <ContentRenderer v-if="page" :value="page" />
+    <ContentRenderer v-if="page" :value="page" class="mdc-prose" />
   </div>
 </template>
 

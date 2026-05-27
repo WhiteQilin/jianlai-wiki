@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+
+const activeCategory = ref('All')
+
 const { data: items } = await useAsyncData('factions-list', () => {
   return queryCollection('content')
     .where('path', 'LIKE', '/factions/%')
@@ -12,105 +16,57 @@ useSeoMeta({
 </script>
 
 <template>
-  <div class="section-index mdc-content animate-fade-up">
-    <h1>Factions <span class="zh">宗门势力</span></h1>
-    <p class="section-desc">The major powers, sects, and organizations.</p>
+  <div class="section-index">
+    <SectionHero 
+      titleEn="Factions" 
+      titleZh="宗门势力" 
+      desc="The major powers, sects, and organizations that shape the balance of the worlds." 
+    />
+    
+    <div class="mdc-content" style="padding-top: 0">
+      <CategoryTabs 
+        :categories="['All', 'Orthodox', 'Demonic', 'Mortal Empires']" 
+        v-model:active="activeCategory" 
+      />
 
-    <div class="archive-grid">
-      <NuxtLink v-for="item in items" :key="item.path" :to="item.path" class="archive-card hover-lift">
-        <h3 class="card-title">{{ item.title }} <span v-if="item.chinese" class="card-zh">{{ item.chinese }}</span></h3>
-        <p class="card-status" v-if="item.status">{{ item.status }}</p>
-        <div class="card-arrow">→</div>
-      </NuxtLink>
+      <div class="dossier-list">
+        <FeaturedDossier 
+          v-for="item in items" 
+          :key="item.path"
+          :link="item.path"
+          :nameEn="item.title || 'Unknown'"
+          :nameZh="item.chinese || ''"
+          :desc="item.description || 'Entry pending detailed documentation.'"
+          :category="item.category || 'Factions'"
+          :status="item.status || 'To be verified'"
+        />
+      </div>
+
+      <div v-if="items?.length === 0" class="empty-state">
+        <span class="empty-icon">🈳</span>
+        <p>No entries found for this category yet.</p>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.zh {
-  font-size: 0.6em;
-  color: var(--c-text-3);
-  margin-left: 0.5rem;
-}
-
-.section-desc {
-  text-align: center;
-  margin-bottom: 4rem;
-  font-size: 1.2rem;
-}
-
-.archive-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 2rem;
-}
-
-.archive-card {
-  padding: 2rem;
-  border: 1px solid var(--c-border);
-  background: var(--c-bg);
-  text-decoration: none !important;
-  border-bottom: 1px solid var(--c-border) !important;
-  position: relative;
-  overflow: hidden;
-}
-
-.archive-card::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: var(--c-seal-red);
-  transform: scaleY(0);
-  transform-origin: center;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.archive-card:hover {
-  background: var(--c-bg-soft);
-}
-
-.archive-card:hover::before {
-  transform: scaleY(1);
-}
-
-.card-title {
-  font-family: var(--font-heading);
-  font-size: 1.4rem;
-  margin: 0 0 0.5rem 0;
-  color: var(--c-ink);
+.dossier-list {
   display: flex;
-  align-items: baseline;
-  gap: 1rem;
+  flex-direction: column;
+  border-top: 1px solid var(--c-border);
 }
 
-.card-zh {
-  font-size: 1.1rem;
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
   color: var(--c-text-3);
 }
 
-.card-status {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--c-seal-red);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin: 0;
-}
-
-.card-arrow {
-  position: absolute;
-  right: 2rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--c-text-3);
-  transition: all 0.3s ease;
-}
-
-.archive-card:hover .card-arrow {
-  color: var(--c-seal-red);
-  transform: translate(5px, -50%);
+.empty-icon {
+  font-size: 3rem;
+  opacity: 0.2;
+  display: block;
+  margin-bottom: 1rem;
 }
 </style>

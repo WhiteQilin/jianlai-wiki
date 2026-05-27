@@ -16,5 +16,7 @@
 }
 .site-main {
   flex-grow: 1;
+  /* Push content down to avoid clipping under fixed header */
+  margin-top: var(--header-height);
 }
 </style>
