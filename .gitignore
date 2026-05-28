@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+
+# Nuxt build output
+.nuxt/
+.output/
+dist/
+
+# Environment
+.env
+.env.*
+*.local
+
+# OS / editor
+.DS_Store
+Thumbs.db
+
+# AI tooling / local agents
+.gemini/
+.cline/
+.cursor/
+
+# Raw official/media archives - local only
+public/images/official/
+public/videos/all-mp4/
+public/videos/official/
+public/videos/raw/
+public/media/official/
+public/media/raw/
+
+# Ignore large videos by default
+*.mp4
+*.mov
+*.mkv
+*.avi
+*.webm
+
+# Allow only curated optimized videos if needed
+!public/videos/curated/
+!public/videos/curated/*.webm
+!public/videos/curated/*.mp4
+
+# Python/cache
+__pycache__/
+*.pyc
