@@ -16,36 +16,62 @@ useSeoMeta({
 </script>
 
 <template>
-  <div class="section-index">
-    <SectionHero 
-      titleEn="World" 
-      titleZh="天下图志" 
-      desc="Explore the vast geography of Jian Lai, spanning multiple worlds, continents, and hidden grotto-heavens." 
-    />
+  <div class="page-container">
+    <ScrollReveal animation="reveal-fade-up">
+      <SectionHero 
+        titleEn="The World" 
+        titleZh="天下图志" 
+        desc="Explore the vast realms, continents, and secret realms of Jian Lai."
+        bannerImage="/images/banners/world-banner.webp"
+        credit="Tencent Video / Jian Lai Animation"
+        :isOfficial="true"
+      />
+    </ScrollReveal>
     
     <div class="mdc-content" style="padding-top: 0">
-      <CategoryTabs 
-        :categories="['All', 'Continents', 'Grotto-Heavens', 'Blessed Lands']" 
-        v-model:active="activeCategory" 
-      />
+      <ScrollReveal animation="reveal-fade-up" delay="stagger-1">
+        <CategoryTabs 
+          :categories="['All', 'Continents', 'Grotto-Heavens', 'Blessed Lands']" 
+          v-model:active="activeCategory" 
+        />
+      </ScrollReveal>
 
       <div class="dossier-list">
-        <FeaturedDossier 
-          v-for="item in items" 
+        <ScrollReveal 
+          v-for="(item, index) in items" 
           :key="item.path"
-          :link="item.path"
-          :nameEn="item.title || 'Unknown'"
-          :nameZh="item.chinese || ''"
-          :desc="item.description || 'Entry pending detailed documentation.'"
-          :category="item.category || 'World'"
-          :status="item.status || 'To be verified'"
-        />
+          animation="reveal-fade-up"
+          :delay="(`stagger-${(index % 5) + 1}` as any)"
+        >
+          <FeaturedDossier 
+            :link="item.path"
+            :nameEn="item.title || 'Unknown'"
+            :nameZh="(item as any).chinese || ''"
+            :desc="item.description || 'Entry pending detailed documentation.'"
+            :category="(item as any).category || 'World'"
+            :status="(item as any).status || 'To be verified'"
+          />
+        </ScrollReveal>
       </div>
 
-      <div v-if="items?.length === 0" class="empty-state">
-        <span class="empty-icon">🈳</span>
-        <p>No entries found for this category yet.</p>
-      </div>
+      <ScrollReveal v-if="items?.length === 0" animation="reveal-fade-up" class="wip-notice">
+        <div class="wip-icon">卷</div>
+        <h3 class="wip-title">Records pending compilation</h3>
+        <p class="wip-text">The lore keepers have not yet inscribed entries for this category.</p>
+      </ScrollReveal>
+
+      <InkDivider type="brush" />
+
+      <ScrollReveal animation="reveal-fade-up">
+        <div class="related-sections">
+          <h3 class="related-title">Explore More</h3>
+          <div class="portal-grid">
+            <ArchivePortal link="/characters" titleZh="人物志" titleEn="Characters" bgChar="人" />
+            <ArchivePortal link="/factions" titleZh="宗门势力" titleEn="Factions" bgChar="宗" />
+            <ArchivePortal link="/timeline" titleZh="年表" titleEn="Timeline" bgChar="史" />
+          </div>
+        </div>
+      </ScrollReveal>
     </div>
   </div>
 </template>
@@ -57,16 +83,54 @@ useSeoMeta({
   border-top: 1px solid var(--c-border);
 }
 
-.empty-state {
+.wip-notice {
   text-align: center;
-  padding: 4rem 2rem;
-  color: var(--c-text-3);
+  padding: 6rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
 }
 
-.empty-icon {
-  font-size: 3rem;
-  opacity: 0.2;
-  display: block;
-  margin-bottom: 1rem;
+.wip-icon {
+  font-family: var(--font-heading);
+  font-size: 4rem;
+  color: var(--c-seal-red);
+  opacity: 0.15;
+  line-height: 1;
+}
+
+.wip-title {
+  font-family: var(--font-heading);
+  font-size: 1.8rem;
+  color: var(--c-ink);
+  margin: 0;
+  font-weight: 400;
+}
+
+.wip-text {
+  font-size: 1.1rem;
+  color: var(--c-text-2);
+  margin: 0;
+}
+
+.related-sections {
+  margin-top: 4rem;
+}
+
+.related-title {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  color: var(--c-ink);
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.portal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1px;
+  background: var(--c-border);
+  border: 1px solid var(--c-border);
 }
 </style>

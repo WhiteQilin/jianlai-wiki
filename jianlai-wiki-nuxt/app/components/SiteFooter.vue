@@ -32,7 +32,7 @@
 
       <div class="footer-bottom">
         <div class="footer-seal">印</div>
-        <p class="disclaimer">This is an unofficial, fan-made lore compendium. All rights to original characters, artwork, and story belong to their respective creators.</p>
+        <p class="disclaimer">Jian Lai Wiki is an unofficial fan-made encyclopedia. Jian Lai, characters, story materials, official artwork, animation materials, and related media belong to their respective rights holders.</p>
         <p class="copyright">&copy; {{ new Date().getFullYear() }} Jian Lai Wiki Contributors.</p>
       </div>
     </div>

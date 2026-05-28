@@ -220,6 +220,28 @@ onUnmounted(() => {
   transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
+.site-nav a::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('/images/textures/ink-wash-02.webp');
+  background-size: cover;
+  opacity: 0;
+  mix-blend-mode: multiply;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: -1;
+  border-radius: 4px;
+}
+
+.dark .site-nav a::before {
+  mix-blend-mode: screen;
+}
+
+.site-nav a:hover::before {
+  opacity: 0.05;
+}
+
 .site-nav a:hover .nav-zh, .site-nav a.router-link-active .nav-zh {
   color: var(--c-seal-red);
 }
@@ -244,13 +266,16 @@ onUnmounted(() => {
   color: var(--c-text-3);
   font-size: 0.85rem;
   cursor: text;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 5px rgba(0,0,0,0);
 }
 
 .search-placeholder:hover {
   border-color: var(--c-charcoal);
   color: var(--c-text-2);
   background: var(--c-bg-alt);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transform: translateY(-1px);
 }
 
 .mobile-menu-btn {

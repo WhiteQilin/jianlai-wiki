@@ -11,6 +11,7 @@ defineProps<{
 
 <template>
   <NuxtLink :to="link" class="dossier-item">
+    <div class="dossier-texture"></div>
     <div class="dossier-meta">
       <span class="category">{{ category }}</span>
       <span class="status">{{ status }}</span>
@@ -59,12 +60,35 @@ defineProps<{
   transform: scaleY(1);
 }
 
+.dossier-texture {
+  position: absolute;
+  inset: 0;
+  background-image: url('/images/textures/ink-wash-02.webp');
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  mix-blend-mode: multiply;
+  transition: opacity 0.5s ease;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.dark .dossier-texture {
+  mix-blend-mode: screen;
+}
+
+.dossier-item:hover .dossier-texture {
+  opacity: 0.03;
+}
+
 .dossier-meta {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   width: 120px;
   flex-shrink: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .category {
@@ -85,6 +109,8 @@ defineProps<{
 .dossier-content {
   flex-grow: 1;
   padding: 0 2rem;
+  position: relative;
+  z-index: 1;
 }
 
 .dossier-name {

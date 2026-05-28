@@ -2,6 +2,10 @@
 defineProps<{
   image?: string
   video?: string
+  alt?: string
+  caption?: string
+  credit?: string
+  isOfficial?: boolean
 }>()
 </script>
 
@@ -12,10 +16,16 @@ defineProps<{
       <video v-if="video" autoplay loop muted playsinline class="bg-video">
         <source :src="video" type="video/mp4" />
       </video>
-      <img v-else-if="image" :src="image" alt="" class="bg-image" />
+      <img v-else-if="image" :src="image" :alt="alt || ''" class="bg-image" />
       <div v-else class="bg-fallback animate-fade-in-up"></div>
       
       <div class="bg-overlay"></div>
+    </div>
+
+    <div v-if="credit || caption || isOfficial" class="media-attribution animate-fade-in-up" style="animation-delay: 1.2s;">
+      <span v-if="isOfficial" class="official-badge">Official Promotional Image</span>
+      <p v-if="caption" class="media-caption">{{ caption }}</p>
+      <p v-if="credit" class="media-credit">Credit: {{ credit }}</p>
     </div>
 
     <div class="hero-content">
@@ -68,6 +78,52 @@ defineProps<{
   position: absolute;
   inset: 0;
   background: linear-gradient(to bottom, transparent 0%, var(--c-bg) 90%);
+}
+
+.media-attribution {
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 2;
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.3rem;
+  pointer-events: none;
+}
+
+.official-badge {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: rgba(0, 0, 0, 0.4);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.2rem 0.5rem;
+  border-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 0.2rem;
+  backdrop-filter: blur(4px);
+}
+
+.media-caption {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.media-credit {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.dark .media-attribution p {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
 }
 
 .hero-content {

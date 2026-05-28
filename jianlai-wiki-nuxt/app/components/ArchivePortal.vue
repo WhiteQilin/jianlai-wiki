@@ -9,6 +9,7 @@ defineProps<{
 
 <template>
   <NuxtLink :to="link" class="portal-card hover-lift" :data-zh="bgChar">
+    <div class="portal-texture"></div>
     <span class="portal-zh">{{ titleZh }}</span>
     <div class="portal-bottom">
       <span class="portal-en">{{ titleEn }}</span>
@@ -18,6 +19,27 @@ defineProps<{
 </template>
 
 <style scoped>
+.portal-texture {
+  position: absolute;
+  inset: 0;
+  background-image: url('/images/textures/ink-wash-01.webp');
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  mix-blend-mode: multiply;
+  transition: opacity 0.5s ease;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.dark .portal-texture {
+  mix-blend-mode: screen;
+}
+
+.portal-card:hover .portal-texture {
+  opacity: 0.05;
+}
+
 .portal-card {
   background: var(--c-bg);
   padding: 3rem 2rem;

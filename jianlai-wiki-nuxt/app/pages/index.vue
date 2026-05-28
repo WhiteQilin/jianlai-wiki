@@ -1,11 +1,55 @@
 <script setup lang="ts">
-// Homepage components
+const spotlightItems = [
+  {
+    id: 'chen-pingan',
+    nameEn: "Chen Ping'an",
+    nameZh: '陈平安',
+    desc: 'A young man from Lizhu Blessed Land who walks his own path with a sword, seeking truths and delivering punches.',
+    category: 'Character',
+    status: 'Main Protagonist',
+    link: '/characters/chen-pingan',
+    image: '/images/characters/chen-pingan.webp' // Placeholder, will fallback if missing
+  },
+  {
+    id: 'ning-yao',
+    nameEn: 'Ning Yao',
+    nameZh: '宁姚',
+    desc: 'The peerless sword immortal from the Sword Qi Great Wall. She only believes in the sword in her hand.',
+    category: 'Character',
+    status: 'Main Heroine',
+    link: '/characters/ning-yao'
+  },
+  {
+    id: 'qi-jingchun',
+    nameEn: 'Qi Jingchun',
+    nameZh: '齐静春',
+    desc: 'The Spring Breeze. A Confucian scholar who chose to hold up the falling sky for the common people.',
+    category: 'Lore',
+    status: 'Legend',
+    link: '/characters/qi-jingchun'
+  },
+  {
+    id: 'haoran',
+    nameEn: 'Haoran Tianxia',
+    nameZh: '浩然天下',
+    desc: 'The Vast and Mighty World, where Confucianism holds sway and scholars guide the mortal dynasties.',
+    category: 'World',
+    status: 'Continent',
+    link: '/world/sample'
+  }
+]
 </script>
 
 <template>
   <div class="home-archive">
-    <HeroMedia>
+    <HeroMedia
+      image="/images/banners/home-hero.webp"
+      alt="Jian Lai Official Animation Key Visual"
+      credit="Tencent Video / Jian Lai Animation"
+      :isOfficial="true"
+    >
       <template #background>
+        <div class="hero-mist animate-drift"></div>
         <div class="hero-calligraphy-wrapper">
           <div class="hero-calligraphy">剑</div>
         </div>
@@ -22,102 +66,59 @@
       </p>
 
       <div class="hero-actions animate-fade-in-up" style="animation-delay: 0.8s;">
-        <a href="#archive" class="btn-primary hover-lift">Enter the Archive</a>
-        <NuxtLink to="/characters" class="btn-secondary hover-lift">Browse Characters</NuxtLink>
+        <NuxtLink to="/characters" class="btn-primary hover-lift">Browse Characters</NuxtLink>
+        <NuxtLink to="/world" class="btn-secondary hover-lift">Explore World</NuxtLink>
+        <NuxtLink to="/timeline" class="btn-secondary hover-lift">View Timeline</NuxtLink>
       </div>
 
-      <template #footer>
-        <div class="hero-meta-row animate-fade-in-up" style="animation-delay: 1s;">
-          <div class="meta-item"><span>Characters</span> Hundreds</div>
-          <div class="meta-item"><span>Worlds</span> Boundless</div>
-          <div class="meta-item"><span>Cultivation</span> 14 Realms</div>
-          <div class="meta-item"><span>Status</span> In Progress</div>
-        </div>
-      </template>
     </HeroMedia>
 
-    <div class="dashboard-section animate-fade-in-up" style="animation-delay: 1.2s;">
-      <div class="dashboard-grid">
-        <NuxtLink to="/characters" class="dashboard-card hover-lift">
-          <h4>Characters</h4>
-          <span class="stat">Profiles</span>
-        </NuxtLink>
-        <NuxtLink to="/world" class="dashboard-card hover-lift">
-          <h4>Worlds</h4>
-          <span class="stat">Atlas</span>
-        </NuxtLink>
-        <NuxtLink to="/cultivation" class="dashboard-card hover-lift">
-          <h4>Cultivation</h4>
-          <span class="stat">Realms</span>
-        </NuxtLink>
-        <NuxtLink to="/factions" class="dashboard-card hover-lift">
-          <h4>Factions</h4>
-          <span class="stat">Sects</span>
-        </NuxtLink>
+    <div class="stats-band animate-fade-in-up" style="animation-delay: 1.2s;">
+      <div class="stats-inner">
+        <div class="stat-item">
+          <span class="stat-num">14</span>
+          <span class="stat-label">Realms</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">100+</span>
+          <span class="stat-label">Characters</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">∞</span>
+          <span class="stat-label">Worlds</span>
+        </div>
       </div>
     </div>
 
     <div class="main-content" id="archive">
-      <div class="portal-grid">
-        <ArchivePortal link="/characters" titleZh="人物志" titleEn="Characters" bgChar="人" />
-        <ArchivePortal link="/world" titleZh="天下图志" titleEn="World" bgChar="地" />
-        <ArchivePortal link="/cultivation" titleZh="山上修行" titleEn="Cultivation" bgChar="修" />
-        <ArchivePortal link="/swordsmanship" titleZh="剑术与神通" titleEn="Swordsmanship" bgChar="剑" />
-        <ArchivePortal link="/factions" titleZh="宗门势力" titleEn="Factions" bgChar="宗" />
-        <ArchivePortal link="/artifacts" titleZh="法宝器物" titleEn="Artifacts" bgChar="宝" />
-        <ArchivePortal link="/timeline" titleZh="年表" titleEn="Timeline" bgChar="史" />
-        <ArchivePortal link="/glossary" titleZh="术语典籍" titleEn="Glossary" bgChar="典" />
-      </div>
-
-      <div class="editorial-section">
-        <div class="editorial-header">
-          <h3 class="section-title">Featured Characters</h3>
-          <div class="title-line"></div>
+      <ScrollReveal animation="reveal-fade-up">
+        <div class="portal-grid">
+          <ArchivePortal link="/characters" titleZh="人物志" titleEn="Characters" bgChar="人" />
+          <ArchivePortal link="/world" titleZh="天下图志" titleEn="World" bgChar="地" />
+          <ArchivePortal link="/cultivation" titleZh="山上修行" titleEn="Cultivation" bgChar="修" />
+          <ArchivePortal link="/swordsmanship" titleZh="剑术与神通" titleEn="Swordsmanship" bgChar="剑" />
+          <ArchivePortal link="/factions" titleZh="宗门势力" titleEn="Factions" bgChar="宗" />
+          <ArchivePortal link="/artifacts" titleZh="法宝器物" titleEn="Artifacts" bgChar="宝" />
+          <ArchivePortal link="/timeline" titleZh="年表" titleEn="Timeline" bgChar="史" />
+          <ArchivePortal link="/glossary" titleZh="术语典籍" titleEn="Glossary" bgChar="典" />
         </div>
+      </ScrollReveal>
 
-        <div class="dossier-list">
-          <FeaturedDossier 
-            link="/characters/chen-pingan" 
-            nameEn="Chen Ping'an" 
-            nameZh="陈平安" 
-            desc="The protagonist from Lizhu Blessed Land. A young man who walks his own path with a sword." 
-            category="Character" 
-            status="To be verified" 
-          />
-          <FeaturedDossier 
-            link="/characters/ning-yao" 
-            nameEn="Ning Yao" 
-            nameZh="宁姚" 
-            desc="The peerless sword immortal of the Sword Qi Great Wall." 
-            category="Character" 
-            status="To be verified" 
-          />
-          <FeaturedDossier 
-            link="/characters/qi-jingchun" 
-            nameEn="Qi Jingchun" 
-            nameZh="齐静春" 
-            desc="The Spring Breeze, a scholar of the highest order." 
-            category="Character" 
-            status="To be verified" 
-          />
-        </div>
+      <InkDivider type="mist" />
 
-        <div class="editorial-header" style="margin-top: 6rem;">
-          <h3 class="section-title">Featured Lore</h3>
-          <div class="title-line"></div>
-        </div>
+      <FeaturedSpotlight 
+        title="Featured Lore"
+        :items="spotlightItems" 
+      />
 
-        <div class="dossier-list">
-          <FeaturedDossier 
-            link="/world/sample" 
-            nameEn="Haoran Tianxia" 
-            nameZh="浩然天下" 
-            desc="The Great World of Haoran, home to Confucian scholars and mortal dynasties." 
-            category="World" 
-            status="To be verified" 
-          />
-        </div>
-      </div>
+      <InkDivider type="brush" />
+
+      <ScrollReveal animation="reveal-fade-up" class="wip-notice">
+        <div class="wip-icon">卷</div>
+        <h3 class="wip-title">The Archives are Expanding</h3>
+        <p class="wip-text">Records of the Jian Lai universe are still being compiled. Many legends remain untold.</p>
+        <a href="https://github.com/WhiteQilin/jianlai-wiki" target="_blank" class="btn-secondary hover-lift">Contribute on GitHub</a>
+      </ScrollReveal>
     </div>
   </div>
 </template>
@@ -128,6 +129,18 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.hero-mist {
+  position: absolute;
+  inset: 0;
+  background-image: url('/images/textures/ink-wash-02.webp');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.08;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .hero-calligraphy-wrapper {
@@ -260,70 +273,58 @@
   background-color: var(--c-bg-soft);
 }
 
-.hero-meta-row {
-  display: flex;
-  justify-content: center;
-  gap: 4rem;
-  padding: 1.5rem 2rem;
-  border-top: 1px solid var(--c-border);
-  background: var(--c-bg);
+.stats-band {
   width: 100%;
+  background-color: var(--c-charcoal);
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--c-border);
 }
 
-.meta-item {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: var(--c-text-1);
+.stats-band::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('/images/textures/ink-wash-01.webp');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.15;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.stats-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+  display: flex;
+  justify-content: space-around;
+  position: relative;
+  z-index: 1;
+}
+
+.stat-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.5rem;
+  color: var(--c-paper);
 }
 
-.meta-item span {
-  color: var(--c-text-3);
+.stat-num {
+  font-family: var(--font-heading);
+  font-size: 2.5rem;
+  line-height: 1;
+  color: var(--c-paper);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.stat-label {
+  font-family: var(--font-mono);
   font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-.dashboard-section {
-  width: 100%;
-  background: var(--c-bg-soft);
-  border-bottom: 1px solid var(--c-border);
-  padding: 2rem;
-}
-
-.dashboard-grid {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 2rem;
-}
-
-.dashboard-card {
-  text-align: center;
-  padding: 2rem 1.5rem;
-  background: var(--c-bg);
-  border: 1px solid var(--c-border);
-  text-decoration: none;
-  display: block;
-}
-
-.dashboard-card h4 {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  color: var(--c-text-3);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin: 0 0 0.5rem 0;
-}
-
-.dashboard-card .stat {
-  font-family: var(--font-heading);
-  font-size: 1.8rem;
-  color: var(--c-ink);
+  letter-spacing: 0.2em;
+  color: rgba(255,255,255,0.6);
 }
 
 .main-content {
@@ -338,39 +339,40 @@
   gap: 1px;
   background: var(--c-border);
   border: 1px solid var(--c-border);
-  margin-bottom: 6rem;
+  margin-bottom: 2rem;
 }
 
-.editorial-section {
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-.editorial-header {
+.wip-notice {
+  text-align: center;
+  padding: 6rem 2rem;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 2rem;
-  margin-bottom: 3rem;
+  gap: 1.5rem;
 }
 
-.section-title {
+.wip-icon {
+  font-family: var(--font-heading);
+  font-size: 4rem;
+  color: var(--c-seal-red);
+  opacity: 0.15;
+  line-height: 1;
+}
+
+.wip-title {
   font-family: var(--font-heading);
   font-size: 1.8rem;
   color: var(--c-ink);
-  font-weight: 400;
   margin: 0;
-  white-space: nowrap;
+  font-weight: 400;
 }
 
-.title-line {
-  flex-grow: 1;
-  height: 1px;
-  background: var(--c-border);
-}
-
-.dossier-list {
-  display: flex;
-  flex-direction: column;
+.wip-text {
+  font-size: 1.1rem;
+  color: var(--c-text-2);
+  margin: 0 0 1rem 0;
+  max-width: 500px;
+  line-height: 1.6;
 }
 
 @media (max-width: 768px) {
