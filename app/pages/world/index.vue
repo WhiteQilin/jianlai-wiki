@@ -3,6 +3,8 @@ import { ref } from 'vue'
 
 const activeCategory = ref('All')
 
+const meta = useSectionMeta('world')
+
 const { data: items } = await useAsyncData('world-list', () => {
   return queryCollection('content')
     .where('path', 'LIKE', '/world/%')
@@ -32,7 +34,7 @@ useSeoMeta({
     <div class="mdc-content" style="padding-top: 0">
       <ScrollReveal animation="reveal-fade-up" delay="stagger-1">
         <CategoryTabs 
-          :categories="['All', 'Continents', 'Grotto-Heavens', 'Blessed Lands']" 
+          :categories="meta.categories"
           v-model:active="activeCategory" 
         />
       </ScrollReveal>

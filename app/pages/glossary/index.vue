@@ -3,6 +3,8 @@ import { ref } from 'vue'
 
 const activeCategory = ref('All')
 
+const meta = useSectionMeta('glossary')
+
 const { data: items } = await useAsyncData('glossary-list', () => {
   return queryCollection('content')
     .where('path', 'LIKE', '/glossary/%')
@@ -16,7 +18,7 @@ useSeoMeta({
 </script>
 
 <template>
-  <div class="section-index">
+  <div class="page-container">
     <SectionHero 
       titleEn="Glossary" 
       titleZh="术语典籍" 
@@ -26,7 +28,7 @@ useSeoMeta({
     <div class="mdc-content" style="padding-top: 0">
       <ScrollReveal animation="reveal-fade-up" delay="stagger-1">
         <CategoryTabs 
-          :categories="['All', 'Concepts', 'Titles', 'Weapons', 'Places']" 
+          :categories="meta.categories"
           v-model:active="activeCategory" 
         />
       </ScrollReveal>

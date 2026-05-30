@@ -3,6 +3,8 @@ import { ref } from 'vue'
 
 const activeCategory = ref('All')
 
+const meta = useSectionMeta('timeline')
+
 const { data: items } = await useAsyncData('timeline-list', () => {
   return queryCollection('content')
     .where('path', 'LIKE', '/timeline/%')
@@ -16,7 +18,7 @@ useSeoMeta({
 </script>
 
 <template>
-  <div class="section-index">
+  <div class="page-container">
     <SectionHero 
       titleEn="Timeline" 
       titleZh="年表" 
@@ -25,9 +27,9 @@ useSeoMeta({
     
     <div class="mdc-content" style="padding-top: 0">
       <ScrollReveal animation="reveal-fade-up" delay="stagger-1">
-        <CategoryTabs 
-          :categories="['All', 'Ancient Era', 'Modern Era']" 
-          v-model:active="activeCategory" 
+        <CategoryTabs
+          :categories="meta.categories"
+          v-model:active="activeCategory"
         />
       </ScrollReveal>
 

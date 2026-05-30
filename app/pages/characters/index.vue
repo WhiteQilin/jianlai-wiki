@@ -3,6 +3,8 @@ import { ref } from 'vue'
 
 const activeCategory = ref('All')
 
+const meta = useSectionMeta('characters')
+
 const { data: items } = await useAsyncData('characters-list', () => {
   return queryCollection('content')
     .where('path', 'LIKE', '/characters/%')
@@ -32,7 +34,7 @@ useSeoMeta({
     <div class="mdc-content" style="padding-top: 0">
       <ScrollReveal animation="reveal-fade-up" delay="stagger-1">
         <CategoryTabs 
-          :categories="['All', 'Major', 'Minor', 'Gods']" 
+          :categories="meta.categories"
           v-model:active="activeCategory" 
         />
       </ScrollReveal>
