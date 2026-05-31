@@ -1,37 +1,77 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 
 const isMobileMenuOpen = ref(false)
 const isScrolled = ref(false)
+const isMoreOpen = ref(false)
+const moreWrapper = ref<HTMLElement | null>(null)
 const route = useRoute()
+
+// Secondary sections surfaced via the "More" dropdown (titles intentionally excluded).
+const moreLinks = [
+  { to: '/rankings', zh: '榜单', en: 'Rankings' },
+  { to: '/teachings', zh: '三教', en: 'Teachings' },
+  { to: '/pantheon', zh: '神灵', en: 'Pantheon' },
+  { to: '/glossary', zh: '术语', en: 'Glossary' },
+]
+
+const isMoreActive = computed(() =>
+  moreLinks.some((l) => route.path === l.to || route.path.startsWith(`${l.to}/`)),
+)
 
 const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
+}
+
+const toggleMore = () => {
+  isMoreOpen.value = !isMoreOpen.value
+}
+
+const closeMore = () => {
+  isMoreOpen.value = false
 }
 
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 20
 }
 
+const handleClickOutside = (e: MouseEvent) => {
+  if (!isMoreOpen.value) return
+  if (moreWrapper.value && !moreWrapper.value.contains(e.target as Node)) {
+    isMoreOpen.value = false
+  }
+}
+
+const handleKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'Escape') isMoreOpen.value = false
+}
+
+// Close the dropdown whenever navigation occurs.
+watch(() => route.path, () => {
+  isMoreOpen.value = false
+})
+
 onMounted(() => {
   window.addEventListener('scroll', handleScroll)
+  document.addEventListener('click', handleClickOutside)
+  document.addEventListener('keydown', handleKeydown)
   handleScroll()
 })
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
+  document.removeEventListener('click', handleClickOutside)
+  document.removeEventListener('keydown', handleKeydown)
 })
 </script>
 
 <template>
   <header class="site-header" :class="{ 'is-scrolled': isScrolled }">
+    <div class="header-bg-texture"></div>
     <div class="header-container">
       <NuxtLink to="/" class="site-logo">
-        <div class="logo-text">
-          <span class="logo-zh">剑来</span>
-          <span class="logo-seal">印</span>
-        </div>
+        <img src="/images/logos/JianLaiLogo.png" alt="Jian Lai" class="logo-mark" />
         <span class="logo-en">JIAN LAI<br>WIKI</span>
       </NuxtLink>
       
@@ -44,6 +84,36 @@ onUnmounted(() => {
           <NuxtLink to="/factions"><span class="nav-zh">势力</span><span class="nav-en">Factions</span></NuxtLink>
           <NuxtLink to="/artifacts"><span class="nav-zh">法宝</span><span class="nav-en">Artifacts</span></NuxtLink>
           <NuxtLink to="/timeline"><span class="nav-zh">年表</span><span class="nav-en">Timeline</span></NuxtLink>
+
+          <div
+            ref="moreWrapper"
+            class="nav-more"
+            :class="{ 'is-open': isMoreOpen }"
+          >
+            <button
+              type="button"
+              class="nav-more-trigger"
+              :class="{ 'is-active': isMoreActive }"
+              :aria-expanded="isMoreOpen"
+              aria-haspopup="true"
+              @click="toggleMore"
+            >
+              <span class="nav-zh">更多</span><span class="nav-en">More</span>
+            </button>
+
+            <div class="nav-more-panel" :class="{ 'is-open': isMoreOpen }">
+              <NuxtLink
+                v-for="link in moreLinks"
+                :key="link.to"
+                :to="link.to"
+                class="nav-more-item"
+                @click="closeMore"
+              >
+                <span class="more-zh">{{ link.zh }}</span>
+                <span class="more-en">{{ link.en }}</span>
+              </NuxtLink>
+            </div>
+          </div>
         </nav>
         
         <div class="search-placeholder">
@@ -82,7 +152,21 @@ onUnmounted(() => {
         <NuxtLink to="/timeline" class="mobile-nav-item" style="--delay: 0.4s">
           <span class="m-zh">年表</span><span class="m-en">Timeline</span>
         </NuxtLink>
-        <NuxtLink to="/glossary" class="mobile-nav-item" style="--delay: 0.45s">
+
+        <div class="mobile-nav-divider" style="--delay: 0.45s">
+          <span class="divider-zh">更多</span><span class="divider-en">More</span>
+        </div>
+
+        <NuxtLink to="/rankings" class="mobile-nav-item" style="--delay: 0.5s">
+          <span class="m-zh">榜单</span><span class="m-en">Rankings</span>
+        </NuxtLink>
+        <NuxtLink to="/teachings" class="mobile-nav-item" style="--delay: 0.55s">
+          <span class="m-zh">三教</span><span class="m-en">Teachings</span>
+        </NuxtLink>
+        <NuxtLink to="/pantheon" class="mobile-nav-item" style="--delay: 0.6s">
+          <span class="m-zh">神灵</span><span class="m-en">Pantheon</span>
+        </NuxtLink>
+        <NuxtLink to="/glossary" class="mobile-nav-item" style="--delay: 0.65s">
           <span class="m-zh">术语</span><span class="m-en">Glossary</span>
         </NuxtLink>
       </nav>
@@ -104,12 +188,33 @@ onUnmounted(() => {
   border-bottom: 1px solid transparent;
 }
 
+.header-bg-texture {
+  position: absolute;
+  inset: 0;
+  background-image: url('/images/header/site-header.jpeg');
+  background-size: cover;
+  background-position: center 25%;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: -1;
+  pointer-events: none;
+  filter: grayscale(80%) brightness(1.2) contrast(0.8);
+}
+
+.dark .header-bg-texture {
+  filter: grayscale(80%) brightness(0.4) contrast(0.9);
+}
+
 .site-header.is-scrolled {
-  background-color: rgba(249, 248, 246, 0.85);
+  background-color: rgba(249, 248, 246, 0.90);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--c-border);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+}
+
+.site-header.is-scrolled .header-bg-texture {
+  opacity: 0.15;
 }
 
 .dark .site-header.is-scrolled {
@@ -134,44 +239,17 @@ onUnmounted(() => {
   position: relative;
 }
 
-.logo-text {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.logo-mark {
+  height: 44px;
+  width: auto;
+  object-fit: contain;
+  transition: transform 0.3s ease, filter 0.3s ease;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.18));
 }
 
-.logo-zh {
-  font-family: var(--font-heading);
-  font-size: 2.2rem;
-  font-weight: 500;
-  color: var(--c-charcoal);
-  letter-spacing: 0.05em;
-  line-height: 1;
-  transition: color 0.3s ease;
-}
-
-.site-logo:hover .logo-zh {
-  color: var(--c-seal-red);
-}
-
-.logo-seal {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border: 1px solid var(--c-seal-red);
-  color: var(--c-seal-red);
-  font-family: var(--font-heading);
-  font-size: 0.8rem;
-  border-radius: 2px;
-  line-height: 1;
-  transition: all 0.3s ease;
-}
-
-.site-logo:hover .logo-seal {
-  background-color: var(--c-seal-red);
-  color: var(--c-paper);
+.site-logo:hover .logo-mark {
+  transform: translateY(-1px);
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.24));
 }
 
 .logo-en {
@@ -183,6 +261,21 @@ onUnmounted(() => {
   line-height: 1.4;
   border-left: 1px solid var(--c-divider);
   padding-left: 1.2rem;
+}
+
+@media (max-width: 640px) {
+  .site-logo {
+    gap: 0.8rem;
+  }
+
+  .logo-mark {
+    height: 36px;
+  }
+
+  .logo-en {
+    font-size: 0.65rem;
+    padding-left: 0.8rem;
+  }
 }
 
 .desktop-nav {
@@ -207,11 +300,12 @@ onUnmounted(() => {
 }
 
 .nav-zh {
-  font-family: var(--font-heading);
-  font-size: 1rem;
+  font-family: var(--font-zh-display);
+  font-size: 1.15rem;
   color: var(--c-ink);
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.2;
+  letter-spacing: 0.08em;
   transition: color 0.3s ease;
 }
 
@@ -271,6 +365,163 @@ onUnmounted(() => {
 .site-nav a:hover::after, .site-nav a.router-link-active::after {
   transform: scaleX(1);
   transform-origin: left;
+}
+
+/* --- "More" dropdown (desktop) --- */
+.nav-more {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+}
+
+.nav-more-trigger {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  background: none;
+  border: none;
+  margin: 0;
+  padding: 0.5rem 0;
+  cursor: pointer;
+  position: relative;
+  font: inherit;
+  transition: all 0.3s ease;
+}
+
+.nav-more-trigger::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--c-seal-red);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.nav-more:hover .nav-more-trigger .nav-zh,
+.nav-more-trigger.is-active .nav-zh {
+  color: var(--c-seal-red);
+}
+
+.nav-more:hover .nav-more-trigger .nav-en,
+.nav-more-trigger.is-active .nav-en {
+  color: var(--c-ink);
+}
+
+.nav-more.is-open .nav-more-trigger::after,
+.nav-more-trigger.is-active::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Hover-open on devices with a hover-capable pointer (desktop) */
+@media (hover: hover) {
+  .nav-more:hover .nav-more-trigger::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+}
+
+.nav-more-panel {
+  position: absolute;
+  top: calc(100% + 0.75rem);
+  right: 0;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  padding: 0.6rem;
+  background: rgba(249, 248, 246, 0.97);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.10);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0.3s;
+  z-index: 1001;
+}
+
+.nav-more-panel::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  height: 0.75rem;
+}
+
+.dark .nav-more-panel {
+  background: rgba(20, 21, 22, 0.97);
+}
+
+.nav-more-panel.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+@media (hover: hover) {
+  .nav-more:hover .nav-more-panel {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+}
+
+.nav-more-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.8rem;
+  padding: 0.6rem 0.8rem;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background 0.3s ease, padding 0.3s ease;
+}
+
+.nav-more-item:hover {
+  background: var(--c-seal-red-soft);
+}
+
+.more-zh {
+  font-family: var(--font-zh-display);
+  font-size: 1rem;
+  color: var(--c-ink);
+  letter-spacing: 0.06em;
+  transition: color 0.3s ease;
+}
+
+.more-en {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--c-text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: color 0.3s ease;
+}
+
+.nav-more-item:hover .more-zh,
+.nav-more-item.router-link-active .more-zh {
+  color: var(--c-seal-red);
+}
+
+.nav-more-item.router-link-active .more-en {
+  color: var(--c-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-more-panel {
+    transition: opacity 0.15s ease, visibility 0.15s;
+    transform: none;
+  }
+  .nav-more-panel.is-open {
+    transform: none;
+  }
 }
 
 .search-placeholder {
@@ -412,6 +663,37 @@ onUnmounted(() => {
 
   .mobile-nav-item:active .m-zh {
     color: var(--c-seal-red);
+  }
+
+  .mobile-nav-divider {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 1.5rem 0 0.4rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .mobile-nav-wrapper.is-open .mobile-nav-divider {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: var(--delay);
+  }
+
+  .divider-zh {
+    font-family: var(--font-zh-display);
+    font-size: 1rem;
+    color: var(--c-seal-red);
+    letter-spacing: 0.1em;
+  }
+
+  .divider-en {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--c-text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
   }
 
   .mobile-nav-seal {

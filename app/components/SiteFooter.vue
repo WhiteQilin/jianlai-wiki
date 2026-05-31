@@ -3,7 +3,10 @@
     <div class="footer-container">
       <div class="footer-top">
         <div class="footer-brand">
-          <span class="footer-logo">剑来 <span>Jian Lai Wiki</span></span>
+          <div class="footer-logo">
+            <img src="/images/logos/JianLaiLogo.png" alt="Jian Lai" class="footer-logo-mark" />
+            <span class="footer-logo-en">Jian Lai Wiki</span>
+          </div>
           <p class="footer-desc">A premium, fan-made encyclopedia dedicated to the world of Sword, Come! by Feng Huo Xi Zhu Hou.</p>
         </div>
         
@@ -21,6 +24,12 @@
             <NuxtLink to="/artifacts">Artifacts</NuxtLink>
             <NuxtLink to="/timeline">Timeline</NuxtLink>
             <NuxtLink to="/glossary">Glossary</NuxtLink>
+          </div>
+          <div class="link-group">
+            <h4>Records</h4>
+            <NuxtLink to="/rankings">Rankings</NuxtLink>
+            <NuxtLink to="/teachings">Teachings</NuxtLink>
+            <NuxtLink to="/pantheon">Pantheon</NuxtLink>
           </div>
           <div class="link-group">
             <h4>Meta</h4>
@@ -68,16 +77,20 @@
 }
 
 .footer-logo {
-  font-family: var(--font-heading);
-  font-size: 2.2rem;
-  color: var(--c-charcoal);
   display: flex;
-  align-items: baseline;
-  gap: 1rem;
+  align-items: center;
+  gap: 0.9rem;
   margin-bottom: 1rem;
 }
 
-.footer-logo span {
+.footer-logo-mark {
+  height: 54px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.16));
+}
+
+.footer-logo-en {
   font-family: var(--font-mono);
   font-size: 0.9rem;
   color: var(--c-text-3);
