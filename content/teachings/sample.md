@@ -12,7 +12,14 @@ description: Sample teaching scaffold demonstrating the teaching entry structure
 teachingType: Teaching
 keyFigures: []
 relatedFactions: []
-tags: []
+tags:
+  - teaching
+  - school
+  - philosophy
+  - confucian
+  - buddhist
+  - daoist
+  - sample
 related: []
 firstAppearance: ""
 sourceNotes: "Sample scaffold pending detailed verification."

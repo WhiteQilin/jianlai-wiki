@@ -10,7 +10,12 @@ importance: minor
 verificationStatus: to-be-verified
 description: Sample ranking scaffold demonstrating the ranking entry structure.
 listType: Named-List
-tags: []
+tags:
+  - ranking
+  - tier-list
+  - leaderboard
+  - named-list
+  - sample
 related: []
 firstAppearance: ""
 sourceNotes: "Sample scaffold pending detailed verification."

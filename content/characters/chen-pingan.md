@@ -12,6 +12,13 @@ seal: 隐
 description: A young man from Lizhu Blessed Land who walks his own path with a sword, seeking truths and delivering punches.
 affiliations:
   - /factions/sample
+tags:
+  - protagonist
+  - swordsman
+  - straw-sandals
+  - Lizhu
+  - Muddy Bottle Alley
+  - mud loach
 ---
 
 ## Overview

@@ -12,7 +12,13 @@ description: Sample pantheon scaffold demonstrating the god/demon/spirit entry s
 beingType: God
 domain: ""
 territory: ""
-tags: []
+tags:
+  - god
+  - deity
+  - spirit
+  - demon
+  - mountain-water-deity
+  - sample
 related: []
 firstAppearance: ""
 sourceNotes: "Sample scaffold pending detailed verification."

@@ -10,6 +10,13 @@ origin: Confucian Temple
 realm: To be verified
 seal: 儒
 description: The Spring Breeze. A Confucian scholar who chose to hold up the falling sky for the common people.
+tags:
+  - Confucian
+  - scholar
+  - Spring Breeze
+  - sage
+  - Lizhu
+  - mentor
 ---
 
 ## Overview

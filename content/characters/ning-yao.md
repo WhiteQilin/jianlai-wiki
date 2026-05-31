@@ -10,6 +10,12 @@ origin: Sword Qi Great Wall
 realm: To be verified
 seal: 剑
 description: A peerless sword immortal from the Sword Qi Great Wall. She only believes in the sword in her hand.
+tags:
+  - sword immortal
+  - heroine
+  - Dao Companion
+  - Sword Qi Great Wall
+  - prodigy
 ---
 
 ## Overview
