@@ -1,6 +1,6 @@
 ---
 title: Sample Factions Entry
-category: Factions
+category: Sect
 status: To be verified
 ---
 

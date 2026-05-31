@@ -1,6 +1,6 @@
 ---
 title: Sample Cultivation Entry
-category: Cultivation
+category: Realm
 status: To be verified
 ---
 

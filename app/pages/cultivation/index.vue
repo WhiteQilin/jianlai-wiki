@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const activeCategory = ref('All')
 
@@ -11,6 +11,10 @@ const { data: items } = await useAsyncData('cultivation-list', () => {
     .order('title', 'ASC')
     .all()
 })
+
+const filteredItems = computed(() =>
+  (items.value ?? []).filter((i) => matchesCategory((i as any).category, activeCategory.value)),
+)
 
 useSeoMeta({
   title: 'Cultivation | Jian Lai Wiki'
@@ -48,9 +52,9 @@ useSeoMeta({
         ]" />
       </ScrollReveal>
 
-      <DossierGrid v-if="items && items.length > 0">
-        <ScrollReveal 
-          v-for="(item, index) in items" 
+      <DossierGrid v-if="filteredItems.length > 0">
+        <ScrollReveal
+          v-for="(item, index) in filteredItems"
           :key="item.path"
           animation="reveal-fade-up"
           :delay="(`stagger-${(index % 5) + 1}` as any)"

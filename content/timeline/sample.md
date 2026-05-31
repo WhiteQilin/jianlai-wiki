@@ -1,6 +1,6 @@
 ---
 title: Sample Timeline Entry
-category: Timeline
+category: Event
 status: To be verified
 ---
 

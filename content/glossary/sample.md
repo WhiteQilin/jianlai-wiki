@@ -1,6 +1,6 @@
 ---
 title: Sample Glossary Entry
-category: Glossary
+category: Term
 status: To be verified
 ---
 

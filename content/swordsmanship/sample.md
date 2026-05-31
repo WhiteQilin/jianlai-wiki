@@ -1,6 +1,6 @@
 ---
 title: Sample Swordsmanship Entry
-category: Swordsmanship
+category: Technique
 status: To be verified
 ---
 

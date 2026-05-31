@@ -1,6 +1,6 @@
 ---
 title: Sample Artifacts Entry
-category: Artifacts
+category: Weapon
 status: To be verified
 ---
 

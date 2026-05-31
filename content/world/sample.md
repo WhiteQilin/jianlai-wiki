@@ -1,6 +1,6 @@
 ---
 title: Sample World Entry
-category: World
+category: Continent
 status: To be verified
 ---
 
