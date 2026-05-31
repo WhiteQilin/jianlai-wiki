@@ -68,4 +68,22 @@ export const SECTION_META: Record<string, RawSectionMeta> = {
     description: 'Key terms, concepts, and phrases from the world of Jian Lai.',
     categories: ['Term', 'Concept', 'Phrase'],
   },
+  rankings: {
+    title: 'Rankings & Lists',
+    chinese: '榜单',
+    description: 'Tier lists, realm ladders, and the great named lists of the Jian Lai world.',
+    categories: ['Tier-List', 'Realm-Ladder', 'Named-List'],
+  },
+  teachings: {
+    title: 'Three Teachings & Hundred Schools',
+    chinese: '三教百家',
+    description: 'The Confucian, Buddhist, and Daoist teachings alongside the Hundred Schools of thought.',
+    categories: ['Teaching', 'School'],
+  },
+  pantheon: {
+    title: 'Pantheon',
+    chinese: '神灵谱',
+    description: 'The gods, demons, spirits, and mountain-water deities of the Jian Lai world.',
+    categories: ['God', 'Demon', 'Spirit', 'Mountain-Water-Deity'],
+  },
 }
