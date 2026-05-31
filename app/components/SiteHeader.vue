@@ -8,6 +8,8 @@ const isMoreOpen = ref(false)
 const moreWrapper = ref<HTMLElement | null>(null)
 const route = useRoute()
 
+const { open: openSearch, toggle: toggleSearch, close: closeSearch, isOpen: isSearchOpen } = useSearchState()
+
 // Secondary sections surfaced via the "More" dropdown (titles intentionally excluded).
 const moreLinks = [
   { to: '/rankings', zh: '榜单', en: 'Rankings' },
@@ -44,7 +46,28 @@ const handleClickOutside = (e: MouseEvent) => {
 }
 
 const handleKeydown = (e: KeyboardEvent) => {
-  if (e.key === 'Escape') isMoreOpen.value = false
+  if (e.key === 'Escape') {
+    isMoreOpen.value = false
+    if (isSearchOpen.value) closeSearch()
+  }
+
+  // Cmd/Ctrl-K toggles search from anywhere.
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault()
+    toggleSearch()
+    return
+  }
+
+  // "/" opens search unless the user is typing in a field.
+  if (e.key === '/' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+    const el = e.target as HTMLElement | null
+    const tag = el?.tagName
+    const typing = tag === 'INPUT' || tag === 'TEXTAREA' || el?.isContentEditable
+    if (!typing) {
+      e.preventDefault()
+      openSearch()
+    }
+  }
 }
 
 // Close the dropdown whenever navigation occurs.
@@ -116,15 +139,21 @@ onUnmounted(() => {
           </div>
         </nav>
         
-        <div class="search-placeholder">
+        <button type="button" class="search-placeholder" @click="openSearch" aria-label="Search the archive">
           <span class="search-icon">🔍</span>
           <span class="search-text">Search lore...</span>
-        </div>
+          <span class="search-kbd" aria-hidden="true">⌘K</span>
+        </button>
       </div>
 
-      <button class="mobile-menu-btn" @click="toggleMobileMenu" aria-label="Toggle menu">
-        <span class="hamburger" :class="{ 'is-active': isMobileMenuOpen }"></span>
-      </button>
+      <div class="header-actions">
+        <button type="button" class="mobile-search-btn" @click="openSearch" aria-label="Search the archive">
+          <span aria-hidden="true">🔍</span>
+        </button>
+        <button class="mobile-menu-btn" @click="toggleMobileMenu" aria-label="Toggle menu">
+          <span class="hamburger" :class="{ 'is-active': isMobileMenuOpen }"></span>
+        </button>
+      </div>
     </div>
 
     <!-- Mobile Navigation -->
@@ -172,6 +201,8 @@ onUnmounted(() => {
       </nav>
       <div class="mobile-nav-seal" v-if="isMobileMenuOpen">印</div>
     </div>
+
+    <SearchModal />
   </header>
 </template>
 
@@ -534,7 +565,8 @@ onUnmounted(() => {
   border-radius: 20px;
   color: var(--c-text-3);
   font-size: 0.85rem;
-  cursor: text;
+  font-family: inherit;
+  cursor: pointer;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 2px 5px rgba(0,0,0,0);
 }
@@ -545,6 +577,34 @@ onUnmounted(() => {
   background: var(--c-bg-alt);
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   transform: translateY(-1px);
+}
+
+.search-kbd {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.05em;
+  color: var(--c-text-3);
+  border: 1px solid var(--c-border);
+  border-radius: 3px;
+  padding: 0.1rem 0.3rem;
+  margin-left: 0.25rem;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.mobile-search-btn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  font-size: 1.1rem;
+  line-height: 1;
+  z-index: 1001;
 }
 
 .mobile-menu-btn {
@@ -587,6 +647,7 @@ onUnmounted(() => {
 @media (max-width: 1100px) {
   .desktop-nav { display: none; }
   .mobile-menu-btn { display: block; }
+  .mobile-search-btn { display: block; }
   
   .mobile-nav-wrapper {
     display: block;
