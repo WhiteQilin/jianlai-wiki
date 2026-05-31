@@ -11,6 +11,8 @@ if (!page.value) {
   throw createError({ statusCode: 404, statusMessage: 'Page Not Found', fatal: true })
 }
 
+const { groups: relatedGroups } = await useRelatedEntries(route.path)
+
 useSeoMeta({
   title: `${page.value?.title} | Jian Lai Wiki`
 })
@@ -25,6 +27,11 @@ useSeoMeta({
     </div>
 
     <ContentRenderer v-if="page" :value="page" />
+
+    <template v-if="relatedGroups.length">
+      <InkDivider type="brush" />
+      <RelatedEntries :groups="relatedGroups" />
+    </template>
   </div>
 </template>
 

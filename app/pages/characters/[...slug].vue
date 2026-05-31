@@ -11,6 +11,8 @@ if (!page.value) {
   throw createError({ statusCode: 404, statusMessage: 'Page Not Found', fatal: true })
 }
 
+const { groups: relatedGroups } = await useRelatedEntries(route.path)
+
 useSeoMeta({
   title: `${page.value?.title} | Jian Lai Wiki`
 })
@@ -78,6 +80,13 @@ useSeoMeta({
             <ContentRenderer v-if="page" :value="page" class="mdc-prose" />
           </ScrollReveal>
 
+          <template v-if="relatedGroups.length">
+            <InkDivider type="brush" />
+            <ScrollReveal animation="reveal-fade-up">
+              <RelatedEntries :groups="relatedGroups" />
+            </ScrollReveal>
+          </template>
+
           <InkDivider type="mist" />
 
           <ScrollReveal animation="reveal-fade-up">
@@ -111,7 +120,7 @@ useSeoMeta({
 .article-layout {
   display: flex;
   flex-direction: row-reverse;
-  gap: 4rem;
+  gap: 5rem;
   position: relative;
 }
 

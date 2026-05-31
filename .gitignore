@@ -16,10 +16,17 @@ dist/
 Thumbs.db
 
 # AI tooling / local agents
-.gemini/
-.cline/
-.cursor/
-.trae/
+.agent/
+.claude/
+.codebuddy/
+.codex/
+.continue/
+.data/
+.kiro/
+.opencode/
+.qoder/
+.roo/
+.windsurf/
 
 # Raw official/media archives - local only
 public/images/official/
@@ -28,6 +35,18 @@ public/videos/official/
 public/videos/raw/
 public/media/official/
 public/media/raw/
+
+# Design/reference drafts
+design-references/
+public/images/design-references/
+public/images/banner-draft/
+public/images/weibo-draft/
+
+# Raw/draft image dumps
+public/images/banners/pinterest_*.jpg
+
+# Local font experiments - commit only licensed production fonts intentionally
+public/fonts/
 
 # Ignore large videos by default
 *.mp4
