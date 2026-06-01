@@ -36,28 +36,28 @@ defineProps<{
   position: relative;
   overflow: hidden;
   margin-bottom: -1px;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .dossier-item::before {
   content: '';
   position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: var(--c-seal-red);
-  transform: scaleY(0);
-  transform-origin: center;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, var(--c-seal-red-soft) 100%);
+  transform: translateX(-100%);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 0;
 }
 
 .dossier-item:hover {
   background: var(--c-bg-soft);
   z-index: 1;
+  padding-left: 3rem;
+  border-color: var(--c-seal-red);
 }
 
 .dossier-item:hover::before {
-  transform: scaleY(1);
+  transform: translateX(0);
 }
 
 .dossier-texture {
@@ -122,12 +122,22 @@ defineProps<{
   display: flex;
   align-items: baseline;
   gap: 1rem;
+  transition: color 0.4s ease;
+}
+
+.dossier-item:hover .dossier-name {
+  color: var(--c-seal-red);
 }
 
 .dossier-name span {
   font-size: 1.2rem;
   color: var(--c-text-3);
   font-weight: 400;
+  transition: color 0.4s ease;
+}
+
+.dossier-item:hover .dossier-name span {
+  color: var(--c-text-2);
 }
 
 .dossier-desc {
@@ -140,7 +150,7 @@ defineProps<{
 .dossier-arrow {
   font-size: 1.5rem;
   color: var(--c-text-3);
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   transform: translateX(-10px);
   opacity: 0;
 }

@@ -1,0 +1,43 @@
+[     471ms] [LOG] %cssr:success%c Vite server hmr 18 files 
+      background: #2ecc71;
+      border-radius: 0.5em;
+      color: white;
+      font-weight: bold;
+      padding: 2px 0.5em;
+      in 1.231ms 
+  at vite_node_entry_default (/node_modules/@nuxt/vite-builder/dist/vite-node-entry.mjs)
+  at process.processTicksAndRejections (node:internal/process/task_queues)
+  at async Object.renderToString (/node_modules/vue-bundle-renderer/dist/runtime.mjs)
+ @ http://localhost:3000/_nuxt/@fs/C:/BaiQilin/jianlai-wiki/jianlai-wiki-nuxt/node_modules/consola/dist/browser.mjs?v=16d8455b:47
+[     474ms] [INFO] <Suspense> is an experimental feature and its API will likely change. @ http://localhost:3000/_nuxt/@fs/C:/BaiQilin/jianlai-wiki/jianlai-wiki-nuxt/node_modules/@vue/runtime-core/dist/runtime-core.esm-bundler.js?v=16d8455b:7248
+[     504ms] [LOG] ✨ %cNuxt DevTools %c Press Shift + Alt + D to open DevTools color: black; border-radius: 3px 0 0 3px; padding: 2px 2px 1px 10px; background: #00DC82 border-radius: 0 3px 3px 0; padding: 2px 10px 1px 2px; background: #00DC8220  @ http://localhost:3000/_nuxt/@fs/C:/BaiQilin/jianlai-wiki/jianlai-wiki-nuxt/node_modules/@nuxt/devtools/dist/runtime/plugins/devtools.client.js?v=16d8455b:51
+[11786888ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:3000/_nuxt/@vite/client:864
+[22842207ms] [INFO] <Suspense> is an experimental feature and its API will likely change. @ http://localhost:3000/_nuxt/@fs/C:/BaiQilin/jianlai-wiki/jianlai-wiki-nuxt/node_modules/@vue/runtime-core/dist/runtime-core.esm-bundler.js?v=16d8455b:7248
+[22842538ms] [LOG] ✨ %cNuxt DevTools %c Press Shift + Alt + D to open DevTools color: black; border-radius: 3px 0 0 3px; padding: 2px 2px 1px 10px; background: #00DC82 border-radius: 0 3px 3px 0; padding: 2px 10px 1px 2px; background: #00DC8220  @ http://localhost:3000/_nuxt/@fs/C:/BaiQilin/jianlai-wiki/jianlai-wiki-nuxt/node_modules/@nuxt/devtools/dist/runtime/plugins/devtools.client.js?v=16d8455b:51
+[24708202ms] [LOG] [Visual Debug] ArchivePortal mounted: Glossary @ http://localhost:3000/_nuxt/components/ArchivePortal.vue?t=1780061705143:17
+[24708202ms] [LOG] [Visual Debug] bgImage applied: /images/portalcard/glossary-portalcard.jpg @ http://localhost:3000/_nuxt/components/ArchivePortal.vue?t=1780061705143:18
+[24708202ms] [LOG] [Visual Debug] Hypothesis: The image opacity (0.15/0.3) is too high or lacks mix-blend-mode, making the 'original picture' (and its baked-in text) too distinctly visible rather than a subtle ink-wash veil. @ http://localhost:3000/_nuxt/components/ArchivePortal.vue?t=1780061705143:19
+[24708203ms] [LOG] [Visual Debug] ArchivePortal mounted: Timeline @ http://localhost:3000/_nuxt/components/ArchivePortal.vue?t=1780061705143:17
+[24708203ms] [LOG] [Visual Debug] bgImage applied: /images/portalcard/timeline-portalcard.jpg @ http://localhost:3000/_nuxt/components/ArchivePortal.vue?t=1780061705143:18
+[24708203ms] [LOG] [Visual Debug] Hypothesis: The image opacity (0.15/0.3) is too high or lacks mix-blend-mode, making the 'original picture' (and its baked-in text) too distinctly visible rather than a subtle ink-wash veil. @ http://localhost:3000/_nuxt/components/ArchivePortal.vue?t=1780061705143:19
+[24708203ms] [LOG] [Visual Debug] ArchivePortal mounted: Artifacts @ http://localhost:3000/_nuxt/components/ArchivePortal.vue?t=1780061705143:17
+[24708203ms] [LOG] [Visual Debug] bgImage applied: /images/portalcard/artifacts-portalcard.jpg @ http://localhost:3000/_nuxt/components/ArchivePortal.vue?t=1780061705143:18
+[24708203ms] [LOG] [Visual Debug] Hypothesis: The image opacity (0.15/0.3) is too high or lacks mix-blend-mode, making the 'original picture' (and its baked-in text) too distinctly visible rather than a subtle ink-wash veil. @ http://localhost:3000/_nuxt/components/ArchivePortal.vue?t=1780061705143:19
+[24708203ms] [LOG] [Visual Debug] ArchivePortal mounted: Factions @ http://localhost:3000/_nuxt/components/ArchivePortal.vue?t=1780061705143:17
+[24708203ms] [LOG] [Visual Debug] bgImage applied: /images/portalcard/factions-portalcard.jpg @ http://localhost:3000/_nuxt/components/ArchivePortal.vue?t=1780061705143:18
+[24708203ms] [LOG] [Visual Debug] Hypothesis: The image opacity (0.15/0.3) is too high or lacks mix-blend-mode, making the 'original picture' (and its baked-in text) too distinctly visible rather than a subtle ink-wash veil. @ http://localhost:3000/_nuxt/components/ArchivePortal.vue?t=1780061705143:19
+[24708203ms] [LOG] [Visual Debug] ArchivePortal mounted: Swordsmanship @ http://localhost:3000/_nuxt/components/ArchivePortal.vue?t=1780061705143:17
+[24708203ms] [LOG] [Visual Debug] bgImage applied: /images/portalcard/swordsmanship-portalcard.png @ http://localhost:3000/_nuxt/components/ArchivePortal.vue?t=1780061705143:18
+[24708203ms] [LOG] [Visual Debug] Hypothesis: The image opacity (0.15/0.3) is too high or lacks mix-blend-mode, making the 'original picture' (and its baked-in text) too distinctly visible rather than a subtle ink-wash veil. @ http://localhost:3000/_nuxt/components/ArchivePortal.vue?t=1780061705143:19
+[24708203ms] [LOG] [Visual Debug] ArchivePortal mounted: Cultivation @ http://localhost:3000/_nuxt/components/ArchivePortal.vue?t=1780061705143:17
+[24708203ms] [LOG] [Visual Debug] bgImage applied: /images/portalcard/cultivation-portalcard.jpg @ http://localhost:3000/_nuxt/components/ArchivePortal.vue?t=1780061705143:18
+[24708203ms] [LOG] [Visual Debug] Hypothesis: The image opacity (0.15/0.3) is too high or lacks mix-blend-mode, making the 'original picture' (and its baked-in text) too distinctly visible rather than a subtle ink-wash veil. @ http://localhost:3000/_nuxt/components/ArchivePortal.vue?t=1780061705143:19
+[24708203ms] [LOG] [Visual Debug] ArchivePortal mounted: World @ http://localhost:3000/_nuxt/components/ArchivePortal.vue?t=1780061705143:17
+[24708204ms] [LOG] [Visual Debug] bgImage applied: /images/portalcard/world-portalcard.jpg @ http://localhost:3000/_nuxt/components/ArchivePortal.vue?t=1780061705143:18
+[24708204ms] [LOG] [Visual Debug] Hypothesis: The image opacity (0.15/0.3) is too high or lacks mix-blend-mode, making the 'original picture' (and its baked-in text) too distinctly visible rather than a subtle ink-wash veil. @ http://localhost:3000/_nuxt/components/ArchivePortal.vue?t=1780061705143:19
+[24708204ms] [LOG] [Visual Debug] ArchivePortal mounted: Characters @ http://localhost:3000/_nuxt/components/ArchivePortal.vue?t=1780061705143:17
+[24708204ms] [LOG] [Visual Debug] bgImage applied: /images/portalcard/Character-portalcard.webp @ http://localhost:3000/_nuxt/components/ArchivePortal.vue?t=1780061705143:18
+[24708204ms] [LOG] [Visual Debug] Hypothesis: The image opacity (0.15/0.3) is too high or lacks mix-blend-mode, making the 'original picture' (and its baked-in text) too distinctly visible rather than a subtle ink-wash veil. @ http://localhost:3000/_nuxt/components/ArchivePortal.vue?t=1780061705143:19
+[33093944ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:3000/_nuxt/@vite/client:864
+[33644715ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_nuxt/builds/latest.json?1780070639349:0
+[33644962ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_nuxt/builds/latest.json?1780070639349:0

@@ -4,12 +4,14 @@ defineProps<{
   titleZh: string
   titleEn: string
   bgChar: string
+  bgImage?: string
 }>()
 </script>
 
 <template>
   <NuxtLink :to="link" class="portal-card hover-lift" :data-zh="bgChar">
-    <div class="portal-texture"></div>
+    <div v-if="bgImage" class="portal-bg-image" :style="{ backgroundImage: `url(${bgImage})` }"></div>
+    <div v-else class="portal-texture"></div>
     <span class="portal-zh">{{ titleZh }}</span>
     <div class="portal-bottom">
       <span class="portal-en">{{ titleEn }}</span>
@@ -19,6 +21,24 @@ defineProps<{
 </template>
 
 <style scoped>
+.portal-bg-image {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.15;
+  filter: grayscale(80%) sepia(20%) hue-rotate(330deg);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.portal-card:hover .portal-bg-image {
+  opacity: 0.3;
+  transform: scale(1.05);
+  filter: grayscale(30%) sepia(20%) hue-rotate(330deg);
+}
+
 .portal-texture {
   position: absolute;
   inset: 0;
@@ -27,7 +47,7 @@ defineProps<{
   background-position: center;
   opacity: 0;
   mix-blend-mode: multiply;
-  transition: opacity 0.5s ease;
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 0;
   pointer-events: none;
 }
@@ -37,11 +57,11 @@ defineProps<{
 }
 
 .portal-card:hover .portal-texture {
-  opacity: 0.05;
+  opacity: 0.12;
 }
 
 .portal-card {
-  background: var(--c-bg);
+  background: var(--c-paper);
   padding: 3rem 2rem;
   display: flex;
   flex-direction: column;
@@ -50,8 +70,18 @@ defineProps<{
   min-height: 200px;
   position: relative;
   overflow: hidden;
-  border: 1px solid transparent;
-  border-bottom: none;
+  border: 1px solid var(--c-border);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.portal-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent 0%, var(--c-seal-red-soft) 100%);
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  z-index: 0;
 }
 
 .portal-card::after {
@@ -59,31 +89,36 @@ defineProps<{
   position: absolute;
   bottom: -20px;
   right: -10px;
-  font-family: var(--font-heading);
+  font-family: var(--font-zh-display);
   font-size: 8rem;
   color: var(--c-text-1);
   opacity: 0.02;
   pointer-events: none;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
   z-index: 0;
 }
 
 .portal-card:hover {
-  background: var(--c-bg-soft);
+  background: var(--c-mist-light);
+  border-color: var(--c-seal-red);
+}
+
+.portal-card:hover::before {
+  opacity: 1;
 }
 
 .portal-card:hover::after {
-  transform: scale(1.1) translate(-10px, -10px);
+  transform: scale(1.3) translate(-10px, -10px) rotate(-5deg);
   color: var(--c-seal-red);
-  opacity: 0.05;
+  opacity: 0.08;
 }
 
 .portal-zh {
-  font-family: var(--font-heading);
-  font-size: 2.2rem;
+  font-family: var(--font-zh-display);
+  font-size: 2.6rem;
   color: var(--c-ink);
   font-weight: 400;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   position: relative;
   z-index: 1;
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);

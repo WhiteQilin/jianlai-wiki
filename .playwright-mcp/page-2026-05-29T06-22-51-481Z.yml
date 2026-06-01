@@ -1,0 +1,195 @@
+- generic [ref=e3]:
+  - button "Skip Intro →" [ref=e6] [cursor=pointer]:
+    - generic [ref=e7]: Skip Intro
+    - generic [ref=e8]: →
+  - banner [ref=e9]:
+    - generic [ref=e10]:
+      - link "Jian Lai JIAN LAI WIKI" [ref=e11] [cursor=pointer]:
+        - /url: /
+        - img "Jian Lai" [ref=e12]
+        - generic [ref=e13]:
+          - text: JIAN LAI
+          - text: WIKI
+      - generic [ref=e14]:
+        - navigation [ref=e15]:
+          - link "人物 Characters" [ref=e16] [cursor=pointer]:
+            - /url: /characters
+            - generic [ref=e17]: 人物
+            - generic [ref=e18]: Characters
+          - link "天下 World" [ref=e19] [cursor=pointer]:
+            - /url: /world
+            - generic [ref=e20]: 天下
+            - generic [ref=e21]: World
+          - link "修行 Cultivation" [ref=e22] [cursor=pointer]:
+            - /url: /cultivation
+            - generic [ref=e23]: 修行
+            - generic [ref=e24]: Cultivation
+          - link "剑术 Swordsmanship" [ref=e25] [cursor=pointer]:
+            - /url: /swordsmanship
+            - generic [ref=e26]: 剑术
+            - generic [ref=e27]: Swordsmanship
+          - link "势力 Factions" [ref=e28] [cursor=pointer]:
+            - /url: /factions
+            - generic [ref=e29]: 势力
+            - generic [ref=e30]: Factions
+          - link "法宝 Artifacts" [ref=e31] [cursor=pointer]:
+            - /url: /artifacts
+            - generic [ref=e32]: 法宝
+            - generic [ref=e33]: Artifacts
+          - link "年表 Timeline" [ref=e34] [cursor=pointer]:
+            - /url: /timeline
+            - generic [ref=e35]: 年表
+            - generic [ref=e36]: Timeline
+        - generic [ref=e37]:
+          - generic [ref=e38]: 🔍
+          - generic [ref=e39]: Search lore...
+  - main [ref=e40]:
+    - generic [ref=e42]:
+      - generic [ref=e44]:
+        - link "Home" [ref=e45] [cursor=pointer]:
+          - /url: /
+        - generic [ref=e46]: /
+        - link "Characters" [ref=e47] [cursor=pointer]:
+          - /url: /characters
+        - generic [ref=e48]: /
+        - generic [ref=e49]: Chen Ping'an
+      - generic [ref=e50]:
+        - generic [ref=e51]:
+          - heading "Chen Ping'an" [level=1] [ref=e53]
+          - generic [ref=e55]: 陈平安
+        - paragraph [ref=e56]: A young man from Lizhu Blessed Land who walks his own path with a sword, seeking truths and delivering punches.
+      - generic [ref=e57]:
+        - complementary [ref=e58]:
+          - complementary [ref=e60]:
+            - generic [ref=e63]: 陈
+            - generic [ref=e64]:
+              - generic [ref=e65]:
+                - generic [ref=e66]: Category
+                - generic [ref=e67]: Character
+              - generic [ref=e68]:
+                - generic [ref=e69]: Status
+                - generic [ref=e70]: To be verified
+              - generic [ref=e71]:
+                - generic [ref=e72]: Origin
+                - generic [ref=e73]: Unknown
+              - generic [ref=e74]:
+                - generic [ref=e75]: Realm
+                - generic [ref=e76]: Unknown
+          - generic [ref=e78]:
+            - heading "Contents" [level=4] [ref=e79]
+            - list [ref=e80]:
+              - listitem [ref=e81]:
+                - link "Overview" [ref=e82] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e83]:
+                - link "Cultivation" [ref=e84] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e85]:
+                - link "Relationships" [ref=e86] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e87]:
+                - link "Story" [ref=e88] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e89]:
+                - link "Abilities" [ref=e90] [cursor=pointer]:
+                  - /url: "#"
+        - generic [ref=e91]:
+          - generic [ref=e93]:
+            - heading "Overview" [level=2] [ref=e94]:
+              - link "Overview" [ref=e95] [cursor=pointer]:
+                - /url: "#overview"
+            - paragraph [ref=e96]:
+              - text: Chen Ping'an is the protagonist of
+              - emphasis [ref=e97]: Jian Lai
+              - text: (Sword, Come!). A young man from Lizhu Blessed Land who embarks on a journey of cultivation and self-discovery.
+            - heading "Cultivation" [level=2] [ref=e98]:
+              - link "Cultivation" [ref=e99] [cursor=pointer]:
+                - /url: "#cultivation"
+            - 'generic "Cultivation Realm: To be verified" [ref=e100]': To be verified
+            - paragraph [ref=e101]: Cultivation details are currently pending verification.
+            - heading "Relationships" [level=2] [ref=e102]:
+              - link "Relationships" [ref=e103] [cursor=pointer]:
+                - /url: "#relationships"
+            - table "Character relationships" [ref=e105]:
+              - rowgroup [ref=e106]:
+                - row "Character Relationship" [ref=e107]:
+                  - columnheader "Character" [ref=e108]
+                  - columnheader "Relationship" [ref=e109]
+              - rowgroup [ref=e110]:
+                - row "Ning Yao → Dao Companion" [ref=e111]:
+                  - cell "Ning Yao →" [ref=e112]:
+                    - link "Ning Yao →" [ref=e113] [cursor=pointer]:
+                      - /url: /characters/ning-yao
+                      - generic [ref=e114]: Ning Yao
+                      - generic [ref=e115]: →
+                  - cell "Dao Companion" [ref=e116]
+                - row "Qi Jingchun → Teacher / Guide" [ref=e117]:
+                  - cell "Qi Jingchun →" [ref=e118]:
+                    - link "Qi Jingchun →" [ref=e119] [cursor=pointer]:
+                      - /url: /characters/qi-jingchun
+                      - generic [ref=e120]: Qi Jingchun
+                      - generic [ref=e121]: →
+                  - cell "Teacher / Guide" [ref=e122]
+            - heading "Story" [level=2] [ref=e123]:
+              - link "Story" [ref=e124] [cursor=pointer]:
+                - /url: "#story"
+            - paragraph [ref=e125]: To be added.
+            - heading "Notes" [level=2] [ref=e126]:
+              - link "Notes" [ref=e127] [cursor=pointer]:
+                - /url: "#notes"
+            - list [ref=e128]:
+              - listitem [ref=e129]: "• To be verified: Specific realm progression details pending confirmation."
+          - generic [ref=e133]:
+            - generic [ref=e134]:
+              - heading "Chen Ping'an Media" [level=3] [ref=e135]
+              - generic [ref=e136]: Pending Processing
+            - generic [ref=e137]:
+              - generic [ref=e139]: 🖼️
+              - generic [ref=e141]: 🖼️
+              - generic [ref=e143]: 🖼️
+              - generic [ref=e145]: 🖼️
+            - paragraph [ref=e147]: Visual assets are being authenticated from official sources.
+          - generic [ref=e151]:
+            - generic [ref=e153]: 印
+            - paragraph [ref=e155]:
+              - strong [ref=e156]: "Source Verification:"
+              - text: This entry is currently being cross-referenced with the original text. Details may be subject to change.
+  - contentinfo [ref=e157]:
+    - generic [ref=e158]:
+      - generic [ref=e159]:
+        - generic [ref=e160]:
+          - generic [ref=e161]:
+            - img "Jian Lai" [ref=e162]
+            - generic [ref=e163]: Jian Lai Wiki
+          - paragraph [ref=e164]: A premium, fan-made encyclopedia dedicated to the world of Sword, Come! by Feng Huo Xi Zhu Hou.
+        - generic [ref=e165]:
+          - generic [ref=e166]:
+            - heading "Archive" [level=4] [ref=e167]
+            - link "Characters" [ref=e168] [cursor=pointer]:
+              - /url: /characters
+            - link "World" [ref=e169] [cursor=pointer]:
+              - /url: /world
+            - link "Cultivation" [ref=e170] [cursor=pointer]:
+              - /url: /cultivation
+            - link "Factions" [ref=e171] [cursor=pointer]:
+              - /url: /factions
+          - generic [ref=e172]:
+            - heading "Lore" [level=4] [ref=e173]
+            - link "Swordsmanship" [ref=e174] [cursor=pointer]:
+              - /url: /swordsmanship
+            - link "Artifacts" [ref=e175] [cursor=pointer]:
+              - /url: /artifacts
+            - link "Timeline" [ref=e176] [cursor=pointer]:
+              - /url: /timeline
+            - link "Glossary" [ref=e177] [cursor=pointer]:
+              - /url: /glossary
+          - generic [ref=e178]:
+            - heading "Meta" [level=4] [ref=e179]
+            - link "About Wiki" [ref=e180] [cursor=pointer]:
+              - /url: /about
+            - link "Contribute on GitHub" [ref=e181] [cursor=pointer]:
+              - /url: https://github.com/WhiteQilin/jianlai-wiki
+      - generic [ref=e182]:
+        - generic: 印
+        - paragraph [ref=e183]: Jian Lai Wiki is an unofficial fan-made encyclopedia. Jian Lai, characters, story materials, official artwork, animation materials, and related media belong to their respective rights holders.
+        - paragraph [ref=e184]: © 2026 Jian Lai Wiki Contributors.

@@ -7,6 +7,10 @@ export default defineNuxtConfig({
     '@nuxt/fonts',
   ],
   css: ['~/assets/css/main.css'],
+  app: {
+    pageTransition: { name: 'page', mode: 'out-in' },
+    layoutTransition: { name: 'page', mode: 'out-in' }
+  },
   devtools: { enabled: true },
   compatibilityDate: '2024-04-03',
 })

@@ -8,6 +8,7 @@ interface SpotlightItem {
   status: string
   link: string
   image?: string
+  imagePosition?: string
 }
 
 defineProps<{
@@ -35,7 +36,7 @@ defineProps<{
         >
           <NuxtLink :to="item.link" class="card-inner hover-lift">
             <div class="card-media">
-              <img v-if="item.image" :src="item.image" :alt="item.nameEn" class="card-image" />
+              <img v-if="item.image" :src="item.image" :alt="item.nameEn" class="card-image" :style="item.imagePosition ? { objectPosition: item.imagePosition } : {}" />
               <div v-else class="card-fallback">
                 <span>{{ item.nameZh.charAt(0) || '无' }}</span>
               </div>
@@ -45,7 +46,13 @@ defineProps<{
             <div class="card-content">
               <div class="card-meta">
                 <span class="category">{{ item.category }}</span>
-                <span class="status">{{ item.status }}</span>
+                <SealBadge
+                  v-if="item.status === 'Main Protagonist'"
+                  :text="'主角'"
+                  variant="filled"
+                  shape="square"
+                />
+                <span v-else class="status">{{ item.status }}</span>
               </div>
               <h4 class="card-title">
                 {{ item.nameEn }}
@@ -139,14 +146,16 @@ defineProps<{
   height: 200px;
   overflow: hidden;
   border-bottom: 1px solid var(--c-border);
+  background: var(--c-bg-soft);
 }
 
 .card-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-  filter: grayscale(80%) contrast(1.1);
+  object-position: top center;
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  filter: grayscale(100%) contrast(1.2);
 }
 
 .card-fallback {
@@ -171,8 +180,14 @@ defineProps<{
 }
 
 .card-inner:hover .card-image {
-  transform: scale(1.05);
-  filter: grayscale(40%) contrast(1.1);
+  transform: scale(1.08);
+  filter: grayscale(0%) contrast(1.1) brightness(1.1);
+}
+
+.card-inner:hover {
+  box-shadow: 0 20px 40px var(--c-seal-red-soft), 0 0 0 1px var(--c-seal-red) inset;
+  border-color: var(--c-seal-red);
+  transform: translateY(-8px);
 }
 
 .card-content {
@@ -215,9 +230,11 @@ defineProps<{
 }
 
 .card-title-zh {
-  font-size: 1.1rem;
+  font-family: var(--font-zh-display);
+  font-size: 1.35rem;
   color: var(--c-text-3);
   font-weight: 400;
+  letter-spacing: 0.04em;
 }
 
 .card-desc {

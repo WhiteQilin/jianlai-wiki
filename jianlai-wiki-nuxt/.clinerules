@@ -1,0 +1,45 @@
+You are working on jianlai.wiki, a Nuxt + Nuxt Content fandom encyclopedia for Jian Lai / Sword, Come!.
+
+Use UI UX Pro Max principles if available.
+
+Design direction:
+- modern cinematic Shuimo / 水墨
+- black-white ink-wash identity
+- premium fandom wiki
+- restrained red seal accents
+- official donghua-inspired atmosphere
+- media-rich but readable
+- animated but not flashy
+
+Avoid:
+- documentation-like layouts
+- Nuxt starter feel
+- SaaS/dashboard cards
+- generic wiki styling
+- flat static pages
+- heavy colorful gradients
+- overusing borders
+- overusing official assets
+
+Technical constraints:
+- Keep Nuxt + Nuxt Content
+- Static generation only
+- No backend
+- No database
+- No authentication
+- No heavy dependencies
+- Do not break existing routes
+- Do not delete existing content
+- Run npm run generate after major changes
+
+Media rules:
+- Do not use public/videos/all-mp4 directly
+- Use only curated videos in public/videos/curated
+- Keep public/images/official as raw archive/reference
+- Use curated assets in public/images/banners, textures, characters, ui
+- Add credit/caption support for official media
+
+Testing rules:
+- Use http://localhost:3000/ for browser testing
+- Do not rely on random preview ports
+- Check desktop and mobile when possible

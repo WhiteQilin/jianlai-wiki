@@ -1,0 +1,129 @@
+- generic [ref=e3]:
+  - button "Skip Intro →" [ref=e6] [cursor=pointer]:
+    - generic [ref=e7]: Skip Intro
+    - generic [ref=e8]: →
+  - banner [ref=e9]:
+    - generic [ref=e10]:
+      - link "Jian Lai JIAN LAI WIKI" [ref=e11] [cursor=pointer]:
+        - /url: /
+        - img "Jian Lai" [ref=e12]
+        - generic [ref=e13]:
+          - text: JIAN LAI
+          - text: WIKI
+      - generic [ref=e14]:
+        - navigation [ref=e15]:
+          - link "人物 Characters" [ref=e16] [cursor=pointer]:
+            - /url: /characters
+            - generic [ref=e17]: 人物
+            - generic [ref=e18]: Characters
+          - link "天下 World" [ref=e19] [cursor=pointer]:
+            - /url: /world
+            - generic [ref=e20]: 天下
+            - generic [ref=e21]: World
+          - link "修行 Cultivation" [ref=e22] [cursor=pointer]:
+            - /url: /cultivation
+            - generic [ref=e23]: 修行
+            - generic [ref=e24]: Cultivation
+          - link "剑术 Swordsmanship" [ref=e25] [cursor=pointer]:
+            - /url: /swordsmanship
+            - generic [ref=e26]: 剑术
+            - generic [ref=e27]: Swordsmanship
+          - link "势力 Factions" [ref=e28] [cursor=pointer]:
+            - /url: /factions
+            - generic [ref=e29]: 势力
+            - generic [ref=e30]: Factions
+          - link "法宝 Artifacts" [ref=e31] [cursor=pointer]:
+            - /url: /artifacts
+            - generic [ref=e32]: 法宝
+            - generic [ref=e33]: Artifacts
+          - link "年表 Timeline" [ref=e34] [cursor=pointer]:
+            - /url: /timeline
+            - generic [ref=e35]: 年表
+            - generic [ref=e36]: Timeline
+        - generic [ref=e37]:
+          - generic [ref=e38]: 🔍
+          - generic [ref=e39]: Search lore...
+  - main [ref=e40]:
+    - generic [ref=e41]:
+      - generic [ref=e43]:
+        - generic [ref=e47]:
+          - generic [ref=e48]: Official Promotional Image
+          - generic [ref=e49]: "Credit: Tencent Video / Jian Lai Animation"
+        - generic [ref=e50]:
+          - heading "The World" [level=1] [ref=e51]
+          - heading "天下图志" [level=2] [ref=e52]
+          - paragraph [ref=e53]: Explore the vast realms, continents, and secret realms of Jian Lai.
+      - generic [ref=e54]:
+        - generic [ref=e56]:
+          - generic [ref=e57]: "Filter:"
+          - generic [ref=e58]:
+            - button "All" [ref=e59] [cursor=pointer]
+            - button "Continents" [ref=e60] [cursor=pointer]
+            - button "Grotto-Heavens" [ref=e61] [cursor=pointer]
+            - button "Blessed Lands" [ref=e62] [cursor=pointer]
+        - link "无 World To be verified Sample World Entry Entry pending detailed documentation." [ref=e65] [cursor=pointer]:
+          - /url: /world/sample
+          - generic [ref=e67]: 无
+          - generic [ref=e68]:
+            - generic [ref=e69]:
+              - generic [ref=e70]: World
+              - generic [ref=e71]: To be verified
+            - heading "Sample World Entry" [level=4] [ref=e72]: Sample World Entry
+            - paragraph [ref=e73]: Entry pending detailed documentation.
+        - generic [ref=e77]:
+          - heading "Explore More" [level=3] [ref=e78]
+          - generic [ref=e79]:
+            - link "人物志 Characters 人" [ref=e80] [cursor=pointer]:
+              - /url: /characters
+              - generic [ref=e81]: 人物志
+              - generic [ref=e83]: Characters
+              - text: 人
+            - link "宗门势力 Factions 宗" [ref=e85] [cursor=pointer]:
+              - /url: /factions
+              - generic [ref=e86]: 宗门势力
+              - generic [ref=e88]: Factions
+              - text: 宗
+            - link "年表 Timeline 史" [ref=e90] [cursor=pointer]:
+              - /url: /timeline
+              - generic [ref=e91]: 年表
+              - generic [ref=e93]: Timeline
+              - text: 史
+  - contentinfo [ref=e95]:
+    - generic [ref=e96]:
+      - generic [ref=e97]:
+        - generic [ref=e98]:
+          - generic [ref=e99]:
+            - img "Jian Lai" [ref=e100]
+            - generic [ref=e101]: Jian Lai Wiki
+          - paragraph [ref=e102]: A premium, fan-made encyclopedia dedicated to the world of Sword, Come! by Feng Huo Xi Zhu Hou.
+        - generic [ref=e103]:
+          - generic [ref=e104]:
+            - heading "Archive" [level=4] [ref=e105]
+            - link "Characters" [ref=e106] [cursor=pointer]:
+              - /url: /characters
+            - link "World" [ref=e107] [cursor=pointer]:
+              - /url: /world
+            - link "Cultivation" [ref=e108] [cursor=pointer]:
+              - /url: /cultivation
+            - link "Factions" [ref=e109] [cursor=pointer]:
+              - /url: /factions
+          - generic [ref=e110]:
+            - heading "Lore" [level=4] [ref=e111]
+            - link "Swordsmanship" [ref=e112] [cursor=pointer]:
+              - /url: /swordsmanship
+            - link "Artifacts" [ref=e113] [cursor=pointer]:
+              - /url: /artifacts
+            - link "Timeline" [ref=e114] [cursor=pointer]:
+              - /url: /timeline
+            - link "Glossary" [ref=e115] [cursor=pointer]:
+              - /url: /glossary
+          - generic [ref=e116]:
+            - heading "Meta" [level=4] [ref=e117]
+            - link "About Wiki" [ref=e118] [cursor=pointer]:
+              - /url: /about
+            - link "Contribute on GitHub" [ref=e119] [cursor=pointer]:
+              - /url: https://github.com/WhiteQilin/jianlai-wiki
+      - generic [ref=e120]:
+        - generic: 印
+        - paragraph [ref=e121]: Jian Lai Wiki is an unofficial fan-made encyclopedia. Jian Lai, characters, story materials, official artwork, animation materials, and related media belong to their respective rights holders.
+        - paragraph [ref=e122]: © 2026 Jian Lai Wiki Contributors.

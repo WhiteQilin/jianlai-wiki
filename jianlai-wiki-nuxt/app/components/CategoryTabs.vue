@@ -29,7 +29,7 @@ defineEmits<{
 <style scoped>
 .category-tabs {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 1.5rem;
   margin-bottom: 3rem;
   padding-bottom: 1rem;
@@ -46,38 +46,33 @@ defineEmits<{
 
 .tab-list {
   display: flex;
-  gap: 1.5rem;
+  gap: 0.5rem;
   flex-wrap: wrap;
 }
 
 .tab-btn {
-  background: none;
-  border: none;
-  font-size: 0.95rem;
+  background: var(--c-bg-soft);
+  border: 1px solid transparent;
+  font-size: 0.9rem;
   color: var(--c-text-2);
   cursor: pointer;
-  padding: 0;
-  position: relative;
-  transition: color 0.3s ease;
+  padding: 0.4rem 1.2rem;
+  border-radius: 20px;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   font-family: inherit;
 }
 
 .tab-btn:hover {
   color: var(--c-ink);
+  background: var(--c-mist-light);
+  border-color: var(--c-border);
 }
 
 .tab-btn.active {
-  color: var(--c-ink);
-  font-weight: 600;
-}
-
-.tab-btn.active::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: var(--c-seal-red);
+  color: #fff;
+  background: var(--c-ink);
+  border-color: var(--c-ink);
+  font-weight: 500;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 </style>

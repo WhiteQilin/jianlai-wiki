@@ -1,5 +1,6 @@
 <template>
   <div class="site-shell">
+    <IntroSequence />
     <SiteHeader />
     <main class="site-main">
       <slot />

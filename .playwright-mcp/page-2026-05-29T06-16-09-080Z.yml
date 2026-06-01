@@ -1,0 +1,262 @@
+- generic [ref=e3]:
+  - button "Skip Intro →" [ref=e6] [cursor=pointer]:
+    - generic [ref=e7]: Skip Intro
+    - generic [ref=e8]: →
+  - banner [ref=e9]:
+    - generic [ref=e10]:
+      - link "Jian Lai JIAN LAI WIKI" [ref=e11] [cursor=pointer]:
+        - /url: /
+        - img "Jian Lai" [ref=e12]
+        - generic [ref=e13]:
+          - text: JIAN LAI
+          - text: WIKI
+      - generic [ref=e14]:
+        - navigation [ref=e15]:
+          - link "人物 Characters" [ref=e16] [cursor=pointer]:
+            - /url: /characters
+            - generic [ref=e17]: 人物
+            - generic [ref=e18]: Characters
+          - link "天下 World" [ref=e19] [cursor=pointer]:
+            - /url: /world
+            - generic [ref=e20]: 天下
+            - generic [ref=e21]: World
+          - link "修行 Cultivation" [ref=e22] [cursor=pointer]:
+            - /url: /cultivation
+            - generic [ref=e23]: 修行
+            - generic [ref=e24]: Cultivation
+          - link "剑术 Swordsmanship" [ref=e25] [cursor=pointer]:
+            - /url: /swordsmanship
+            - generic [ref=e26]: 剑术
+            - generic [ref=e27]: Swordsmanship
+          - link "势力 Factions" [ref=e28] [cursor=pointer]:
+            - /url: /factions
+            - generic [ref=e29]: 势力
+            - generic [ref=e30]: Factions
+          - link "法宝 Artifacts" [ref=e31] [cursor=pointer]:
+            - /url: /artifacts
+            - generic [ref=e32]: 法宝
+            - generic [ref=e33]: Artifacts
+          - link "年表 Timeline" [ref=e34] [cursor=pointer]:
+            - /url: /timeline
+            - generic [ref=e35]: 年表
+            - generic [ref=e36]: Timeline
+        - generic [ref=e37]:
+          - generic [ref=e38]: 🔍
+          - generic [ref=e39]: Search lore...
+  - main [ref=e40]:
+    - generic [ref=e41]:
+      - generic [ref=e42]:
+        - generic [ref=e43]:
+          - generic:
+            - generic: 剑
+        - generic:
+          - generic: Official Promotional Media
+          - paragraph: "Credit: Tencent Video / Jian Lai Animation"
+        - generic [ref=e47]:
+          - img "Jian Lai" [ref=e49]
+          - heading "Sword, Come! Encyclopedia" [level=2] [ref=e50]
+          - paragraph [ref=e51]: A premium fandom archive of characters, realms, locations, and legends.
+          - generic [ref=e52]:
+            - link "Browse Characters" [ref=e53] [cursor=pointer]:
+              - /url: /characters
+            - link "Explore World" [ref=e54] [cursor=pointer]:
+              - /url: /world
+            - link "View Timeline" [ref=e55] [cursor=pointer]:
+              - /url: /timeline
+      - generic [ref=e57]:
+        - generic [ref=e58]:
+          - generic [ref=e59]: "14"
+          - generic [ref=e60]: Realms
+        - generic [ref=e61]:
+          - generic [ref=e62]: 100+
+          - generic [ref=e63]: Characters
+        - generic [ref=e64]:
+          - generic [ref=e65]: ∞
+          - generic [ref=e66]: Worlds
+      - generic [ref=e67]:
+        - generic [ref=e69]:
+          - link "人物志 Characters 人" [ref=e70] [cursor=pointer]:
+            - /url: /characters
+            - generic [ref=e71]: 人物志
+            - generic [ref=e73]: Characters
+            - text: 人
+          - link "天下图志 World 地" [ref=e75] [cursor=pointer]:
+            - /url: /world
+            - generic [ref=e76]: 天下图志
+            - generic [ref=e78]: World
+            - text: 地
+          - link "山上修行 Cultivation 修" [ref=e80] [cursor=pointer]:
+            - /url: /cultivation
+            - generic [ref=e81]: 山上修行
+            - generic [ref=e83]: Cultivation
+            - text: 修
+          - link "剑术神通 Swordsmanship 剑" [ref=e85] [cursor=pointer]:
+            - /url: /swordsmanship
+            - generic [ref=e86]: 剑术神通
+            - generic [ref=e88]: Swordsmanship
+            - text: 剑
+          - link "宗门势力 Factions 宗" [ref=e90] [cursor=pointer]:
+            - /url: /factions
+            - generic [ref=e91]: 宗门势力
+            - generic [ref=e93]: Factions
+            - text: 宗
+          - link "法宝器物 Artifacts 宝" [ref=e95] [cursor=pointer]:
+            - /url: /artifacts
+            - generic [ref=e96]: 法宝器物
+            - generic [ref=e98]: Artifacts
+            - text: 宝
+          - link "年表 Timeline 史" [ref=e100] [cursor=pointer]:
+            - /url: /timeline
+            - generic [ref=e101]: 年表
+            - generic [ref=e103]: Timeline
+            - text: 史
+          - link "术语典籍 Glossary 典" [ref=e105] [cursor=pointer]:
+            - /url: /glossary
+            - generic [ref=e106]: 术语典籍
+            - generic [ref=e108]: Glossary
+            - text: 典
+        - generic [ref=e112]:
+          - heading "Featured Lore" [level=3] [ref=e114]
+          - generic [ref=e117]:
+            - article [ref=e118]:
+              - link "Chen Ping'an Character Main Protagonist Chen Ping'an 陈平安 A young man from Lizhu Blessed Land who walks his own path with a sword, seeking truths and delivering punches. Explore →" [ref=e119] [cursor=pointer]:
+                - /url: /characters/chen-pingan
+                - img "Chen Ping'an" [ref=e121]
+                - generic [ref=e123]:
+                  - generic [ref=e124]:
+                    - generic [ref=e125]: Character
+                    - generic [ref=e126]: Main Protagonist
+                  - heading "Chen Ping'an 陈平安" [level=4] [ref=e127]:
+                    - text: Chen Ping'an
+                    - generic [ref=e128]: 陈平安
+                  - paragraph [ref=e129]: A young man from Lizhu Blessed Land who walks his own path with a sword, seeking truths and delivering punches.
+                  - generic [ref=e130]:
+                    - generic [ref=e131]: Explore
+                    - generic [ref=e132]: →
+            - article [ref=e133]:
+              - link "宁 Character Main Heroine Ning Yao 宁姚 The peerless sword immortal from the Sword Qi Great Wall. She only believes in the sword in her hand. Explore →" [ref=e134] [cursor=pointer]:
+                - /url: /characters/ning-yao
+                - generic [ref=e137]: 宁
+                - generic [ref=e139]:
+                  - generic [ref=e140]:
+                    - generic [ref=e141]: Character
+                    - generic [ref=e142]: Main Heroine
+                  - heading "Ning Yao 宁姚" [level=4] [ref=e143]:
+                    - text: Ning Yao
+                    - generic [ref=e144]: 宁姚
+                  - paragraph [ref=e145]: The peerless sword immortal from the Sword Qi Great Wall. She only believes in the sword in her hand.
+                  - generic [ref=e146]:
+                    - generic [ref=e147]: Explore
+                    - generic [ref=e148]: →
+            - article [ref=e149]:
+              - link "齐 Lore Legend Qi Jingchun 齐静春 The Spring Breeze. A Confucian scholar who chose to hold up the falling sky for the common people. Explore →" [ref=e150] [cursor=pointer]:
+                - /url: /characters/qi-jingchun
+                - generic [ref=e153]: 齐
+                - generic [ref=e155]:
+                  - generic [ref=e156]:
+                    - generic [ref=e157]: Lore
+                    - generic [ref=e158]: Legend
+                  - heading "Qi Jingchun 齐静春" [level=4] [ref=e159]:
+                    - text: Qi Jingchun
+                    - generic [ref=e160]: 齐静春
+                  - paragraph [ref=e161]: The Spring Breeze. A Confucian scholar who chose to hold up the falling sky for the common people.
+                  - generic [ref=e162]:
+                    - generic [ref=e163]: Explore
+                    - generic [ref=e164]: →
+            - article [ref=e165]:
+              - link "浩 World Continent Haoran Tianxia 浩然天下 The Vast and Mighty World, where Confucianism holds sway and scholars guide the mortal dynasties. Explore →" [ref=e166] [cursor=pointer]:
+                - /url: /world/sample
+                - generic [ref=e169]: 浩
+                - generic [ref=e171]:
+                  - generic [ref=e172]:
+                    - generic [ref=e173]: World
+                    - generic [ref=e174]: Continent
+                  - heading "Haoran Tianxia 浩然天下" [level=4] [ref=e175]:
+                    - text: Haoran Tianxia
+                    - generic [ref=e176]: 浩然天下
+                  - paragraph [ref=e177]: The Vast and Mighty World, where Confucianism holds sway and scholars guide the mortal dynasties.
+                  - generic [ref=e178]:
+                    - generic [ref=e179]: Explore
+                    - generic [ref=e180]: →
+        - generic [ref=e184]:
+          - heading "Cinematic Archives" [level=3] [ref=e186]
+          - generic [ref=e188]:
+            - article [ref=e190]:
+              - figure [ref=e191]:
+                - generic [ref=e192]:
+                  - button "Play video" [ref=e195] [cursor=pointer]:
+                    - generic [ref=e196]: ">"
+                  - generic:
+                    - generic: Official Promotional Video
+              - generic [ref=e197]:
+                - generic [ref=e198]: Featured Duel
+                - heading "Epic Confrontations" [level=4] [ref=e199]
+                - paragraph [ref=e200]: Fluid combat sequences and breathtaking swordsmanship.
+            - generic [ref=e201]:
+              - article [ref=e203]:
+                - figure [ref=e204]:
+                  - generic [ref=e205]:
+                    - button "Play video" [ref=e208] [cursor=pointer]:
+                      - generic [ref=e209]: ">"
+                    - generic:
+                      - generic: Official Promotional Video
+                - generic [ref=e210]:
+                  - generic [ref=e211]: Visual Craft
+                  - heading "Ink-Wash Aesthetic" [level=4] [ref=e212]
+                  - paragraph [ref=e213]: Experience the unique Donghua ink-wash style.
+              - article [ref=e215]:
+                - figure [ref=e216]:
+                  - generic [ref=e217]:
+                    - button "Play video" [ref=e220] [cursor=pointer]:
+                      - generic [ref=e221]: ">"
+                    - generic:
+                      - generic: Official Promotional Video
+                - generic [ref=e222]:
+                  - generic [ref=e223]: Mystic Lore
+                  - heading "Secrets of Lizhu" [level=4] [ref=e224]
+                  - paragraph [ref=e225]: Uncovering the truth behind the hidden realm.
+        - generic [ref=e226]:
+          - generic [ref=e227]: 卷
+          - heading "The Archives are Expanding" [level=3] [ref=e228]
+          - paragraph [ref=e229]: Records of the Jian Lai universe are still being compiled. Many legends remain untold.
+          - link "Contribute on GitHub" [ref=e230] [cursor=pointer]:
+            - /url: https://github.com/WhiteQilin/jianlai-wiki
+  - contentinfo [ref=e231]:
+    - generic [ref=e232]:
+      - generic [ref=e233]:
+        - generic [ref=e234]:
+          - generic [ref=e235]:
+            - img "Jian Lai" [ref=e236]
+            - generic [ref=e237]: Jian Lai Wiki
+          - paragraph [ref=e238]: A premium, fan-made encyclopedia dedicated to the world of Sword, Come! by Feng Huo Xi Zhu Hou.
+        - generic [ref=e239]:
+          - generic [ref=e240]:
+            - heading "Archive" [level=4] [ref=e241]
+            - link "Characters" [ref=e242] [cursor=pointer]:
+              - /url: /characters
+            - link "World" [ref=e243] [cursor=pointer]:
+              - /url: /world
+            - link "Cultivation" [ref=e244] [cursor=pointer]:
+              - /url: /cultivation
+            - link "Factions" [ref=e245] [cursor=pointer]:
+              - /url: /factions
+          - generic [ref=e246]:
+            - heading "Lore" [level=4] [ref=e247]
+            - link "Swordsmanship" [ref=e248] [cursor=pointer]:
+              - /url: /swordsmanship
+            - link "Artifacts" [ref=e249] [cursor=pointer]:
+              - /url: /artifacts
+            - link "Timeline" [ref=e250] [cursor=pointer]:
+              - /url: /timeline
+            - link "Glossary" [ref=e251] [cursor=pointer]:
+              - /url: /glossary
+          - generic [ref=e252]:
+            - heading "Meta" [level=4] [ref=e253]
+            - link "About Wiki" [ref=e254] [cursor=pointer]:
+              - /url: /about
+            - link "Contribute on GitHub" [ref=e255] [cursor=pointer]:
+              - /url: https://github.com/WhiteQilin/jianlai-wiki
+      - generic [ref=e256]:
+        - generic: 印
+        - paragraph [ref=e257]: Jian Lai Wiki is an unofficial fan-made encyclopedia. Jian Lai, characters, story materials, official artwork, animation materials, and related media belong to their respective rights holders.
+        - paragraph [ref=e258]: © 2026 Jian Lai Wiki Contributors.
