@@ -66,3 +66,9 @@ public/fonts/
 # Python/cache
 __pycache__/
 *.pyc
+node_modules/
+.nuxt/
+.output/
+dist/
+.env
+.env.*
