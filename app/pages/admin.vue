@@ -51,31 +51,45 @@ const tagsString = ref('')
 const relatedString = ref('')
 const isSaving = ref(false)
 
+const referencesEditor = ref<{ parseBody: () => void } | null>(null)
+const referencesStatus = ref({ hasReferences: false, hasLowConfidence: false })
+
+function handleReferencesStatus(status: { hasReferences: boolean, hasLowConfidence: boolean }) {
+  referencesStatus.value = status
+}
+
+function hasReferencesSection(body: string): boolean {
+  return /(^|\n)##\s+References\s*(\n|$)/.test(body)
+}
+
 // Sync fetched data into editable state
 watch(selectedEntry, (newVal) => {
   if (newVal && newVal.frontmatter) {
     // Deep clone to avoid mutating the fetch cache directly
     editForm.value = JSON.parse(JSON.stringify(newVal.frontmatter))
     editBody.value = newVal.body || ''
-    
+
     // Convert arrays to comma-separated strings for simple text inputs
     tagsString.value = Array.isArray(editForm.value.tags) ? editForm.value.tags.join(', ') : ''
     relatedString.value = Array.isArray(editForm.value.related) ? editForm.value.related.join(', ') : ''
+
+    referencesStatus.value = { hasReferences: hasReferencesSection(editBody.value), hasLowConfidence: false }
+
+    nextTick(() => {
+      referencesEditor.value?.parseBody()
+    })
   } else {
     editForm.value = {}
     editBody.value = ''
     tagsString.value = ''
     relatedString.value = ''
+    referencesStatus.value = { hasReferences: false, hasLowConfidence: false }
   }
 }, { immediate: true })
 
 // --- Validation ---
 const availableCategories = computed(() => {
   if (!editForm.value.section) return []
-  // We can fetch this from an API or hardcode the map. For MVP, we'll fetch it or rely on the server.
-  // Since we don't have the sectionMeta imported here easily, we'll just allow any string for now
-  // and let the server validate, OR we can hardcode the known ones.
-  // Let's hardcode the map for client-side convenience based on the registry.
   const map: Record<string, string[]> = {
     characters: ['Character', 'Major', 'Minor', 'Gods'],
     world: ['Continent', 'Grotto-Heaven', 'Blessed Land', 'City', 'Landmark', 'Sword-Qi-Great-Wall'],
@@ -102,12 +116,27 @@ const validationErrors = computed(() => {
   return errs
 })
 
+const verificationHints = computed(() => {
+  const hints: string[] = []
+  const fm = editForm.value
+
+  if (fm.verificationStatus === 'verified' && !referencesStatus.value.hasReferences) {
+    hints.push('verificationStatus is "verified" but no references exist.')
+  }
+
+  if (referencesStatus.value.hasReferences && referencesStatus.value.hasLowConfidence) {
+    hints.push('Some references are low confidence / need verification. Consider keeping verificationStatus as "to-be-verified".')
+  }
+
+  return hints
+})
+
 const validationWarnings = computed(() => {
   const warns: string[] = []
   const fm = editForm.value
   if (!fm.pinyin?.trim()) warns.push('Pinyin is recommended')
   if (fm.seal && fm.seal.length > 3) warns.push('Seal should ideally be 1-3 characters')
-  
+
   if (editForm.value.tags && Array.isArray(editForm.value.tags)) {
     const hasInvalidTag = editForm.value.tags.some((t: string) => !/^[a-z0-9-]+$/.test(t))
     if (hasInvalidTag) warns.push('Tags should be lowercase and hyphenated')
@@ -124,7 +153,7 @@ const validationWarnings = computed(() => {
       if (!p.startsWith('/')) warns.push(`${field}: Path "${p}" must start with /`)
       if (p.startsWith('/titles')) warns.push(`${field}: Path "${p}" points to internal /titles section`)
       if (p.startsWith('/_')) warns.push(`${field}: Path "${p}" points to internal partial`)
-      
+
       // Check if it exists in entries list
       if (entries.value && !entries.value.some(e => e.routePath === p)) {
         warns.push(`${field}: Path "${p}" does not exist yet (Ghost Link)`)
@@ -136,8 +165,12 @@ const validationWarnings = computed(() => {
     warns.push('Body starts with a top-level # Title. The layout already renders the title.')
   }
 
-  if (fm.verificationStatus === 'verified' && !editBody.value.includes('## References')) {
-    warns.push('Status is "verified" but no "## References" section found in body.')
+  if (editForm.value.verificationStatus === 'verified' && !referencesStatus.value.hasReferences) {
+    warns.push('Status is "verified" but no references found.')
+  }
+
+  if (editForm.value.verificationStatus === 'verified' && referencesStatus.value.hasLowConfidence) {
+    warns.push('Status is "verified" but references include low confidence / needs verification rows.')
   }
 
   return warns
@@ -186,7 +219,7 @@ async function saveEntry() {
 
     <div v-if="!selectedEntryPath" class="dashboard">
       <h1>Editor Dashboard</h1>
-      
+
       <div class="controls">
         <input v-model="searchQuery" type="text" placeholder="Search entries..." class="search-input" />
         <select v-model="selectedSection" class="section-select">
@@ -195,7 +228,7 @@ async function saveEntry() {
       </div>
 
       <div v-if="pending" class="loading">Loading entries...</div>
-      
+
       <table v-else class="entries-table">
         <thead>
           <tr>
@@ -234,9 +267,8 @@ async function saveEntry() {
       </div>
 
       <div v-if="entryPending" class="loading">Loading entry...</div>
-      
+
       <div v-else-if="selectedEntry" class="editor-panels">
-        
         <!-- Validation Panel -->
         <div v-if="validationErrors.length || validationWarnings.length" class="validation-panel">
           <div v-if="validationErrors.length" class="errors">
@@ -323,22 +355,30 @@ async function saveEntry() {
             <div class="form-group full-width">
               <label>Source Notes</label>
               <textarea v-model="editForm.sourceNotes" rows="3"></textarea>
+              <div v-if="verificationHints.length" class="source-hints">
+                <div v-for="hint in verificationHints" :key="hint" class="hint-item">⚠️ {{ hint }}</div>
+              </div>
             </div>
             <div class="form-group full-width">
               <label>Related (comma separated paths)</label>
               <input v-model="relatedString" type="text" placeholder="e.g. /characters/chen-pingan, /world/lizhu-grotto-heaven" />
             </div>
           </div>
-          
+
           <details class="raw-json-details">
             <summary>View Raw Frontmatter JSON (Includes preserved complex fields)</summary>
             <pre>{{ editForm }}</pre>
           </details>
         </div>
-        
+
         <div class="panel body-panel">
           <h3>Body Markdown</h3>
           <textarea v-model="editBody" class="body-textarea"></textarea>
+          <AdminReferencesEditor
+            ref="referencesEditor"
+            v-model="editBody"
+            @status-change="handleReferencesStatus"
+          />
         </div>
       </div>
     </div>
@@ -431,6 +471,18 @@ async function saveEntry() {
 .panel pre {
   white-space: pre-wrap;
   word-wrap: break-word;
+}
+
+.source-hints {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.hint-item {
+  font-size: 0.85rem;
+  color: #856404;
 }
 
 .body-textarea {

@@ -27,7 +27,7 @@ related:
   - /characters/chen-qingdu
   - /artifacts/tianzhen
   - /swordsmanship/zhan-xian
-sourceNotes: >
+sourceNotes: |
   Origins and Lizhu Grotto-Heaven events verified in Volumes 1-2. Confession at Daoxuan Mountain verified in Volume 7. Slaying ancient gods and ascending to Feisheng Realm verified in Volume 26. 14th Realm breakthrough verified in Volume 47.
 ---
 
@@ -79,9 +79,9 @@ Despite the heavy restrictions on traveling between worlds, Ning Yao forced her 
 ## Relationships
 
 *   **Chen Ping'an (陈平安):** Her Dao Companion. Their mutual absolute trust and affection form the emotional core of the story. While he is meticulous, calculating, and thinks ten steps ahead, she is direct and decisive; they perfectly complement each other.
-*   **Chen Qingdu (陈清都):** The Eldest Sword Immortal. He watched over Ning Yao like a protective, albeit strict, grandfather, secretly arranging for her protection and constantly pushing her to lead the next generation.
-*   **Nalan Yexing (纳兰夜行) & Bai Lianshuang (白炼霜):** The loyal old servants of the Ning Mansion. Both dropped in cultivation realms (Nalan from Immortal to Jade, Bai from 10th-realm Martial Arts to 9th-realm) to protect a young Ning Yao from assassins.
-*   **Guo Zhujiu (郭竹酒):** Chen Ping'an's disciple, who affectionately and shamelessly calls Ning Yao "Mistress" (师娘), often acting as a bridge of humor in the otherwise solemn Ning Mansion.
+*   **Chen Qingdu (陈�都):** The Eldest Sword Immortal. He watched over Ning Yao like a protective, albeit strict, grandfather, secretly arranging for her protection and constantly pushing her to lead the next generation.
+*   **Nalan Yexing (纳��夜行) & Bai Lianshuang (白炼霜):** The loyal old servants of the Ning Mansion. Both dropped in cultivation realms (Nalan from Immortal to Jade, Bai from 10th-realm Martial Arts to 9th-realm) to protect a young Ning Yao from assassins.
+*   **Guo Zhujiu (郭竹��):** Chen Ping'an's disciple, who affectionately and shamelessly calls Ning Yao "Mistress" (师娘), often acting as a bridge of humor in the otherwise solemn Ning Mansion.
 
 ## Quotes
 
@@ -99,7 +99,7 @@ Despite the heavy restrictions on traveling between worlds, Ning Yao forced her 
 - **剑来1：少年骑微马, 第三章 — 少女和飞剑:** Supports her initial appearance, background, and her first encounter with Chen Ping'an in Lizhu Grotto-Heaven.
 - **剑来7：迢迢渡阴驿, 第三章 — 一枕黄粱剑气长:** Supports the emotional reunion at Daoxuan Mountain where Chen Ping'an confesses his feelings and Ning Yao accepts him.
 - **剑来19：剑修如云处出拳, 第七章 — 剑修如云处出拳:** Supports her family background, the Zhuajou ceremony with the Dragon Slaying Platform, and the sacrifices of Nalan Yexing and Bai Lianshuang.
-- **剑来20：隐者留其名, 第二章 — 天下剑术天上来:** Supports the legendary sword spirit of the Immortal Sword *Tianzhen* recognizing and submitting to Ning Yao.
+- **剑来20：隐�留��名, 第二章 — 天下剑术天上来:** Supports the legendary sword spirit of the Immortal Sword *Tianzhen* recognizing and submitting to Ning Yao.
 - **剑来26：人间最得意, 第十章 — 问剑商位:** Supports her battling ancient remnant gods at the "Sword" stele and successfully breaking through to the Ascension Realm (Feisheng).
 - **剑来29：左中皆好剑, 第二章 — 宁姚来见陈平安:** Supports her arrival in Haoran Heaven as a Feisheng Realm sword cultivator to find Chen Ping'an.
-- **剑来47：隐者谪魔敢, 第四章 — 高两境:** Supports her breakthrough to the 14th Realm as a pure sword cultivator during the "Heavenly Weeping" anomaly.
+- **剑来47：隐�谪魔敢, 第四章 — 高两境:** Supports her breakthrough to the 14th Realm as a pure sword cultivator during the "Heavenly Weeping" anomaly.
