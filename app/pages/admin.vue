@@ -44,6 +44,21 @@ const { data: selectedEntry, pending: entryPending } = await useFetch<any>(() =>
   selectedEntryPath.value ? `/api/editor/entry?path=${selectedEntryPath.value}` : '/api/editor/entry?path=/invalid'
 )
 
+// --- Preview / UX polish state ---
+const previewNonce = ref(0)
+const showPreviewPanel = ref(true)
+const importSuccess = ref<null | {
+  action: 'created' | 'updated'
+  routePath: string
+  fileRelPath: string
+}>(null)
+
+const previewRoute = computed(() => selectedEntryPath.value || selectedEntry?.value?.routePath || '')
+const previewUrl = computed(() => {
+  if (!previewRoute.value) return ''
+  return `${previewRoute.value}${previewRoute.value.includes('?') ? '&' : '?'}preview=${previewNonce.value}`
+})
+
 const PUBLIC_SECTIONS = ['characters', 'world', 'cultivation', 'swordsmanship', 'factions', 'artifacts', 'timeline', 'glossary', 'rankings', 'teachings', 'pantheon'] as const
 const IMPORTANCE_VALUES = ['primary', 'major', 'minor', 'background'] as const
 const VERIFICATION_VALUES = ['verified', 'to-be-verified', 'disputed', 'speculative'] as const
@@ -215,6 +230,7 @@ async function createEntry() {
     await refreshEntries()
     selectedEntryPath.value = res.routePath
     isCreateWizardOpen.value = false
+    importSuccess.value = null
   } catch (e: any) {
     createWizardError.value = e?.data?.statusMessage || e?.message || 'Failed to create entry'
   } finally {
@@ -229,6 +245,7 @@ function openImportModal() {
   importOverwritePhrase.value = ''
   importBodyPreview.value = ''
   importFrontmatterPreview.value = ''
+  importSuccess.value = null
   isImportModalOpen.value = true
 }
 
@@ -317,6 +334,11 @@ async function importAndSaveMarkdown() {
 
     await refreshEntries()
     selectedEntryPath.value = path
+    importSuccess.value = {
+      action: importParseResult.value.exists ? 'updated' : 'created',
+      routePath: path,
+      fileRelPath: importParseResult.value.fileRelPath,
+    }
     isImportModalOpen.value = false
   } catch (e: any) {
     importParseError.value = e?.data?.statusMessage || e?.message || 'Import save failed'
@@ -444,12 +466,72 @@ const validationWarnings = computed(() => {
   return warns
 })
 
+const initialSnapshot = ref('')
+
+const canSave = computed(() => validationErrors.value.length === 0)
+
+const hasUnsavedChanges = computed(() => {
+  if (!selectedEntryPath.value || !selectedEntry.value) return false
+  const normalized = {
+    frontmatter: editForm.value,
+    body: editBody.value,
+  }
+  return JSON.stringify(normalized) !== initialSnapshot.value
+})
+
+watch(selectedEntryPath, (newPath, oldPath) => {
+  if (!oldPath) return
+  if (hasUnsavedChanges.value) {
+    const proceed = window.confirm('You have unsaved changes. Switch entry anyway?')
+    if (!proceed) {
+      selectedEntryPath.value = oldPath
+    }
+  }
+})
+
+watch([editForm, editBody], () => {
+  // no-op: keeps computed reactive
+}, { deep: true })
+
+watch(selectedEntry, (val) => {
+  if (!val) {
+    initialSnapshot.value = ''
+    return
+  }
+  initialSnapshot.value = JSON.stringify({
+    frontmatter: val.frontmatter || {},
+    body: val.body || '',
+  })
+}, { immediate: true })
+
+if (import.meta.client) {
+  window.addEventListener('beforeunload', (e) => {
+    if (!hasUnsavedChanges.value) return
+    e.preventDefault()
+    e.returnValue = ''
+  })
+}
+
+function refreshPreview() {
+  previewNonce.value += 1
+}
+
+function openPublicPage() {
+  const route = previewRoute.value
+  if (!route) return
+  window.open(route, '_blank', 'noopener,noreferrer')
+}
+
 // --- Actions ---
 function editEntry(path: string) {
   selectedEntryPath.value = path
 }
 
 function closeEditor() {
+  if (hasUnsavedChanges.value) {
+    const proceed = window.confirm('You have unsaved changes. Close editor anyway?')
+    if (!proceed) return
+  }
   selectedEntryPath.value = ''
 }
 
@@ -471,8 +553,12 @@ async function saveEntry() {
       }
     })
     alert('Saved successfully! Backup created at: ' + (res as any).backup)
+    initialSnapshot.value = JSON.stringify({
+      frontmatter: editForm.value,
+      body: editBody.value,
+    })
   } catch (e: any) {
-    alert('Save failed: ' + (e.data?.statusMessage || e.message))
+    alert('Save failed: ' + (e.data?.message || e.data?.statusMessage || e.message))
   } finally {
     isSaving.value = false
   }
@@ -487,6 +573,12 @@ async function saveEntry() {
 
     <div v-if="!selectedEntryPath" class="dashboard">
       <h1>Editor Dashboard</h1>
+
+      <div v-if="importSuccess" class="import-success">
+        <strong>Import {{ importSuccess.action === 'created' ? 'created' : 'updated' }} successfully.</strong>
+        <div>Route: <code>{{ importSuccess.routePath }}</code></div>
+        <div>File: <code>content/{{ importSuccess.fileRelPath }}</code></div>
+      </div>
 
       <div class="controls">
         <input v-model="searchQuery" type="text" placeholder="Search entries..." class="search-input" />
@@ -529,7 +621,12 @@ async function saveEntry() {
       <div class="editor-header">
         <h2>Editing: {{ selectedEntry?.routePath }}</h2>
         <div class="header-actions">
-          <button @click="saveEntry" class="save-btn" :disabled="isSaving">
+          <span class="save-state" :class="canSave ? 'ok' : 'blocked'">
+            {{ canSave ? 'Can save' : 'Cannot save' }}
+          </span>
+          <button @click="openPublicPage" class="create-btn" :disabled="!previewRoute">Open Public Page</button>
+          <button @click="refreshPreview" class="create-btn" :disabled="!previewRoute">Refresh Preview</button>
+          <button @click="saveEntry" class="save-btn" :disabled="isSaving || !canSave">
             {{ isSaving ? 'Saving...' : 'Save Changes' }}
           </button>
           <button @click="closeEditor" class="close-btn">Discard & Back</button>
@@ -649,6 +746,11 @@ async function saveEntry() {
             v-model="editBody"
             @status-change="handleReferencesStatus"
           />
+        </div>
+
+        <div v-if="showPreviewPanel && previewUrl" class="panel preview-panel">
+          <h3>Live Preview (saved route)</h3>
+          <iframe :src="previewUrl" class="preview-iframe" />
         </div>
       </div>
     </div>
@@ -1024,12 +1126,54 @@ async function saveEntry() {
   font-size: 0.85rem;
 }
 
+.save-state {
+  font-size: 0.85rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+
+.save-state.ok {
+  color: #1b5e20;
+  background: #e8f5e9;
+  border-color: #c8e6c9;
+}
+
+.save-state.blocked {
+  color: #8f1d18;
+  background: #fdecec;
+  border-color: #f2b8b5;
+}
+
+.preview-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.preview-iframe {
+  width: 100%;
+  min-height: 520px;
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  background: #fff;
+}
+
 .create-error {
   margin-top: 0.8rem;
   padding: 0.55rem 0.7rem;
   border: 1px solid #f2b8b5;
   background: #fdecec;
   color: #8f1d18;
+  border-radius: 4px;
+}
+
+.import-success {
+  margin-top: 0.8rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #c8e6c9;
+  background: #e8f5e9;
+  color: #1b5e20;
   border-radius: 4px;
 }
 </style>

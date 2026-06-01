@@ -157,7 +157,7 @@ function buildMarkdown(frontmatter: Record<string, any>, body: string): string {
 
 export default defineEventHandler(async (event) => {
   if (!import.meta.dev) {
-    throw createError({ statusCode: 404, statusMessage: 'Not Found' })
+    throw createError({ statusCode: 404, statusMessage: 'Not Found', message: 'Endpoint is dev-only' })
   }
 
   const payload = await readBody<ImportPayload>(event)
@@ -166,12 +166,12 @@ export default defineEventHandler(async (event) => {
   if (mode === 'parse') {
     const markdown = asString(payload?.markdown)
     if (!markdown.trim()) {
-      throw createError({ statusCode: 400, statusMessage: 'markdown is required' })
+      throw createError({ statusCode: 400, statusMessage: 'Bad Request', message: 'markdown is required' })
     }
 
     const split = splitMarkdown(markdown)
     if ('error' in split) {
-      throw createError({ statusCode: 422, statusMessage: split.error })
+      throw createError({ statusCode: 422, statusMessage: 'Invalid Markdown', message: split.error })
     }
 
     let frontmatter: Record<string, any>
@@ -180,12 +180,13 @@ export default defineEventHandler(async (event) => {
     } catch (e: any) {
       throw createError({
         statusCode: 422,
-        statusMessage: `Invalid YAML frontmatter: ${e?.message || 'unknown error'}`,
+        statusMessage: 'Invalid YAML frontmatter',
+        message: e?.message || 'unknown error',
       })
     }
 
     if (!frontmatter || typeof frontmatter !== 'object' || Array.isArray(frontmatter)) {
-      throw createError({ statusCode: 422, statusMessage: 'Frontmatter must be a YAML object' })
+      throw createError({ statusCode: 422, statusMessage: 'Invalid Frontmatter', message: 'Frontmatter must be a YAML object' })
     }
 
     const result = await buildParseResult(frontmatter, split.body)
@@ -197,9 +198,9 @@ export default defineEventHandler(async (event) => {
   const frontmatter = payload?.frontmatter
   const body = asString(payload?.body)
 
-  if (!path) throw createError({ statusCode: 400, statusMessage: 'path is required' })
+  if (!path) throw createError({ statusCode: 400, statusMessage: 'Bad Request', message: 'path is required' })
   if (!frontmatter || typeof frontmatter !== 'object' || Array.isArray(frontmatter)) {
-    throw createError({ statusCode: 400, statusMessage: 'frontmatter object is required' })
+    throw createError({ statusCode: 400, statusMessage: 'Bad Request', message: 'frontmatter object is required' })
   }
 
   const parseResult = await buildParseResult(frontmatter, body)
@@ -207,19 +208,21 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 422,
       statusMessage: 'Validation failed',
+      message: parseResult.errors.join('; '),
       data: { errors: parseResult.errors, warnings: parseResult.warnings },
     })
   }
 
   const resolved = resolveEntryPath(path)
   if ('error' in resolved) {
-    throw createError({ statusCode: 400, statusMessage: resolved.error })
+    throw createError({ statusCode: 400, statusMessage: 'Invalid Path', message: resolved.error })
   }
 
   if (resolved.routePath !== parseResult.routePath) {
     throw createError({
       statusCode: 422,
-      statusMessage: `path "${resolved.routePath}" does not match parsed route "${parseResult.routePath}"`,
+      statusMessage: 'Path mismatch',
+      message: `path "${resolved.routePath}" does not match parsed route "${parseResult.routePath}"`,
     })
   }
 
@@ -227,7 +230,8 @@ export default defineEventHandler(async (event) => {
     await readFile(resolved.fileAbsPath, 'utf-8')
     throw createError({
       statusCode: 409,
-      statusMessage: 'Target file already exists. Use overwrite flow via /api/editor/entry with explicit confirmation.',
+      statusMessage: 'Target exists',
+      message: 'Target file already exists. Use overwrite flow via /api/editor/entry with explicit confirmation.',
     })
   } catch (e: any) {
     if (e?.statusCode === 409) throw e
@@ -241,7 +245,8 @@ export default defineEventHandler(async (event) => {
   } catch (e: any) {
     throw createError({
       statusCode: 500,
-      statusMessage: `Failed to create entry file: ${e?.message || 'unknown error'}`,
+      statusMessage: 'Create failed',
+      message: e?.message || 'unknown error',
     })
   }
 

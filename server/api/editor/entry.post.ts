@@ -95,19 +95,19 @@ function validateFrontmatter(section: string, fm: Record<string, any>): string[]
 
 export default defineEventHandler(async (event) => {
   if (!import.meta.dev) {
-    throw createError({ statusCode: 404, statusMessage: 'Not Found' })
+    throw createError({ statusCode: 404, statusMessage: 'Not Found', message: 'Endpoint is dev-only' })
   }
 
   const payload = await readBody<SavePayload>(event)
 
   const resolved = resolveEntryPath(payload?.path)
   if ('error' in resolved) {
-    throw createError({ statusCode: 400, statusMessage: resolved.error })
+    throw createError({ statusCode: 400, statusMessage: 'Invalid Path', message: resolved.error })
   }
 
   const frontmatter = payload?.frontmatter
   if (!frontmatter || typeof frontmatter !== 'object' || Array.isArray(frontmatter)) {
-    throw createError({ statusCode: 400, statusMessage: 'frontmatter object is required' })
+    throw createError({ statusCode: 400, statusMessage: 'Bad Request', message: 'frontmatter object is required' })
   }
 
   const body = typeof payload?.body === 'string' ? payload.body : ''
@@ -118,6 +118,7 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 422,
       statusMessage: 'Validation failed',
+      message: errors.join('; '),
       data: { errors },
     })
   }
@@ -127,7 +128,7 @@ export default defineEventHandler(async (event) => {
   try {
     original = await readFile(resolved.fileAbsPath, 'utf-8')
   } catch {
-    throw createError({ statusCode: 404, statusMessage: 'Entry not found' })
+    throw createError({ statusCode: 404, statusMessage: 'Not Found', message: 'Entry not found' })
   }
 
   // --- Backup BEFORE overwriting ---
@@ -140,7 +141,8 @@ export default defineEventHandler(async (event) => {
   } catch (e: any) {
     throw createError({
       statusCode: 500,
-      statusMessage: `Failed to create backup: ${e?.message || 'unknown error'}`,
+      statusMessage: 'Backup failed',
+      message: e?.message || 'unknown error',
     })
   }
 
@@ -151,7 +153,8 @@ export default defineEventHandler(async (event) => {
   } catch (e: any) {
     throw createError({
       statusCode: 500,
-      statusMessage: `Failed to serialize frontmatter: ${e?.message || 'unknown error'}`,
+      statusMessage: 'Serialization failed',
+      message: e?.message || 'unknown error',
     })
   }
 
@@ -164,7 +167,8 @@ export default defineEventHandler(async (event) => {
   } catch (e: any) {
     throw createError({
       statusCode: 500,
-      statusMessage: `Failed to write file: ${e?.message || 'unknown error'}`,
+      statusMessage: 'Write failed',
+      message: e?.message || 'unknown error',
     })
   }
 

@@ -35,7 +35,7 @@ function reqString(value: unknown): string {
 
 export default defineEventHandler(async (event) => {
   if (!import.meta.dev) {
-    throw createError({ statusCode: 404, statusMessage: 'Not Found' })
+    throw createError({ statusCode: 404, statusMessage: 'Not Found', message: 'Endpoint is dev-only' })
   }
 
   const payload = await readBody<CreateEntryPayload>(event)
@@ -52,50 +52,53 @@ export default defineEventHandler(async (event) => {
   const status = reqString(payload?.status)
   const seal = reqString(payload?.seal)
 
-  if (!title) throw createError({ statusCode: 422, statusMessage: 'title is required' })
-  if (!chinese) throw createError({ statusCode: 422, statusMessage: 'chinese is required' })
-  if (!description) throw createError({ statusCode: 422, statusMessage: 'description is required' })
+  if (!title) throw createError({ statusCode: 422, statusMessage: 'Validation failed', message: 'title is required' })
+  if (!chinese) throw createError({ statusCode: 422, statusMessage: 'Validation failed', message: 'chinese is required' })
+  if (!description) throw createError({ statusCode: 422, statusMessage: 'Validation failed', message: 'description is required' })
 
   if (!(EDITOR_SECTIONS as readonly string[]).includes(section)) {
-    throw createError({ statusCode: 422, statusMessage: `section "${section}" is not allowed` })
+    throw createError({ statusCode: 422, statusMessage: 'Validation failed', message: `section "${section}" is not allowed` })
   }
 
   const validCategories = categoriesForSection(section)
   if (!category || !validCategories.includes(category)) {
     throw createError({
       statusCode: 422,
-      statusMessage: `category "${category}" is not valid for section "${section}"`,
+      statusMessage: 'Validation failed',
+      message: `category "${category}" is not valid for section "${section}"`,
     })
   }
 
   if (!(IMPORTANCE_VALUES as readonly string[]).includes(importance)) {
     throw createError({
       statusCode: 422,
-      statusMessage: `importance "${importance}" must be one of: ${IMPORTANCE_VALUES.join(', ')}`,
+      statusMessage: 'Validation failed',
+      message: `importance "${importance}" must be one of: ${IMPORTANCE_VALUES.join(', ')}`,
     })
   }
 
   if (!(VERIFICATION_VALUES as readonly string[]).includes(verificationStatus)) {
     throw createError({
       statusCode: 422,
-      statusMessage: `verificationStatus "${verificationStatus}" must be one of: ${VERIFICATION_VALUES.join(', ')}`,
+      statusMessage: 'Validation failed',
+      message: `verificationStatus "${verificationStatus}" must be one of: ${VERIFICATION_VALUES.join(', ')}`,
     })
   }
 
   const slugError = validateCreateSlug(slug)
   if (slugError) {
-    throw createError({ statusCode: 422, statusMessage: slugError })
+    throw createError({ statusCode: 422, statusMessage: 'Validation failed', message: slugError })
   }
 
   const resolved = resolveEntryPath(`/${section}/${slug}`)
   if ('error' in resolved) {
-    throw createError({ statusCode: 400, statusMessage: resolved.error })
+    throw createError({ statusCode: 400, statusMessage: 'Invalid Path', message: resolved.error })
   }
 
   // Prevent overwrite
   try {
     await readFile(resolved.fileAbsPath, 'utf-8')
-    throw createError({ statusCode: 409, statusMessage: 'Entry already exists' })
+    throw createError({ statusCode: 409, statusMessage: 'Conflict', message: 'Entry already exists' })
   } catch (e: any) {
     if (e?.statusCode === 409) throw e
     // ENOENT is expected; continue
@@ -122,7 +125,8 @@ export default defineEventHandler(async (event) => {
   } catch (e: any) {
     throw createError({
       statusCode: 500,
-      statusMessage: `Failed to serialize frontmatter: ${e?.message || 'unknown error'}`,
+      statusMessage: 'Serialization failed',
+      message: e?.message || 'unknown error',
     })
   }
 
@@ -134,7 +138,8 @@ export default defineEventHandler(async (event) => {
   } catch (e: any) {
     throw createError({
       statusCode: 500,
-      statusMessage: `Failed to create entry file: ${e?.message || 'unknown error'}`,
+      statusMessage: 'Create failed',
+      message: e?.message || 'unknown error',
     })
   }
 
