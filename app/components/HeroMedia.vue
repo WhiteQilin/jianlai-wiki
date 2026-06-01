@@ -1,5 +1,7 @@
 <script setup lang="ts">
-defineProps<{
+import { computed, ref, watch } from 'vue'
+
+const props = defineProps<{
   image?: string
   video?: string
   alt?: string
@@ -7,37 +9,56 @@ defineProps<{
   credit?: string
   isOfficial?: boolean
 }>()
+const emit = defineEmits<{
+  'video-error': []
+}>()
+
+const hasVideoError = ref(false)
+
+watch(() => props.video, () => {
+  hasVideoError.value = false
+})
+
+const handleVideoError = () => {
+  hasVideoError.value = true
+  emit('video-error')
+}
+
+// True only when a real video is playing (not errored).
+const videoActive = computed(() => Boolean(props.video) && !hasVideoError.value)
 </script>
 
 <template>
   <div class="hero-media">
     <div class="hero-background">
-      <slot name="background" />
-      <div class="bg-media-wrapper animate-ken-burns">
-        <!-- Optional chaining for reduced motion fallback (if supported) or handled via CSS -->
-        <video 
-          v-if="video" 
-          autoplay 
-          loop 
-          muted 
-          playsinline 
+      <!-- Expose video-active state so atmosphere layers (e.g. ink mist) can hide behind a playing video -->
+      <slot name="background" :videoActive="videoActive" />
+      <div class="bg-media-wrapper" :class="{ 'animate-ken-burns': !videoActive }">
+        <!-- Ken Burns slow-zoom is reserved for static posters/fallbacks; videos already carry their own motion. -->
+        <video
+          v-if="videoActive"
+          :key="props.video"
+          :src="props.video"
+          autoplay
+          loop
+          muted
+          playsinline
           controlslist="nodownload"
           oncontextmenu="return false;"
-          :poster="image" 
+          :poster="props.image"
           class="bg-video"
-        >
-          <source :src="video" type="video/mp4" />
-        </video>
-        <img v-if="image" :src="image" :alt="alt || ''" class="bg-image" :class="{ 'fallback-only': video }" />
-        <div v-else-if="!video" class="bg-fallback animate-fade-in-up"></div>
+          @error="handleVideoError"
+        />
+        <img v-if="props.image" :src="props.image" :alt="props.alt || ''" class="bg-image" :class="{ 'fallback-only': videoActive }" />
+        <div v-else-if="!props.video" class="bg-fallback animate-fade-in-up"></div>
       </div>
       <div class="bg-overlay"></div>
     </div>
 
-    <div v-if="credit || caption || isOfficial" class="media-attribution animate-fade-in-up" style="animation-delay: 1.2s;">
-      <span v-if="isOfficial" class="official-badge">Official Promotional Image</span>
-      <p v-if="caption" class="media-caption">{{ caption }}</p>
-      <p v-if="credit" class="media-credit">Credit: {{ credit }}</p>
+    <div v-if="props.credit || props.caption || props.isOfficial" class="media-attribution animate-fade-in-up" style="animation-delay: 1.2s;">
+      <span v-if="props.isOfficial" class="official-badge">Official Promotional Media</span>
+      <p v-if="props.caption" class="media-caption">{{ props.caption }}</p>
+      <p v-if="props.credit" class="media-credit">Credit: {{ props.credit }}</p>
     </div>
 
     <div class="hero-content">
@@ -82,7 +103,7 @@ defineProps<{
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: grayscale(100%) contrast(1.1);
+  filter: grayscale(55%) contrast(1.08);
   opacity: 0;
   animation: fadeIn 2s ease-out forwards;
   position: absolute;
@@ -98,13 +119,6 @@ defineProps<{
   .animate-ken-burns {
     animation: none !important;
   }
-  .bg-video {
-    /* Hide video if reduced motion is preferred, fallback to poster */
-    display: none !important;
-  }
-  .fallback-only {
-    display: block !important;
-  }
 }
 
 .bg-fallback {
@@ -117,7 +131,7 @@ defineProps<{
 .bg-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, transparent 0%, var(--c-bg) 90%);
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 0%, var(--c-bg) 82%);
 }
 
 .media-attribution {
@@ -193,6 +207,6 @@ defineProps<{
 
 @keyframes fadeIn {
   from { opacity: 0; }
-  to { opacity: 0.15; }
+  to { opacity: 0.62; }
 }
 </style>

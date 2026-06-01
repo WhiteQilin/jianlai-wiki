@@ -66,7 +66,7 @@ export default defineContentConfig({
         // --- Faction / Sect ---
         factionType: z.string().optional(),
         headquarters: z.string().optional(),
-        leader: z.string().optional(),
+        leader: z.union([z.string(), z.array(z.string())]).optional(),
         members: z.array(z.string()).optional(),
         teachings: z.array(z.string()).optional(),
 

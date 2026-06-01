@@ -8,6 +8,7 @@ interface SpotlightItem {
   status: string
   link: string
   image?: string
+  imagePosition?: string
 }
 
 defineProps<{
@@ -35,7 +36,7 @@ defineProps<{
         >
           <NuxtLink :to="item.link" class="card-inner hover-lift">
             <div class="card-media">
-              <img v-if="item.image" :src="item.image" :alt="item.nameEn" class="card-image" />
+              <img v-if="item.image" :src="item.image" :alt="item.nameEn" class="card-image" :style="item.imagePosition ? { objectPosition: item.imagePosition } : {}" />
               <div v-else class="card-fallback">
                 <span>{{ item.nameZh.charAt(0) || '无' }}</span>
               </div>
@@ -45,7 +46,13 @@ defineProps<{
             <div class="card-content">
               <div class="card-meta">
                 <span class="category">{{ item.category }}</span>
-                <span class="status">{{ item.status }}</span>
+                <SealBadge
+                  v-if="item.status === 'Main Protagonist'"
+                  :text="'主角'"
+                  variant="filled"
+                  shape="square"
+                />
+                <span v-else class="status">{{ item.status }}</span>
               </div>
               <h4 class="card-title">
                 {{ item.nameEn }}
@@ -223,9 +230,11 @@ defineProps<{
 }
 
 .card-title-zh {
-  font-size: 1.1rem;
+  font-family: var(--font-zh-display);
+  font-size: 1.35rem;
   color: var(--c-text-3);
   font-weight: 400;
+  letter-spacing: 0.04em;
 }
 
 .card-desc {

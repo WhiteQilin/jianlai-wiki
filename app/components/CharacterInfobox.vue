@@ -18,9 +18,10 @@ defineProps<{
     </div>
     
     <div class="infobox-content">
-      <div v-for="stat in stats" :key="stat.label" class="infobox-stat">
+      <div class="infobox-texture"></div>
+      <div v-for="stat in stats" :key="stat.label" class="infobox-stat" :class="{ 'is-status': stat.label.toLowerCase() === 'status' }">
         <span class="stat-label">{{ stat.label }}</span>
-        <span class="stat-value">{{ stat.value }}</span>
+        <span class="stat-value" :class="{ 'stamp-effect': stat.label.toLowerCase() === 'status' }">{{ stat.value }}</span>
       </div>
     </div>
   </aside>
@@ -31,8 +32,10 @@ defineProps<{
   width: 100%;
   background: var(--c-bg-soft);
   border: 1px solid var(--c-border);
-  border-radius: 4px;
+  border-radius: 2px;
   overflow: hidden;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
 .infobox-image-wrapper {
@@ -83,18 +86,42 @@ defineProps<{
 }
 
 .infobox-content {
-  padding: 1.5rem;
+  padding: 2rem 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.2rem;
+  position: relative;
+}
+
+.infobox-texture {
+  position: absolute;
+  inset: 0;
+  background-image: url('/images/textures/ink-wash-02.webp');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.dark .infobox-texture {
+  mix-blend-mode: screen;
+  opacity: 0.03;
 }
 
 .infobox-stat {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px dashed var(--c-divider);
+  gap: 0.4rem;
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid var(--c-divider);
+  position: relative;
+  z-index: 1;
+}
+
+.infobox-stat.is-status {
+  align-items: flex-start;
 }
 
 .infobox-stat:last-child {
@@ -111,9 +138,23 @@ defineProps<{
 }
 
 .stat-value {
-  font-size: 0.95rem;
+  font-size: 1rem;
   color: var(--c-ink);
   font-weight: 500;
   line-height: 1.4;
+}
+
+.stamp-effect {
+  font-family: var(--font-heading);
+  color: var(--c-seal-red);
+  border: 1px solid var(--c-seal-red-soft);
+  padding: 0.2rem 0.6rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: rgba(184, 42, 42, 0.03);
+  transform: rotate(-2deg);
+  display: inline-block;
+  margin-top: 0.2rem;
 }
 </style>

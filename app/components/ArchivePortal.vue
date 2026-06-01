@@ -4,12 +4,14 @@ defineProps<{
   titleZh: string
   titleEn: string
   bgChar: string
+  bgImage?: string
 }>()
 </script>
 
 <template>
   <NuxtLink :to="link" class="portal-card hover-lift" :data-zh="bgChar">
-    <div class="portal-texture"></div>
+    <div v-if="bgImage" class="portal-bg-image" :style="{ backgroundImage: `url(${bgImage})` }"></div>
+    <div v-else class="portal-texture"></div>
     <span class="portal-zh">{{ titleZh }}</span>
     <div class="portal-bottom">
       <span class="portal-en">{{ titleEn }}</span>
@@ -19,6 +21,24 @@ defineProps<{
 </template>
 
 <style scoped>
+.portal-bg-image {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.15;
+  filter: grayscale(80%) sepia(20%) hue-rotate(330deg);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.portal-card:hover .portal-bg-image {
+  opacity: 0.3;
+  transform: scale(1.05);
+  filter: grayscale(30%) sepia(20%) hue-rotate(330deg);
+}
+
 .portal-texture {
   position: absolute;
   inset: 0;
@@ -69,7 +89,7 @@ defineProps<{
   position: absolute;
   bottom: -20px;
   right: -10px;
-  font-family: var(--font-heading);
+  font-family: var(--font-zh-display);
   font-size: 8rem;
   color: var(--c-text-1);
   opacity: 0.02;
@@ -94,11 +114,11 @@ defineProps<{
 }
 
 .portal-zh {
-  font-family: var(--font-heading);
-  font-size: 2.2rem;
+  font-family: var(--font-zh-display);
+  font-size: 2.6rem;
   color: var(--c-ink);
   font-weight: 400;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   position: relative;
   z-index: 1;
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);

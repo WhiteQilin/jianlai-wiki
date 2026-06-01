@@ -5,16 +5,16 @@ defineProps<{
 </script>
 
 <template>
-  <div class="wiki-notice" :class="`notice-${type || 'info'}`">
+  <aside class="wiki-notice" :class="`notice-${type || 'info'}`">
     <div class="notice-icon">
-      <span v-if="type === 'warning'">⚠️</span>
-      <span v-else-if="type === 'verification'">印</span>
-      <span v-else>ℹ️</span>
+      <span v-if="type === 'warning'">!</span>
+      <SealBadge v-else-if="type === 'verification'" text="印" variant="outline" shape="square" />
+      <span v-else>i</span>
     </div>
     <div class="notice-content">
       <slot />
     </div>
-  </div>
+  </aside>
 </template>
 
 <style scoped>
@@ -22,15 +22,35 @@ defineProps<{
   display: flex;
   gap: 1.2rem;
   padding: 1.5rem;
-  border-radius: 4px;
-  background: var(--c-bg-soft);
+  border-radius: 6px;
+  background:
+    linear-gradient(90deg, var(--c-seal-red-soft), transparent 36%),
+    var(--c-bg-soft);
+  border: 1px solid var(--c-border);
   border-left: 3px solid var(--c-border);
   margin: 2rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.wiki-notice::after {
+  content: '';
+  position: absolute;
+  top: 0.75rem;
+  right: 1rem;
+  width: 5rem;
+  height: 2.2rem;
+  border-top: 1px solid color-mix(in srgb, var(--c-teal-accent) 45%, transparent);
+  border-radius: 999px 999px 0 0;
+  opacity: 0.35;
+  pointer-events: none;
 }
 
 .notice-verification {
   border-left-color: var(--c-seal-red);
-  background: rgba(186, 38, 38, 0.03);
+  background:
+    linear-gradient(90deg, var(--c-seal-red-soft), transparent 38%),
+    var(--c-bg-soft);
 }
 
 .notice-warning {
@@ -42,19 +62,14 @@ defineProps<{
 }
 
 .notice-icon {
-  font-size: 1.5rem;
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
   display: flex;
   align-items: flex-start;
-}
-
-.notice-verification .notice-icon {
-  font-family: var(--font-heading);
   color: var(--c-seal-red);
-  border: 1px solid var(--c-seal-red);
-  padding: 2px 4px;
-  font-size: 1.2rem;
-  border-radius: 2px;
   line-height: 1;
+  position: relative;
+  z-index: 1;
 }
 
 .notice-content {
@@ -62,6 +77,8 @@ defineProps<{
   font-size: 0.95rem;
   color: var(--c-text-2);
   line-height: 1.6;
+  position: relative;
+  z-index: 1;
 }
 
 .notice-content :deep(p:first-child) {

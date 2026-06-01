@@ -68,14 +68,18 @@ withDefaults(defineProps<{
   width: 80%;
   max-width: 600px;
   height: 12px;
-  background-image: url('/images/textures/ink-wash-01.webp');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  opacity: 0.3;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(20, 20, 20, 0.10) 15%,
+    rgba(20, 20, 20, 0.28) 50%,
+    rgba(20, 20, 20, 0.10) 85%,
+    transparent 100%
+  );
+  opacity: 1;
   mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
   -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-  filter: grayscale(100%) contrast(1.5);
+  filter: none;
 }
 
 .dark .brush-stroke {

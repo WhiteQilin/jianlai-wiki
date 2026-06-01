@@ -1,4 +1,26 @@
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
+import { HOME_HERO_VIDEOS } from '~/constants/homeHeroVideos'
+import { pickRandomHeroVideo } from '~/composables/useRandomHeroVideo'
+
+const defaultHeroVideo = '/videos/curated/home-intro.mp4'
+const heroVideo = ref(defaultHeroVideo)
+const heroCandidates = [...HOME_HERO_VIDEOS]
+const activeCandidates = ref<string[]>([])
+
+const rotateHeroVideo = () => {
+  const next = pickRandomHeroVideo(activeCandidates.value, defaultHeroVideo)
+  heroVideo.value = next
+  if (next !== defaultHeroVideo) {
+    activeCandidates.value = activeCandidates.value.filter((video) => video !== next)
+  }
+}
+
+onMounted(() => {
+  activeCandidates.value = [...heroCandidates]
+  rotateHeroVideo()
+})
+
 const spotlightItems = [
   {
     id: 'chen-pingan',
@@ -17,7 +39,9 @@ const spotlightItems = [
     desc: 'The peerless sword immortal from the Sword Qi Great Wall. She only believes in the sword in her hand.',
     category: 'Character',
     status: 'Main Heroine',
-    link: '/characters/ning-yao'
+    link: '/characters/ning-yao',
+    image: '/images/characters/ning-yao.jpg',
+    imagePosition: 'center 15%'
   },
   {
     id: 'qi-jingchun',
@@ -26,7 +50,9 @@ const spotlightItems = [
     desc: 'The Spring Breeze. A Confucian scholar who chose to hold up the falling sky for the common people.',
     category: 'Lore',
     status: 'Legend',
-    link: '/characters/qi-jingchun'
+    link: '/characters/qi-jingchun',
+    image: '/images/characters/qi-jingchun.jpg',
+    imagePosition: 'center 20%'
   },
   {
     id: 'haoran',
@@ -43,22 +69,22 @@ const spotlightItems = [
 <template>
   <div class="home-archive">
     <HeroMedia
-      video="/videos/curated/home-intro.mp4"
+      :video="heroVideo"
       image="/images/banners/home-hero.webp"
       alt="Jian Lai Official Animation Key Visual"
       credit="Tencent Video / Jian Lai Animation"
       :isOfficial="true"
+      @video-error="rotateHeroVideo"
     >
-      <template #background>
-        <div class="hero-mist animate-drift"></div>
+      <template #background="{ videoActive }">
+        <div v-if="!videoActive" class="hero-mist animate-drift"></div>
         <div class="hero-calligraphy-wrapper">
           <div class="hero-calligraphy">剑</div>
         </div>
       </template>
 
       <div class="hero-title-group animate-fade-in-up" style="animation-delay: 0.3s;">
-        <h1 class="hero-title-zh">剑来</h1>
-        <div class="hero-seal animate-stamp" style="animation-delay: 0.6s;">剑来</div>
+        <img src="/images/logos/JianLaiLogo.png" alt="Jian Lai" class="hero-logo-mark" />
       </div>
       
       <h2 class="hero-title-en animate-fade-in-up" style="animation-delay: 0.9s;">Sword, Come! Encyclopedia</h2>
@@ -67,9 +93,9 @@ const spotlightItems = [
       </p>
 
       <div class="hero-actions animate-fade-in-up" style="animation-delay: 0.9s;">
-        <NuxtLink to="/characters" class="btn-primary hover-lift">Browse Characters</NuxtLink>
-        <NuxtLink to="/world" class="btn-secondary hover-lift">Explore World</NuxtLink>
-        <NuxtLink to="/timeline" class="btn-secondary hover-lift">View Timeline</NuxtLink>
+        <OrnamentalButton to="/characters" variant="primary" class="hover-lift">Browse Characters</OrnamentalButton>
+        <OrnamentalButton to="/world" variant="secondary" class="hover-lift">Explore World</OrnamentalButton>
+        <OrnamentalButton to="/timeline" variant="secondary" class="hover-lift">View Timeline</OrnamentalButton>
       </div>
 
     </HeroMedia>
@@ -94,33 +120,35 @@ const spotlightItems = [
     <div class="main-content" id="archive">
       <ScrollReveal animation="reveal-fade-up">
         <div class="bento-grid">
-          <ArchivePortal link="/characters" titleZh="人物志" titleEn="Characters" bgChar="人" class="bento-item featured-wide" />
-          <ArchivePortal link="/world" titleZh="天下图志" titleEn="World" bgChar="地" class="bento-item featured-wide" />
-          <ArchivePortal link="/cultivation" titleZh="山上修行" titleEn="Cultivation" bgChar="修" class="bento-item" />
-          <ArchivePortal link="/swordsmanship" titleZh="剑术神通" titleEn="Swordsmanship" bgChar="剑" class="bento-item" />
-          <ArchivePortal link="/factions" titleZh="宗门势力" titleEn="Factions" bgChar="宗" class="bento-item" />
-          <ArchivePortal link="/artifacts" titleZh="法宝器物" titleEn="Artifacts" bgChar="宝" class="bento-item" />
-          <ArchivePortal link="/timeline" titleZh="年表" titleEn="Timeline" bgChar="史" class="bento-item" />
-          <ArchivePortal link="/glossary" titleZh="术语典籍" titleEn="Glossary" bgChar="典" class="bento-item" />
+          <ArchivePortal link="/characters" titleZh="人物志" titleEn="Characters" bgChar="人" bgImage="/images/portalcard/Character-portalcard.webp" class="bento-item featured-wide" />
+          <ArchivePortal link="/world" titleZh="天下图志" titleEn="World" bgChar="地" bgImage="/images/portalcard/world-portalcard.jpg" class="bento-item featured-wide" />
+          <ArchivePortal link="/cultivation" titleZh="山上修行" titleEn="Cultivation" bgChar="修" bgImage="/images/portalcard/cultivation-portalcard.jpg" class="bento-item" />
+          <ArchivePortal link="/swordsmanship" titleZh="剑术神通" titleEn="Swordsmanship" bgChar="剑" bgImage="/images/portalcard/swordsmanship-portalcard.png" class="bento-item" />
+          <ArchivePortal link="/factions" titleZh="宗门势力" titleEn="Factions" bgChar="宗" bgImage="/images/portalcard/factions-portalcard.jpg" class="bento-item" />
+          <ArchivePortal link="/artifacts" titleZh="法宝器物" titleEn="Artifacts" bgChar="宝" bgImage="/images/portalcard/artifacts-portalcard.jpg" class="bento-item" />
+          <ArchivePortal link="/timeline" titleZh="年表" titleEn="Timeline" bgChar="史" bgImage="/images/portalcard/timeline-portalcard.jpg" class="bento-item" />
+          <ArchivePortal link="/glossary" titleZh="术语典籍" titleEn="Glossary" bgChar="典" bgImage="/images/portalcard/glossary-portalcard.jpg" class="bento-item" />
         </div>
       </ScrollReveal>
 
-      <InkDivider type="mist" />
+      <OrnamentalDivider motif="ruyi" color="ink" />
 
       <FeaturedSpotlight 
         title="Featured Lore"
         :items="spotlightItems" 
       />
       
-      <InkDivider type="brush" />
+      <OrnamentalDivider motif="jade" color="celadon" />
       
-      <FeaturedTheatre />
+      <section class="theatre-stage">
+        <FeaturedTheatre />
+      </section>
 
       <ScrollReveal animation="reveal-fade-up" class="wip-notice">
-        <div class="wip-icon">卷</div>
+        <div class="wip-icon"><SealBadge text="卷" variant="filled" shape="square" /></div>
         <h3 class="wip-title">The Archives are Expanding</h3>
         <p class="wip-text">Records of the Jian Lai universe are still being compiled. Many legends remain untold.</p>
-        <a href="https://github.com/WhiteQilin/jianlai-wiki" target="_blank" class="btn-secondary hover-lift">Contribute on GitHub</a>
+        <OrnamentalButton to="https://github.com/WhiteQilin/jianlai-wiki" variant="secondary" class="hover-lift">Contribute on GitHub</OrnamentalButton>
       </ScrollReveal>
     </div>
   </div>
@@ -158,7 +186,7 @@ const spotlightItems = [
 }
 
 .hero-calligraphy {
-  font-family: var(--font-heading);
+  font-family: var(--font-zh-display);
   font-size: 45vw;
   color: rgba(20, 20, 20, 0.03);
   pointer-events: none;
@@ -177,37 +205,11 @@ const spotlightItems = [
   margin-bottom: 2rem;
 }
 
-.hero-title-zh {
-  font-family: var(--font-heading);
-  font-size: 6rem;
-  font-weight: 400;
-  color: var(--c-ink);
-  margin: 0;
-  line-height: 1;
-  letter-spacing: 0.1em;
-  text-align: center;
-  white-space: nowrap;
-}
-.hero-title-zh::after {
-  display: none;
-}
-
-.hero-seal {
-  position: absolute;
-  top: 10%;
-  right: -2.5rem;
-  width: 32px;
+.hero-logo-mark {
+  width: min(300px, 62vw);
   height: auto;
-  padding: 6px 4px;
-  background: transparent;
-  border: 2px solid var(--c-seal-red);
-  color: var(--c-seal-red);
-  font-family: var(--font-heading);
-  font-size: 1rem;
-  writing-mode: vertical-rl;
-  text-orientation: upright;
-  letter-spacing: 2px;
-  border-radius: 2px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.25));
 }
 
 .hero-title-en {
@@ -378,6 +380,11 @@ const spotlightItems = [
   gap: 1.5rem;
 }
 
+.theatre-stage {
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+}
+
 .wip-icon {
   font-family: var(--font-heading);
   font-size: 4rem;
@@ -403,8 +410,7 @@ const spotlightItems = [
 }
 
 @media (max-width: 768px) {
-  .hero-title-zh { font-size: 5rem; }
-  .hero-seal { right: -1.5rem; }
+  .hero-logo-mark { width: min(240px, 70vw); }
   .hero-actions { flex-direction: column; }
   .hero-meta-row { flex-wrap: wrap; gap: 1.5rem; padding: 1.5rem; }
   .hero-calligraphy { font-size: 60vw; }

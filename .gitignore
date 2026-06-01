@@ -48,6 +48,9 @@ public/images/banners/pinterest_*.jpg
 # Local font experiments - commit only licensed production fonts intentionally
 public/fonts/
 
+# Local AI prompt packs
+.github/prompts/ui-ux-pro-max/
+
 # Ignore large videos by default
 *.mp4
 *.mov

@@ -1,3 +1,14 @@
+/* Decorative Chinese calligraphy display font (HanYi DiSheng Hero).
+   Used ONLY as a wuxia/xianxia accent for short Chinese display text.
+   The official Jian Lai logo image is never affected by this font. */
+@font-face {
+  font-family: 'HYDiShengHero';
+  src: url('/fonts/汉仪迪升英雄体W.TTF') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   /* Modern Shuimo Palette */
   --c-paper: #f9f8f6;
@@ -29,6 +40,8 @@
   --font-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans SC', 'PingFang SC', sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
   --font-heading: 'Georgia', 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', serif;
+  /* Decorative calligraphy accent for short Chinese display text only */
+  --font-zh-display: 'HYDiShengHero', 'STKaiti', 'KaiTi', 'Noto Serif SC', serif;
 
   --header-height: 80px;
 }
@@ -95,6 +108,14 @@ body::after {
   mix-blend-mode: screen;
 }
 
+/* Reusable decorative calligraphy accent for short Chinese display text.
+   Apply only to titles, names, labels, and watermarks — never body copy. */
+.zh-display {
+  font-family: var(--font-zh-display);
+  letter-spacing: 0.06em;
+  font-weight: 400;
+}
+
 /* Cinematic Nuxt Page Transitions */
 .page-enter-active,
 .page-leave-active {
@@ -105,6 +126,24 @@ body::after {
   opacity: 0;
   filter: blur(8px);
   transform: scale(0.98);
+}
+
+/* Layout Containers */
+.page-container {
+  width: 100%;
+}
+
+.mdc-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .mdc-content {
+    padding: 1.5rem 1rem;
+  }
 }
 
 /* Base Prose / MDC Styling */

@@ -37,22 +37,26 @@ defineProps<{
 
 .name-en {
   font-family: var(--font-heading);
-  font-size: 4rem;
+  font-size: 4.5rem;
   color: var(--c-ink);
   margin: 0;
-  line-height: 1;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
 }
 
 .name-seal {
-  font-family: var(--font-heading);
+  font-family: var(--font-zh-display);
   color: var(--c-seal-red);
-  border: 2px solid var(--c-seal-red);
-  padding: 4px 6px;
-  font-size: 1.2rem;
+  border: 2px solid var(--c-seal-red-soft);
+  background: rgba(184, 42, 42, 0.05);
+  padding: 6px 8px;
+  font-size: 1.4rem;
   border-radius: 2px;
   line-height: 1;
   writing-mode: vertical-rl;
   text-orientation: upright;
+  transform: rotate(-3deg);
+  box-shadow: 2px 2px 0 rgba(184, 42, 42, 0.1);
 }
 
 .name-secondary {
@@ -63,23 +67,29 @@ defineProps<{
 }
 
 .name-zh {
-  font-family: var(--font-heading);
-  font-size: 2.5rem;
+  font-family: var(--font-zh-display);
+  font-size: 3.1rem;
   color: var(--c-text-2);
   line-height: 1;
+  letter-spacing: 0.16em;
 }
 
 .name-pinyin {
   font-family: var(--font-mono);
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: var(--c-text-3);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
 }
 
 @media (max-width: 768px) {
-  .name-en { font-size: 3rem; }
-  .name-zh { font-size: 2rem; }
+  .name-block {
+    margin-bottom: 1.5rem;
+  }
+  .name-en { font-size: 3.2rem; }
+  .name-zh { font-size: 2.2rem; letter-spacing: 0.1em; }
   .name-primary { gap: 1rem; }
+  .name-seal { font-size: 1.2rem; padding: 4px 6px; }
+  .name-secondary { gap: 1rem; flex-wrap: wrap; }
 }
 </style>
