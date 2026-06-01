@@ -27,6 +27,8 @@ export const EDITOR_SECTIONS = [
   'pantheon',
 ] as const
 
+export type EditorSection = (typeof EDITOR_SECTIONS)[number]
+
 export const IMPORTANCE_VALUES = ['primary', 'major', 'minor', 'background'] as const
 export const VERIFICATION_VALUES = ['verified', 'to-be-verified', 'disputed', 'speculative'] as const
 
@@ -106,4 +108,325 @@ export function resolveEntryPath(rawPath: unknown): ResolvedEntryPath | { error:
   }
 
   return { routePath: path, section, slug, fileAbsPath, fileRelPath }
+}
+
+export function slugifyTitle(input: string): string {
+  return input
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+}
+
+export function validateCreateSlug(slug: string): string | null {
+  if (!slug || typeof slug !== 'string') return 'slug is required'
+  const s = slug.trim()
+  if (!s) return 'slug is required'
+  if (s.includes('..') || s.includes('\0') || s.includes('/') || s.includes('\\')) return 'slug contains invalid characters'
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(s)) return 'slug must be lowercase ASCII and hyphenated'
+
+  const reserved = new Set(['sample', '_meta', '_templates', 'titles'])
+  if (reserved.has(s)) return `slug "${s}" is reserved`
+
+  return null
+}
+
+export interface CreateEntrySeedInput {
+  title: string
+  chinese: string
+  pinyin?: string
+  section: EditorSection
+  category: string
+  description: string
+  importance: (typeof IMPORTANCE_VALUES)[number]
+  verificationStatus: (typeof VERIFICATION_VALUES)[number]
+  status?: string
+  seal?: string
+}
+
+export function buildCreateEntryFrontmatter(input: CreateEntrySeedInput): Record<string, any> {
+  const base: Record<string, any> = {
+    title: input.title,
+    chinese: input.chinese,
+    pinyin: input.pinyin || '',
+    section: input.section,
+    category: input.category,
+    status: input.status || '',
+    importance: input.importance,
+    verificationStatus: input.verificationStatus,
+    image: '',
+    banner: '',
+    seal: input.seal || '',
+    description: input.description,
+    tags: [],
+    related: [],
+    sourceNotes: '',
+    firstAppearance: '',
+    lastUpdated: new Date().toISOString().slice(0, 10),
+  }
+
+  switch (input.section) {
+    case 'characters':
+      return {
+        ...base,
+        origin: '',
+        realm: '',
+        affiliations: [],
+        titles: [],
+        abilities: [],
+      }
+    case 'world':
+      return {
+        ...base,
+        locationType: '',
+        location: '',
+        leader: '',
+        governingFaction: '',
+        parentLocation: '',
+        inhabitants: [],
+      }
+    case 'cultivation':
+      return {
+        ...base,
+        pathType: '',
+        realmLevel: 0,
+        practitioners: [],
+      }
+    case 'swordsmanship':
+      return {
+        ...base,
+        abilityType: '',
+        users: [],
+        lineage: '',
+      }
+    case 'factions':
+      return {
+        ...base,
+        factionType: '',
+        headquarters: '',
+        leader: '',
+        members: [],
+        teachings: [],
+      }
+    case 'artifacts':
+      return {
+        ...base,
+        artifactType: '',
+        tier: '',
+        owners: [],
+      }
+    case 'timeline':
+      return {
+        ...base,
+        date: '',
+        era: '',
+        eraOrder: 0,
+        participants: [],
+        location: '',
+      }
+    case 'rankings':
+      return {
+        ...base,
+        listType: '',
+        entries: [],
+      }
+    case 'teachings':
+      return {
+        ...base,
+        teachingType: '',
+        keyFigures: [],
+        relatedFactions: [],
+      }
+    case 'pantheon':
+      return {
+        ...base,
+        beingType: '',
+        domain: '',
+        territory: '',
+      }
+    case 'glossary':
+      return {
+        ...base,
+        termType: '',
+        relatedTerms: [],
+      }
+    default:
+      return base
+  }
+}
+
+export function buildCreateEntryBody(section: EditorSection): string {
+  const templates: Record<EditorSection, string> = {
+    characters: [
+      '## Overview',
+      '',
+      '## Appearance',
+      '',
+      '## Personality',
+      '',
+      '## History',
+      '',
+      '## Cultivation',
+      '',
+      '## Abilities',
+      '',
+      '## Relationships',
+      '',
+      '## Notes',
+      '',
+      '## References',
+      '',
+    ].join('\n'),
+    factions: [
+      '## Overview',
+      '',
+      '## History / Founding',
+      '',
+      '## Territory & Location',
+      '',
+      '## Hierarchy & Members',
+      '',
+      '## Teachings / Doctrine',
+      '',
+      '## Relationships',
+      '',
+      '## Notes',
+      '',
+      '## References',
+      '',
+    ].join('\n'),
+    world: [
+      '## Overview',
+      '',
+      '## Geography',
+      '',
+      '## History & Formation',
+      '',
+      '## Ruling Factions & Demographics',
+      '',
+      '## Notable Sites',
+      '',
+      '## Related Events',
+      '',
+      '## Notes',
+      '',
+      '## References',
+      '',
+    ].join('\n'),
+    cultivation: [
+      '## Overview',
+      '',
+      '## Path / Realm Definition',
+      '',
+      '## Key Principles',
+      '',
+      '## Notable Practitioners',
+      '',
+      '## Notes',
+      '',
+      '## References',
+      '',
+    ].join('\n'),
+    swordsmanship: [
+      '## Overview',
+      '',
+      '## Mechanism',
+      '',
+      '## Users & Lineage',
+      '',
+      '## Combat Notes',
+      '',
+      '## Notes',
+      '',
+      '## References',
+      '',
+    ].join('\n'),
+    artifacts: [
+      '## Overview',
+      '',
+      '## Origin',
+      '',
+      '## Abilities / Properties',
+      '',
+      '## Owners & Transmission',
+      '',
+      '## Notes',
+      '',
+      '## References',
+      '',
+    ].join('\n'),
+    timeline: [
+      '## Overview',
+      '',
+      '## Event Details',
+      '',
+      '## Participants',
+      '',
+      '## Outcome & Impact',
+      '',
+      '## Notes',
+      '',
+      '## References',
+      '',
+    ].join('\n'),
+    rankings: [
+      '## Overview',
+      '',
+      '## Methodology',
+      '',
+      '## List Notes',
+      '',
+      '## Notes',
+      '',
+      '## References',
+      '',
+    ].join('\n'),
+    teachings: [
+      '## Overview',
+      '',
+      '## Core Doctrine',
+      '',
+      '## Key Figures',
+      '',
+      '## Influence',
+      '',
+      '## Notes',
+      '',
+      '## References',
+      '',
+    ].join('\n'),
+    pantheon: [
+      '## Overview',
+      '',
+      '## Domain & Authority',
+      '',
+      '## Myths & History',
+      '',
+      '## Relationships',
+      '',
+      '## Notes',
+      '',
+      '## References',
+      '',
+    ].join('\n'),
+    glossary: [
+      '## Overview',
+      '',
+      '## Definition',
+      '',
+      '## Usage in Context',
+      '',
+      '## Related Terms',
+      '',
+      '## Notes',
+      '',
+      '## References',
+      '',
+    ].join('\n'),
+  }
+
+  return templates[section]
 }

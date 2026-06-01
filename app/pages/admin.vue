@@ -8,7 +8,7 @@ useSeoMeta({
   title: 'Local Editor | Jian Lai Wiki'
 })
 
-const { data: entries, pending } = await useFetch<any[]>('/api/editor/entries')
+const { data: entries, pending, refresh: refreshEntries } = await useFetch<any[]>('/api/editor/entries')
 
 const searchQuery = ref('')
 const selectedSection = ref('All')
@@ -43,6 +43,160 @@ const selectedEntryPath = ref('')
 const { data: selectedEntry, pending: entryPending } = await useFetch<any>(() =>
   selectedEntryPath.value ? `/api/editor/entry?path=${selectedEntryPath.value}` : '/api/editor/entry?path=/invalid'
 )
+
+const PUBLIC_SECTIONS = ['characters', 'world', 'cultivation', 'swordsmanship', 'factions', 'artifacts', 'timeline', 'glossary', 'rankings', 'teachings', 'pantheon'] as const
+const IMPORTANCE_VALUES = ['primary', 'major', 'minor', 'background'] as const
+const VERIFICATION_VALUES = ['verified', 'to-be-verified', 'disputed', 'speculative'] as const
+
+const CATEGORY_MAP: Record<string, string[]> = {
+  characters: ['Character', 'Major', 'Minor', 'Gods'],
+  world: ['Continent', 'Grotto-Heaven', 'Blessed Land', 'City', 'Landmark', 'Sword-Qi-Great-Wall'],
+  cultivation: ['Realm', 'Path', 'Method', 'Concept'],
+  swordsmanship: ['Technique', 'Flying-Sword-Art', 'Ability', 'Sword-Style'],
+  factions: ['Sect', 'Dynasty', 'Academy', 'Clan', 'Alliance'],
+  artifacts: ['Weapon', 'Flying-Sword', 'Sword-Nurturing-Gourd', 'Treasure', 'Material', 'Talisman'],
+  timeline: ['Era', 'Event', 'Arc'],
+  rankings: ['Tier-List', 'Realm-Ladder', 'Named-List'],
+  teachings: ['Teaching', 'School'],
+  pantheon: ['God', 'Demon', 'Spirit', 'Mountain-Water-Deity'],
+  glossary: ['Term', 'Concept', 'Phrase']
+}
+
+// --- Create Wizard State ---
+const isCreateWizardOpen = ref(false)
+const isCreating = ref(false)
+const isSlugManuallyEdited = ref(false)
+const createWizardError = ref('')
+
+const createForm = ref({
+  title: '',
+  chinese: '',
+  pinyin: '',
+  section: 'characters',
+  category: 'Character',
+  slug: '',
+  description: '',
+  importance: 'minor',
+  verificationStatus: 'to-be-verified',
+  status: 'Unknown',
+  seal: ''
+})
+
+const createAvailableCategories = computed(() => CATEGORY_MAP[createForm.value.section] || [])
+
+watch(() => createForm.value.section, (section) => {
+  const categories = CATEGORY_MAP[section] || []
+  if (!categories.includes(createForm.value.category)) {
+    createForm.value.category = categories[0] || ''
+  }
+})
+
+watch(() => createForm.value.title, (title) => {
+  if (isSlugManuallyEdited.value) return
+  createForm.value.slug = slugifyTitle(title)
+})
+
+const routePreview = computed(() => `/${createForm.value.section}/${createForm.value.slug || '<slug>'}`)
+const filePreview = computed(() => `content/${createForm.value.section}/${createForm.value.slug || '<slug>'}.md`)
+
+const slugValidationError = computed(() => {
+  const s = createForm.value.slug.trim()
+  if (!s) return 'Slug is required'
+  if (s.includes('..') || s.includes('/') || s.includes('\\') || s.includes('\0')) return 'Slug contains invalid characters'
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(s)) return 'Slug must be lowercase ASCII and hyphenated'
+  if (['sample', '_meta', '_templates', 'titles'].includes(s)) return `Slug "${s}" is reserved`
+  return ''
+})
+
+function slugifyTitle(input: string): string {
+  return input
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+}
+
+function openCreateWizard() {
+  createWizardError.value = ''
+  isSlugManuallyEdited.value = false
+  createForm.value = {
+    title: '',
+    chinese: '',
+    pinyin: '',
+    section: 'characters',
+    category: CATEGORY_MAP.characters?.[0] || '',
+    slug: '',
+    description: '',
+    importance: 'minor',
+    verificationStatus: 'to-be-verified',
+    status: 'Unknown',
+    seal: ''
+  }
+  isCreateWizardOpen.value = true
+}
+
+function closeCreateWizard() {
+  if (isCreating.value) return
+  isCreateWizardOpen.value = false
+}
+
+function onSlugInput(val: string) {
+  isSlugManuallyEdited.value = true
+  createForm.value.slug = val
+}
+
+async function createEntry() {
+  createWizardError.value = ''
+
+  if (!createForm.value.title.trim()) {
+    createWizardError.value = 'Title is required'
+    return
+  }
+  if (!createForm.value.chinese.trim()) {
+    createWizardError.value = 'Chinese is required'
+    return
+  }
+  if (!createForm.value.description.trim()) {
+    createWizardError.value = 'Description is required'
+    return
+  }
+  if (slugValidationError.value) {
+    createWizardError.value = slugValidationError.value
+    return
+  }
+
+  isCreating.value = true
+
+  try {
+    const res = await $fetch<{ routePath: string }>('/api/editor/create-entry', {
+      method: 'POST',
+      body: {
+        title: createForm.value.title,
+        chinese: createForm.value.chinese,
+        pinyin: createForm.value.pinyin,
+        section: createForm.value.section,
+        category: createForm.value.category,
+        slug: createForm.value.slug,
+        description: createForm.value.description,
+        importance: createForm.value.importance,
+        verificationStatus: createForm.value.verificationStatus,
+        status: createForm.value.status,
+        seal: createForm.value.seal,
+      }
+    })
+
+    await refreshEntries()
+    selectedEntryPath.value = res.routePath
+    isCreateWizardOpen.value = false
+  } catch (e: any) {
+    createWizardError.value = e?.data?.statusMessage || e?.message || 'Failed to create entry'
+  } finally {
+    isCreating.value = false
+  }
+}
 
 // --- Editor State ---
 const editForm = ref<Record<string, any>>({})
@@ -90,20 +244,7 @@ watch(selectedEntry, (newVal) => {
 // --- Validation ---
 const availableCategories = computed(() => {
   if (!editForm.value.section) return []
-  const map: Record<string, string[]> = {
-    characters: ['Character', 'Major', 'Minor', 'Gods'],
-    world: ['Continent', 'Grotto-Heaven', 'Blessed Land', 'City', 'Landmark', 'Sword-Qi-Great-Wall'],
-    cultivation: ['Realm', 'Path', 'Method', 'Concept'],
-    swordsmanship: ['Technique', 'Flying-Sword-Art', 'Ability', 'Sword-Style'],
-    factions: ['Sect', 'Dynasty', 'Academy', 'Clan', 'Alliance'],
-    artifacts: ['Weapon', 'Flying-Sword', 'Sword-Nurturing-Gourd', 'Treasure', 'Material', 'Talisman'],
-    timeline: ['Era', 'Event', 'Arc'],
-    rankings: ['Tier-List', 'Realm-Ladder', 'Named-List'],
-    teachings: ['Teaching', 'School'],
-    pantheon: ['God', 'Demon', 'Spirit', 'Mountain-Water-Deity'],
-    glossary: ['Term', 'Concept', 'Phrase']
-  }
-  return map[editForm.value.section] || []
+  return CATEGORY_MAP[editForm.value.section] || []
 })
 
 const validationErrors = computed(() => {
@@ -225,6 +366,7 @@ async function saveEntry() {
         <select v-model="selectedSection" class="section-select">
           <option v-for="sec in sections" :key="sec" :value="sec">{{ sec }}</option>
         </select>
+        <button class="create-btn" @click="openCreateWizard">Create Entry</button>
       </div>
 
       <div v-if="pending" class="loading">Loading entries...</div>
@@ -382,6 +524,87 @@ async function saveEntry() {
         </div>
       </div>
     </div>
+
+    <!-- Create Entry Wizard Modal -->
+    <div v-if="isCreateWizardOpen" class="modal-overlay" @click.self="closeCreateWizard">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>Create New Entry</h3>
+          <button class="modal-close" :disabled="isCreating" @click="closeCreateWizard">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Title *</label>
+              <input v-model="createForm.title" type="text" />
+            </div>
+            <div class="form-group">
+              <label>Chinese *</label>
+              <input v-model="createForm.chinese" type="text" />
+            </div>
+            <div class="form-group">
+              <label>Pinyin</label>
+              <input v-model="createForm.pinyin" type="text" />
+            </div>
+            <div class="form-group">
+              <label>Section *</label>
+              <select v-model="createForm.section">
+                <option v-for="sec in PUBLIC_SECTIONS" :key="sec" :value="sec">{{ sec }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Category *</label>
+              <select v-model="createForm.category">
+                <option v-for="cat in createAvailableCategories" :key="cat" :value="cat">{{ cat }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Slug *</label>
+              <input :value="createForm.slug" type="text" @input="onSlugInput(($event.target as HTMLInputElement).value)" />
+              <small v-if="slugValidationError" class="error-text">{{ slugValidationError }}</small>
+            </div>
+            <div class="form-group full-width">
+              <label>Description *</label>
+              <textarea v-model="createForm.description" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Importance</label>
+              <select v-model="createForm.importance">
+                <option v-for="v in IMPORTANCE_VALUES" :key="v" :value="v">{{ v }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Verification Status</label>
+              <select v-model="createForm.verificationStatus">
+                <option v-for="v in VERIFICATION_VALUES" :key="v" :value="v">{{ v }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Status</label>
+              <input v-model="createForm.status" type="text" placeholder="e.g. Active, Unknown" />
+            </div>
+            <div class="form-group">
+              <label>Seal</label>
+              <input v-model="createForm.seal" type="text" />
+            </div>
+            <div class="form-group full-width preview-group">
+              <div><strong>Route preview:</strong> <code>{{ routePreview }}</code></div>
+              <div><strong>File preview:</strong> <code>{{ filePreview }}</code></div>
+            </div>
+          </div>
+
+          <div v-if="createWizardError" class="create-error">{{ createWizardError }}</div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="close-btn" :disabled="isCreating" @click="closeCreateWizard">Cancel</button>
+          <button class="save-btn" :disabled="isCreating" @click="createEntry">
+            {{ isCreating ? 'Creating...' : 'Create Entry' }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -417,6 +640,14 @@ async function saveEntry() {
 
 .search-input {
   flex: 1;
+}
+
+.create-btn {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  background: var(--c-bg-soft);
+  cursor: pointer;
 }
 
 .entries-table {
@@ -473,6 +704,30 @@ async function saveEntry() {
   word-wrap: break-word;
 }
 
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 0.45rem 0.55rem;
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+}
+
 .source-hints {
   margin-top: 0.5rem;
   display: flex;
@@ -495,5 +750,67 @@ async function saveEntry() {
   resize: vertical;
   background: var(--c-bg);
   color: var(--c-ink);
+}
+
+.error-text {
+  color: #b3261e;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.modal-card {
+  width: min(900px, 96vw);
+  max-height: 92vh;
+  overflow: auto;
+  background: var(--c-bg);
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+}
+
+.modal-header,
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--c-border);
+}
+
+.modal-footer {
+  border-bottom: none;
+  border-top: 1px solid var(--c-border);
+}
+
+.modal-body {
+  padding: 1rem;
+}
+
+.modal-close {
+  border: none;
+  background: transparent;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.preview-group code {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+.create-error {
+  margin-top: 0.8rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid #f2b8b5;
+  background: #fdecec;
+  color: #8f1d18;
+  border-radius: 4px;
 }
 </style>
