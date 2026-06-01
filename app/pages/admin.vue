@@ -44,12 +44,128 @@ const { data: selectedEntry, pending: entryPending } = await useFetch<any>(() =>
   selectedEntryPath.value ? `/api/editor/entry?path=${selectedEntryPath.value}` : '/api/editor/entry?path=/invalid'
 )
 
+// --- Editor State ---
+const editForm = ref<Record<string, any>>({})
+const editBody = ref('')
+const tagsString = ref('')
+const relatedString = ref('')
+const isSaving = ref(false)
+
+// Sync fetched data into editable state
+watch(selectedEntry, (newVal) => {
+  if (newVal && newVal.frontmatter) {
+    // Deep clone to avoid mutating the fetch cache directly
+    editForm.value = JSON.parse(JSON.stringify(newVal.frontmatter))
+    editBody.value = newVal.body || ''
+    
+    // Convert arrays to comma-separated strings for simple text inputs
+    tagsString.value = Array.isArray(editForm.value.tags) ? editForm.value.tags.join(', ') : ''
+    relatedString.value = Array.isArray(editForm.value.related) ? editForm.value.related.join(', ') : ''
+  } else {
+    editForm.value = {}
+    editBody.value = ''
+    tagsString.value = ''
+    relatedString.value = ''
+  }
+}, { immediate: true })
+
+// --- Validation ---
+const availableCategories = computed(() => {
+  if (!editForm.value.section) return []
+  // We can fetch this from an API or hardcode the map. For MVP, we'll fetch it or rely on the server.
+  // Since we don't have the sectionMeta imported here easily, we'll just allow any string for now
+  // and let the server validate, OR we can hardcode the known ones.
+  // Let's hardcode the map for client-side convenience based on the registry.
+  const map: Record<string, string[]> = {
+    characters: ['Character', 'Major', 'Minor', 'Gods'],
+    world: ['Continent', 'Grotto-Heaven', 'Blessed Land', 'City', 'Landmark', 'Sword-Qi-Great-Wall'],
+    cultivation: ['Realm', 'Path', 'Method', 'Concept'],
+    swordsmanship: ['Technique', 'Flying-Sword-Art', 'Ability', 'Sword-Style'],
+    factions: ['Sect', 'Dynasty', 'Academy', 'Clan', 'Alliance'],
+    artifacts: ['Weapon', 'Flying-Sword', 'Sword-Nurturing-Gourd', 'Treasure', 'Material', 'Talisman'],
+    timeline: ['Era', 'Event', 'Arc'],
+    rankings: ['Tier-List', 'Realm-Ladder', 'Named-List'],
+    teachings: ['Teaching', 'School'],
+    pantheon: ['God', 'Demon', 'Spirit', 'Mountain-Water-Deity'],
+    glossary: ['Term', 'Concept', 'Phrase']
+  }
+  return map[editForm.value.section] || []
+})
+
+const validationErrors = computed(() => {
+  const errs: string[] = []
+  const fm = editForm.value
+  if (!fm.title?.trim()) errs.push('Title is required')
+  if (!fm.chinese?.trim()) errs.push('Chinese name is required')
+  if (!fm.description?.trim()) errs.push('Description is required')
+  if (!fm.category) errs.push('Category is required')
+  return errs
+})
+
+const validationWarnings = computed(() => {
+  const warns: string[] = []
+  const fm = editForm.value
+  if (!fm.pinyin?.trim()) warns.push('Pinyin is recommended')
+  if (fm.seal && fm.seal.length > 3) warns.push('Seal should ideally be 1-3 characters')
+  
+  if (tagsString.value) {
+    const tags = tagsString.value.split(',').map(t => t.trim()).filter(Boolean)
+    const hasInvalidTag = tags.some(t => !/^[a-z0-9-]+$/.test(t))
+    if (hasInvalidTag) warns.push('Tags should be lowercase and hyphenated')
+  }
+
+  if (editBody.value.trim().startsWith('# ')) {
+    warns.push('Body starts with a top-level # Title. The layout already renders the title.')
+  }
+
+  if (fm.verificationStatus === 'verified' && !editBody.value.includes('## References')) {
+    warns.push('Status is "verified" but no "## References" section found in body.')
+  }
+
+  return warns
+})
+
+// --- Actions ---
 function editEntry(path: string) {
   selectedEntryPath.value = path
 }
 
 function closeEditor() {
   selectedEntryPath.value = ''
+}
+
+async function saveEntry() {
+  if (validationErrors.value.length > 0) {
+    alert('Please fix validation errors before saving.')
+    return
+  }
+
+  isSaving.value = true
+
+  // Reconstruct arrays from strings
+  const tags = tagsString.value.split(',').map(t => t.trim()).filter(Boolean)
+  if (tags.length) editForm.value.tags = tags
+  else delete editForm.value.tags
+
+  const related = relatedString.value.split(',').map(t => t.trim()).filter(Boolean)
+  if (related.length) editForm.value.related = related
+  else delete editForm.value.related
+
+  try {
+    const res = await $fetch('/api/editor/entry', {
+      method: 'POST',
+      body: {
+        path: selectedEntryPath.value,
+        frontmatter: editForm.value,
+        body: editBody.value
+      }
+    })
+    alert('Saved successfully! Backup created at: ' + (res as any).backup)
+  } catch (e: any) {
+    alert('Save failed: ' + (e.data?.statusMessage || e.message))
+  } finally {
+    isSaving.value = false
+  }
 }
 </script>
 
@@ -100,19 +216,120 @@ function closeEditor() {
     <div v-else class="editor-view">
       <div class="editor-header">
         <h2>Editing: {{ selectedEntry?.routePath }}</h2>
-        <button @click="closeEditor" class="close-btn">Back to Dashboard</button>
+        <div class="header-actions">
+          <button @click="saveEntry" class="save-btn" :disabled="isSaving">
+            {{ isSaving ? 'Saving...' : 'Save Changes' }}
+          </button>
+          <button @click="closeEditor" class="close-btn">Discard & Back</button>
+        </div>
       </div>
 
       <div v-if="entryPending" class="loading">Loading entry...</div>
       
       <div v-else-if="selectedEntry" class="editor-panels">
-        <div class="panel frontmatter-panel">
-          <h3>Frontmatter (Read-Only)</h3>
-          <pre>{{ selectedEntry.frontmatter }}</pre>
+        
+        <!-- Validation Panel -->
+        <div v-if="validationErrors.length || validationWarnings.length" class="validation-panel">
+          <div v-if="validationErrors.length" class="errors">
+            <h4>❌ Errors (Cannot Save)</h4>
+            <ul>
+              <li v-for="err in validationErrors" :key="err">{{ err }}</li>
+            </ul>
+          </div>
+          <div v-if="validationWarnings.length" class="warnings">
+            <h4>⚠️ Warnings (Can Save)</h4>
+            <ul>
+              <li v-for="warn in validationWarnings" :key="warn">{{ warn }}</li>
+            </ul>
+          </div>
         </div>
+
+        <div class="panel frontmatter-panel">
+          <h3>Frontmatter</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Title *</label>
+              <input v-model="editForm.title" type="text" />
+            </div>
+            <div class="form-group">
+              <label>Chinese *</label>
+              <input v-model="editForm.chinese" type="text" />
+            </div>
+            <div class="form-group">
+              <label>Pinyin</label>
+              <input v-model="editForm.pinyin" type="text" />
+            </div>
+            <div class="form-group">
+              <label>Section (Read-Only)</label>
+              <input :value="editForm.section" type="text" disabled />
+            </div>
+            <div class="form-group">
+              <label>Category *</label>
+              <select v-model="editForm.category">
+                <option v-for="cat in availableCategories" :key="cat" :value="cat">{{ cat }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Status</label>
+              <input v-model="editForm.status" type="text" placeholder="e.g. Alive, Active" />
+            </div>
+            <div class="form-group">
+              <label>Importance</label>
+              <select v-model="editForm.importance">
+                <option value="primary">primary</option>
+                <option value="major">major</option>
+                <option value="minor">minor</option>
+                <option value="background">background</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Verification Status</label>
+              <select v-model="editForm.verificationStatus">
+                <option value="verified">verified</option>
+                <option value="to-be-verified">to-be-verified</option>
+                <option value="disputed">disputed</option>
+                <option value="speculative">speculative</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Seal</label>
+              <input v-model="editForm.seal" type="text" />
+            </div>
+            <div class="form-group full-width">
+              <label>Description *</label>
+              <textarea v-model="editForm.description" rows="2"></textarea>
+            </div>
+            <div class="form-group full-width">
+              <label>Tags (comma separated)</label>
+              <input v-model="tagsString" type="text" placeholder="e.g. sword-cultivator, fourteen-realm" />
+            </div>
+            <div class="form-group">
+              <label>Image Path</label>
+              <input v-model="editForm.image" type="text" />
+            </div>
+            <div class="form-group">
+              <label>Banner Path</label>
+              <input v-model="editForm.banner" type="text" />
+            </div>
+            <div class="form-group full-width">
+              <label>Source Notes</label>
+              <textarea v-model="editForm.sourceNotes" rows="3"></textarea>
+            </div>
+            <div class="form-group full-width">
+              <label>Related (comma separated paths)</label>
+              <input v-model="relatedString" type="text" placeholder="e.g. /characters/chen-pingan, /world/lizhu-grotto-heaven" />
+            </div>
+          </div>
+          
+          <details class="raw-json-details">
+            <summary>View Raw Frontmatter JSON (Includes preserved complex fields)</summary>
+            <pre>{{ editForm }}</pre>
+          </details>
+        </div>
+        
         <div class="panel body-panel">
-          <h3>Body (Read-Only)</h3>
-          <textarea readonly :value="selectedEntry.body" class="body-textarea"></textarea>
+          <h3>Body Markdown</h3>
+          <textarea v-model="editBody" class="body-textarea"></textarea>
         </div>
       </div>
     </div>

@@ -1,6 +1,9 @@
 # Dependencies
 node_modules/
 
+# Local editor backups (dev-only, never committed)
+.editor-backups/
+
 # Nuxt build output
 .nuxt/
 .output/
