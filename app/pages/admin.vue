@@ -108,10 +108,28 @@ const validationWarnings = computed(() => {
   if (!fm.pinyin?.trim()) warns.push('Pinyin is recommended')
   if (fm.seal && fm.seal.length > 3) warns.push('Seal should ideally be 1-3 characters')
   
-  if (tagsString.value) {
-    const tags = tagsString.value.split(',').map(t => t.trim()).filter(Boolean)
-    const hasInvalidTag = tags.some(t => !/^[a-z0-9-]+$/.test(t))
+  if (editForm.value.tags && Array.isArray(editForm.value.tags)) {
+    const hasInvalidTag = editForm.value.tags.some((t: string) => !/^[a-z0-9-]+$/.test(t))
     if (hasInvalidTag) warns.push('Tags should be lowercase and hyphenated')
+  }
+
+  // Relationship validation warnings
+  const relFields = ['related', 'affiliations', 'members', 'leader', 'headquarters', 'location', 'owners', 'users', 'practitioners']
+  for (const field of relFields) {
+    const val = editForm.value[field]
+    if (!val) continue
+    const paths = Array.isArray(val) ? val : [val]
+    for (const p of paths) {
+      if (typeof p !== 'string') continue
+      if (!p.startsWith('/')) warns.push(`${field}: Path "${p}" must start with /`)
+      if (p.startsWith('/titles')) warns.push(`${field}: Path "${p}" points to internal /titles section`)
+      if (p.startsWith('/_')) warns.push(`${field}: Path "${p}" points to internal partial`)
+      
+      // Check if it exists in entries list
+      if (entries.value && !entries.value.some(e => e.routePath === p)) {
+        warns.push(`${field}: Path "${p}" does not exist yet (Ghost Link)`)
+      }
+    }
   }
 
   if (editBody.value.trim().startsWith('# ')) {
@@ -141,15 +159,6 @@ async function saveEntry() {
   }
 
   isSaving.value = true
-
-  // Reconstruct arrays from strings
-  const tags = tagsString.value.split(',').map(t => t.trim()).filter(Boolean)
-  if (tags.length) editForm.value.tags = tags
-  else delete editForm.value.tags
-
-  const related = relatedString.value.split(',').map(t => t.trim()).filter(Boolean)
-  if (related.length) editForm.value.related = related
-  else delete editForm.value.related
 
   try {
     const res = await $fetch('/api/editor/entry', {

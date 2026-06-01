@@ -71,6 +71,25 @@ function validateFrontmatter(section: string, fm: Record<string, any>): string[]
     )
   }
 
+  // Relationship path validation
+  const relFields = ['related', 'affiliations', 'members', 'leader', 'headquarters', 'location', 'owners', 'users', 'practitioners']
+  for (const field of relFields) {
+    const val = fm[field]
+    if (!val) continue
+    const paths = Array.isArray(val) ? val : [val]
+    for (const p of paths) {
+      if (typeof p !== 'string') continue
+      if (!p.startsWith('/')) errors.push(`${field}: Path "${p}" must start with /`)
+      if (p.startsWith('/titles')) errors.push(`${field}: Path "${p}" points to internal /titles section`)
+      if (p.startsWith('/_')) errors.push(`${field}: Path "${p}" points to internal partial`)
+      
+      const segments = p.split('/').filter(Boolean)
+      if (segments.length !== 2) {
+        errors.push(`${field}: Path "${p}" must be /section/slug`)
+      }
+    }
+  }
+
   return errors
 }
 
