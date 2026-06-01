@@ -62,11 +62,35 @@ const CATEGORY_MAP: Record<string, string[]> = {
   glossary: ['Term', 'Concept', 'Phrase']
 }
 
+interface ImportParseResult {
+  frontmatter: Record<string, any>
+  body: string
+  section: string
+  slug: string
+  routePath: string
+  fileRelPath: string
+  exists: boolean
+  errors: string[]
+  warnings: string[]
+  hasReferences: boolean
+}
+
 // --- Create Wizard State ---
 const isCreateWizardOpen = ref(false)
 const isCreating = ref(false)
 const isSlugManuallyEdited = ref(false)
 const createWizardError = ref('')
+
+// --- Import Workflow State ---
+const isImportModalOpen = ref(false)
+const isImportParsing = ref(false)
+const isImportSaving = ref(false)
+const importRawMarkdown = ref('')
+const importParseResult = ref<ImportParseResult | null>(null)
+const importParseError = ref('')
+const importOverwritePhrase = ref('')
+const importBodyPreview = ref('')
+const importFrontmatterPreview = ref('')
 
 const createForm = ref({
   title: '',
@@ -195,6 +219,109 @@ async function createEntry() {
     createWizardError.value = e?.data?.statusMessage || e?.message || 'Failed to create entry'
   } finally {
     isCreating.value = false
+  }
+}
+
+function openImportModal() {
+  importRawMarkdown.value = ''
+  importParseResult.value = null
+  importParseError.value = ''
+  importOverwritePhrase.value = ''
+  importBodyPreview.value = ''
+  importFrontmatterPreview.value = ''
+  isImportModalOpen.value = true
+}
+
+function closeImportModal() {
+  if (isImportParsing.value || isImportSaving.value) return
+  isImportModalOpen.value = false
+}
+
+const expectedOverwritePhrase = computed(() => {
+  if (!importParseResult.value?.exists) return ''
+  return `OVERWRITE ${importParseResult.value.routePath}`
+})
+
+const canSaveImport = computed(() => {
+  if (!importParseResult.value) return false
+  if (importParseResult.value.errors.length > 0) return false
+  if (importParseResult.value.exists) {
+    return importOverwritePhrase.value.trim() === expectedOverwritePhrase.value
+  }
+  return true
+})
+
+async function parseImportMarkdown() {
+  importParseError.value = ''
+  importParseResult.value = null
+  importOverwritePhrase.value = ''
+
+  if (!importRawMarkdown.value.trim()) {
+    importParseError.value = 'Please paste markdown content first.'
+    return
+  }
+
+  isImportParsing.value = true
+
+  try {
+    const res = await $fetch<{ success: boolean; result: ImportParseResult }>('/api/editor/import-markdown', {
+      method: 'POST',
+      body: {
+        mode: 'parse',
+        markdown: importRawMarkdown.value,
+      }
+    })
+
+    importParseResult.value = res.result
+    importBodyPreview.value = res.result.body
+    importFrontmatterPreview.value = JSON.stringify(res.result.frontmatter, null, 2)
+  } catch (e: any) {
+    importParseError.value = e?.data?.statusMessage || e?.message || 'Failed to parse markdown'
+  } finally {
+    isImportParsing.value = false
+  }
+}
+
+async function importAndSaveMarkdown() {
+  if (!importParseResult.value || !canSaveImport.value) return
+
+  isImportSaving.value = true
+  importParseError.value = ''
+
+  try {
+    const path = importParseResult.value.routePath
+    const frontmatter = importParseResult.value.frontmatter
+    const body = importBodyPreview.value
+
+    if (importParseResult.value.exists) {
+      // Must use existing save path for backup-on-overwrite safety
+      await $fetch('/api/editor/entry', {
+        method: 'POST',
+        body: {
+          path,
+          frontmatter,
+          body,
+        }
+      })
+    } else {
+      await $fetch('/api/editor/import-markdown', {
+        method: 'POST',
+        body: {
+          mode: 'save',
+          path,
+          frontmatter,
+          body,
+        }
+      })
+    }
+
+    await refreshEntries()
+    selectedEntryPath.value = path
+    isImportModalOpen.value = false
+  } catch (e: any) {
+    importParseError.value = e?.data?.statusMessage || e?.message || 'Import save failed'
+  } finally {
+    isImportSaving.value = false
   }
 }
 
@@ -367,6 +494,7 @@ async function saveEntry() {
           <option v-for="sec in sections" :key="sec" :value="sec">{{ sec }}</option>
         </select>
         <button class="create-btn" @click="openCreateWizard">Create Entry</button>
+        <button class="create-btn" @click="openImportModal">Import Markdown</button>
       </div>
 
       <div v-if="pending" class="loading">Loading entries...</div>
@@ -605,6 +733,80 @@ async function saveEntry() {
         </div>
       </div>
     </div>
+
+    <!-- Import Markdown Modal -->
+    <div v-if="isImportModalOpen" class="modal-overlay" @click.self="closeImportModal">
+      <div class="modal-card import-modal-card">
+        <div class="modal-header">
+          <h3>Import NotebookLM Markdown</h3>
+          <button class="modal-close" :disabled="isImportParsing || isImportSaving" @click="closeImportModal">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="form-group full-width">
+            <label>Raw Markdown (frontmatter + body)</label>
+            <textarea v-model="importRawMarkdown" rows="12" class="body-textarea"></textarea>
+          </div>
+
+          <div class="import-actions-row">
+            <button class="create-btn" :disabled="isImportParsing || isImportSaving" @click="parseImportMarkdown">
+              {{ isImportParsing ? 'Parsing...' : 'Parse Markdown' }}
+            </button>
+          </div>
+
+          <div v-if="importParseError" class="create-error">{{ importParseError }}</div>
+
+          <div v-if="importParseResult" class="import-preview">
+            <div class="preview-group">
+              <div><strong>Target Route:</strong> <code>{{ importParseResult.routePath || '(unresolved)' }}</code></div>
+              <div><strong>Target File:</strong> <code>content/{{ importParseResult.fileRelPath || '(unresolved)' }}</code></div>
+              <div>
+                <strong>Operation:</strong>
+                <span v-if="importParseResult.exists">Update existing entry (overwrite)</span>
+                <span v-else>Create new entry</span>
+              </div>
+            </div>
+
+            <div v-if="importParseResult.errors.length" class="validation-panel errors">
+              <h4>❌ Import Errors</h4>
+              <ul>
+                <li v-for="err in importParseResult.errors" :key="err">{{ err }}</li>
+              </ul>
+            </div>
+
+            <div v-if="importParseResult.warnings.length" class="validation-panel warnings">
+              <h4>⚠️ Import Warnings</h4>
+              <ul>
+                <li v-for="warn in importParseResult.warnings" :key="warn">{{ warn }}</li>
+              </ul>
+            </div>
+
+            <div v-if="importParseResult.exists" class="form-group full-width">
+              <label>Overwrite confirmation phrase</label>
+              <input v-model="importOverwritePhrase" type="text" :placeholder="expectedOverwritePhrase" />
+              <small class="error-text">Type exactly: {{ expectedOverwritePhrase }}</small>
+            </div>
+
+            <div class="form-group full-width">
+              <label>Parsed Frontmatter Preview</label>
+              <textarea :value="importFrontmatterPreview" rows="12" readonly class="body-textarea"></textarea>
+            </div>
+
+            <div class="form-group full-width">
+              <label>Body Preview (editable before save)</label>
+              <textarea v-model="importBodyPreview" rows="14" class="body-textarea"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="close-btn" :disabled="isImportParsing || isImportSaving" @click="closeImportModal">Cancel</button>
+          <button class="save-btn" :disabled="!canSaveImport || isImportParsing || isImportSaving" @click="importAndSaveMarkdown">
+            {{ isImportSaving ? 'Importing...' : 'Import and Save' }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -775,6 +977,10 @@ async function saveEntry() {
   border-radius: 8px;
 }
 
+.import-modal-card {
+  width: min(1100px, 98vw);
+}
+
 .modal-header,
 .modal-footer {
   display: flex;
@@ -798,6 +1004,19 @@ async function saveEntry() {
   background: transparent;
   font-size: 1.1rem;
   cursor: pointer;
+}
+
+.import-actions-row {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 0.75rem;
+}
+
+.import-preview {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
 }
 
 .preview-group code {
