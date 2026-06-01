@@ -17,7 +17,7 @@ tags:
 users:
   - /characters/chen-pingan
 related:
-  - /swordsmanship/moon-in-the-well
+  - /artifacts/moon-in-the-well
   - /artifacts/dragon-slaying-stone
 verificationStatus: to-be-verified
 sourceNotes: "NotebookLM draft with chapter-level references; still pending manual lore review."

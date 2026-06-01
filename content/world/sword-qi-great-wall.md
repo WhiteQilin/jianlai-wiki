@@ -1,6 +1,7 @@
 ---
 title: Sword Qi Great Wall
 chinese: 剑气长城
+pinyin: Jiànqì Chángchéng
 description: A massive defensive wall and city standing between the Haoran Heaven and Manhuang Heaven, exiled home to the world's most powerful sword cultivators.
 section: world
 category: Sword-Qi-Great-Wall
@@ -23,8 +24,6 @@ related:
 sourceNotes: >
   Origins as an exile for ancient sword cultivators verified in Vol 20, Ch 2. The 13 Duels verified in Vol 5, Ch 1. Faction structure (Three Officials) verified in Vol 23, Ch 9. Layout (Smithies, Mirage, Palaces) verified in Vol 20, Ch 9 and Vol 23, Ch 2. Ascension and splitting of the wall verified in Vol 23, Ch 10. Wall engravings verified in Vol 33, Ch 6.
 ---
-
-# Sword Qi Great Wall
 
 ## Overview
 

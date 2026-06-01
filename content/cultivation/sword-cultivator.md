@@ -1,6 +1,7 @@
 ---
 title: Sword Cultivator
 chinese: 剑修
+pinyin: Jiànxiū
 description: The most lethal and revered path of Qi Refiners, known for their natal flying swords, pure sword hearts, and unparalleled offensive power.
 section: cultivation
 category: Path

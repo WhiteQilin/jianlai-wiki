@@ -1,6 +1,7 @@
 ---
 title: Great Li Dynasty
 chinese: 大骊王朝
+pinyin: Dàlí Wángcháo
 description: The paramount human empire of the Eastern Aquarius Continent, renowned for its invincible iron cavalry, strict legalist governance, and successful defense of the continent against the Manhuang Heaven.
 section: factions
 category: Dynasty
@@ -27,8 +28,6 @@ related:
 sourceNotes: >
   Historical expansion from a Lu Dynasty vassal to continental hegemon verified in Volume 1. The Haoran-Manhuang War preparations and imitation White Jade Capital verified in Volumes 3, 14, and 22. Post-war territory and political hierarchy verified in Volume 52.
 ---
-
-# Great Li Dynasty
 
 ## Overview
 

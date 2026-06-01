@@ -1,6 +1,7 @@
 ---
 title: Moon in the Well
 chinese: 井中月 / 井底月
+pinyin: Jǐng Zhōng Yuè
 description: Chen Ping'an's natal flying sword, capable of dividing into hundreds of thousands of blades to construct the physical framework of his localized domains.
 section: artifacts
 category: Flying-Sword
@@ -22,8 +23,6 @@ sourceNotes: >
   Labyrinth/Domain manifestation verified in Vol 36, Ch 2.
   Countered by Biluo verified in Vol 47, Ch 9.
 ---
-
-# Moon in the Well
 
 ## Overview
 

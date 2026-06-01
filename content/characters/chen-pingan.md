@@ -17,7 +17,7 @@ tags: [protagonist, sword-cultivator, pure-martial-artist, hidden-official, luop
 related: [/characters/ning-yao, /factions/luopo-mountain, /world/lizhu-grotto-heaven, /characters/qi-jingchun]
 affiliations:
   - /factions/luopo-mountain
-  - /factions/great-wall-of-sword-qi
+  - /world/sword-qi-great-wall
 relationships:
   - name: Ning Yao
     relation: Dao companion
@@ -26,7 +26,8 @@ relationships:
     relation: Senior brother / early mentor
     link: /characters/qi-jingchun
 verificationStatus: to-be-verified
-sourceNotes: "Needs comprehensive chapter verification across all claims."
+sourceNotes: >
+  Needs comprehensive chapter verification across all claims. Macro-events (becoming the Last Hidden Official, reaching the Immortal Realm as a sword cultivator, attaining Ultimate Realm pure martial arts) are comprehensively evidenced in the provided excerpts, but granular chapter citations for every event and minor interaction are not yet pinned to specific volume/chapter numbers. The exact chapters marking his ascensions between the lower and middle realms (e.g. the 4th, 5th, and 6th martial tiers and early Qi Refining tiers) lack precise citation tracking in the current database — hence the to-be-verified status.
 firstAppearance: "Volume 1, Chapter 1: Waking of Insects (惊蛰)"
 lastUpdated: 2026-05-31
 ---
@@ -84,6 +85,3 @@ After finally returning to the Haoran World, he helped rebuild the fractured con
 * "My name is Chen Ping'an, the Ping'an of safe and sound, and I am a swordsman." (我叫陈平安，平平安安的平安，我是一名剑客。)
 * He frequently asserts that if the Heavenly Dao collapses, he will rely on his solitary sword to move mountains, overturn seas, subdue demons, and open the sky. 
 
-## Notes
-* **Uncertain Claims:** The specific chapter numbers marking his exact ascensions between the lower and middle realms (e.g., exactly when he broke through the 4th, 5th, and 6th martial tiers, or early Qi Refining tiers) lack precise citation tracking in the current database.
-* **Verification Status:** The entry is currently marked as `to-be-verified` because while the macro-events (becoming Hidden Official, reaching the Immortal Realm, attaining Ultimate Realm martial arts) are comprehensively evidenced in the provided excerpts, granular chapter citations for every single event and minor character interaction have not yet been pinned to specific volume/chapter numbers.

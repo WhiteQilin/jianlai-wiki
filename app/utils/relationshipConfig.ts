@@ -57,19 +57,75 @@ export interface RelationshipField {
   field: string
   outgoingLabel: string
   inverseLabel: string
-  shape: 'pathArray' | 'pathString' | 'linkObjectArray'
+  shape: 'pathArray' | 'pathString' | 'pathStringOrArray' | 'linkObjectArray'
 }
 
 /**
- * Stage 5 starter set (incremental). Only the relationships proven against
- * existing sample data are enabled here; more can be appended later without
- * touching the composable.
+ * Stage 7C set. Every authored relationship field in the real seed batch is
+ * wired here so it can render on both sides of the graph. Shapes mirror the
+ * frontmatter:
+ * - `pathArray`: array of path strings (related, members, owners, users,
+ *   practitioners).
+ * - `pathString`: single path string (location, headquarters).
+ * - `pathStringOrArray`: single path string OR an array (leader — a faction/
+ *   world may have one or several; a character may reuse it for a master).
+ * - `linkObjectArray`: array of objects exposing `.link` (ranking entries).
+ *
+ * Order here is the render order of OUTGOING groups on a page.
  */
 export const RELATIONSHIP_FIELDS: RelationshipField[] = [
   {
     field: 'affiliations',
     outgoingLabel: 'Affiliations',
     inverseLabel: 'Notable Members',
+    shape: 'pathArray',
+  },
+  {
+    field: 'members',
+    outgoingLabel: 'Members',
+    inverseLabel: 'Member Of',
+    shape: 'pathArray',
+  },
+  {
+    field: 'leader',
+    outgoingLabel: 'Leadership',
+    inverseLabel: 'Leadership Of',
+    shape: 'pathStringOrArray',
+  },
+  {
+    field: 'headquarters',
+    outgoingLabel: 'Headquarters',
+    inverseLabel: 'Seat Of',
+    shape: 'pathString',
+  },
+  {
+    field: 'location',
+    outgoingLabel: 'Location',
+    inverseLabel: 'Located Here',
+    shape: 'pathString',
+  },
+  {
+    field: 'owners',
+    outgoingLabel: 'Owners',
+    inverseLabel: 'Artifacts & Items',
+    shape: 'pathArray',
+  },
+  {
+    field: 'users',
+    outgoingLabel: 'Known Users',
+    inverseLabel: 'Techniques & Arts',
+    shape: 'pathArray',
+  },
+  {
+    field: 'practitioners',
+    outgoingLabel: 'Practitioners',
+    inverseLabel: 'Cultivation Paths',
+    shape: 'pathArray',
+  },
+  {
+    field: 'related',
+    outgoingLabel: 'Related Entries',
+    inverseLabel: 'Referenced By',
     shape: 'pathArray',
   },
   {
@@ -90,6 +146,13 @@ export function extractPaths(record: Record<string, unknown>, def: RelationshipF
   }
 
   if (def.shape === 'pathArray') {
+    return Array.isArray(raw) ? raw.filter((v): v is string => typeof v === 'string') : []
+  }
+
+  // pathStringOrArray: a single path string OR an array of path strings
+  // (e.g. `leader`, which a faction/world may declare as one or many).
+  if (def.shape === 'pathStringOrArray') {
+    if (typeof raw === 'string') return [raw]
     return Array.isArray(raw) ? raw.filter((v): v is string => typeof v === 'string') : []
   }
 

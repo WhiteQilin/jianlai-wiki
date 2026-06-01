@@ -31,8 +31,6 @@ sourceNotes: >
   Origins and Lizhu Grotto-Heaven events verified in Volumes 1-2. Confession at Daoxuan Mountain verified in Volume 7. Slaying ancient gods and ascending to Feisheng Realm verified in Volume 26. 14th Realm breakthrough verified in Volume 47.
 ---
 
-# Ning Yao
-
 ## Overview
 
 **Ning Yao** (宁姚) is the primary heroine of the narrative and the Dao Companion (道侣) of Chen Ping'an. Born in the Sword Qi Great Wall (剑气长城) to the prestigious Ning and Yao sword cultivation families, she is universally acknowledged as the most exceptionally talented sword cultivator of her generation, and potentially of the last ten thousand years.

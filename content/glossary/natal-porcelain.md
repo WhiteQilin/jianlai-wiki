@@ -1,6 +1,7 @@
 ---
 title: Natal Porcelain
 chinese: 本命瓷
+pinyin: Běnmìng Cí
 description: A mystical porcelain artifact forged in Lizhu Grotto-Heaven that binds and dictates the destiny and cultivation potential of its native youth.
 section: glossary
 category: Term

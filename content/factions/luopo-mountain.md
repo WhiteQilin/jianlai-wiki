@@ -12,7 +12,7 @@ banner: ""
 seal: 落
 description: The primary faction founded by Chen Ping'an, located in Longquan County. It is the upper sect of the Qingping Sword Sect and the owner of the Lotus Root Blessed Land.
 tags: [luopo-mountain, faction, sect, dali-empire, lotus-root-blessed-land, qingping-sword-sect]
-related: [/characters/chen-pingan, /world/lizhu-grotto-heaven, /characters/zhu-lian, /characters/cui-dongshan, /factions/great-wall-of-sword-qi]
+related: [/characters/chen-pingan, /world/lizhu-grotto-heaven, /characters/zhu-lian, /characters/cui-dongshan, /world/sword-qi-great-wall]
 members: [/characters/chen-pingan, /characters/zhu-lian, /characters/changming, /characters/jiang-shangzhen, /characters/mi-yu, /characters/pei-qian, /characters/zhou-mili]
 leader: /characters/chen-pingan
 headquarters: /world/longquan-county

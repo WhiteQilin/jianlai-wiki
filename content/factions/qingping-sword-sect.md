@@ -1,6 +1,7 @@
 ---
 title: Qingping Sword Sect
 chinese: 青萍剑宗
+pinyin: Qīngpíng Jiànzōng
 description: The lower sect of Luopo Mountain, established in the Tongye Continent as a premier sword dao sect under the leadership of Cui Dongshan.
 section: factions
 category: Sect
@@ -21,8 +22,6 @@ related:
   - /characters/mi-yu
   - /characters/cui-wei
 ---
-
-# Qingping Sword Sect
 
 ## Overview
 

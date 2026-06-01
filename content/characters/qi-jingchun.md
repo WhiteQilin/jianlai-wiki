@@ -96,4 +96,4 @@ Before his death, Qi Jingchun made profound arrangements to ensure the continuat
 - **剑来2：护为远行客, 第七章 — 大考落幕:** Supports his complex ideological confrontation with Cui Chan, the revelation of his profound foresight, and his choice of Li Baoping as his academic successor.
 - **剑来13：陇上花又开, 第七章 — 报道先生归也:** Supports the Old Scholar's assessment of Qi Jingchun's fundamentally optimistic worldview, contrasting it with Cui Chan's pessimism.
 - **剑来27：风雪夜归人, 第三章 — 春风得意:** Supports his secret attainment of the 14th Realm through the integration of the Three Teachings, and the manifestation of his lingering will to collaborate with Cui Chan against Zhou Mi.
-- **剑来39：Jie Qu Wan Zhong Sh, 第一章 — 我行我素:** Supports the fact that he possessed three natal words at the pinnacle of his cultivation.
+- **剑来39：借取万钟赏, 第一章 — 我行我素:** Supports the fact that he possessed three natal words at the pinnacle of his cultivation.

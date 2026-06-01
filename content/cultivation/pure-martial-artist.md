@@ -1,6 +1,7 @@
 ---
 title: Pure Martial Artist
 chinese: 纯粹武夫
+pinyin: Chúncuì Wǔfū
 description: A cultivation path focusing on the extreme refinement of the physical body, martial will, and a single breath of pure true qi.
 section: cultivation
 category: Path

@@ -73,19 +73,24 @@ export async function useRelatedEntries(currentPath: string) {
     const current = byPath.get(currentPath)
     const result: RelatedGroup[] = []
 
+    // Page-level dedupe: with symmetric fields (e.g. `related`) the same entity
+    // can satisfy both an OUTGOING and an INVERSE relation. Render each target
+    // only once, prioritising the OUTGOING (authored-on-this-page) appearance,
+    // then earlier-defined fields. Prevents the same card showing twice.
+    const shown = new Set<string>()
+
     // --- OUTGOING: this page's own relationship fields ---
     if (current) {
       for (const def of RELATIONSHIP_FIELDS) {
         const resolved: RelatedEntry[] = []
-        const seen = new Set<string>()
         for (const targetPath of extractPaths(current, def)) {
-          if (targetPath === currentPath || seen.has(targetPath)) continue
+          if (targetPath === currentPath || shown.has(targetPath)) continue
           const target = byPath.get(targetPath)
           if (!target) continue
           const re = toRelatedEntry(target)
           if (re) {
             resolved.push(re)
-            seen.add(targetPath)
+            shown.add(targetPath)
           }
         }
         if (resolved.length) {
@@ -97,16 +102,14 @@ export async function useRelatedEntries(currentPath: string) {
     // --- INVERSE: other pages whose relationship fields point at this page ---
     for (const def of RELATIONSHIP_FIELDS) {
       const resolved: RelatedEntry[] = []
-      const seen = new Set<string>()
       for (const e of entries) {
-        if (e.path === currentPath) continue
-        if (seen.has(e.path)) continue
+        if (e.path === currentPath || shown.has(e.path)) continue
         const paths = extractPaths(e, def)
         if (paths.includes(currentPath)) {
           const re = toRelatedEntry(e)
           if (re) {
             resolved.push(re)
-            seen.add(e.path)
+            shown.add(e.path)
           }
         }
       }
