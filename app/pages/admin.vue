@@ -9,6 +9,7 @@ useSeoMeta({
 })
 
 const { data: entries, pending, refresh: refreshEntries } = await useFetch<any[]>('/api/editor/entries')
+const { data: mediaCatalog } = await useFetch<{ success: boolean; media: Array<{ publicPath: string; extension: string; type: 'image' | 'video' }> }>('/api/editor/media')
 
 const searchQuery = ref('')
 const selectedSection = ref('All')
@@ -62,6 +63,9 @@ const previewUrl = computed(() => {
 const PUBLIC_SECTIONS = ['characters', 'world', 'cultivation', 'swordsmanship', 'factions', 'artifacts', 'timeline', 'glossary', 'rankings', 'teachings', 'pantheon'] as const
 const IMPORTANCE_VALUES = ['primary', 'major', 'minor', 'background'] as const
 const VERIFICATION_VALUES = ['verified', 'to-be-verified', 'disputed', 'speculative'] as const
+
+const IMAGE_EXTS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg'])
+const VIDEO_EXTS = new Set(['.mp4', '.webm', '.mov'])
 
 const CATEGORY_MAP: Record<string, string[]> = {
   characters: ['Character', 'Major', 'Minor', 'Gods'],
@@ -567,6 +571,17 @@ const verificationHints = computed(() => {
   return hints
 })
 
+function fileExt(path: string): string {
+  const idx = path.lastIndexOf('.')
+  if (idx === -1) return ''
+  return path.slice(idx).toLowerCase()
+}
+
+function mediaExists(path: string): boolean {
+  const list = mediaCatalog.value?.media || []
+  return list.some((m) => m.publicPath === path)
+}
+
 const validationWarnings = computed(() => {
   const warns: string[] = []
   const fm = editForm.value
@@ -630,6 +645,30 @@ const validationWarnings = computed(() => {
       const n = Number(val)
       if (Number.isNaN(n)) warns.push(`${key} should be numeric`)
     }
+  }
+
+  const imagePath = typeof fm.image === 'string' ? fm.image.trim() : ''
+  if (imagePath) {
+    if (!imagePath.startsWith('/images/')) warns.push('image path should usually start with /images/')
+    const ext = fileExt(imagePath)
+    if (ext && !IMAGE_EXTS.has(ext)) warns.push(`image path uses unsupported extension "${ext}"`)
+    if (!mediaExists(imagePath)) warns.push(`image path "${imagePath}" not found in media catalog (allowed placeholder)`)
+  }
+
+  const bannerPath = typeof fm.banner === 'string' ? fm.banner.trim() : ''
+  if (bannerPath) {
+    if (!bannerPath.startsWith('/images/')) warns.push('banner path should usually start with /images/')
+    const ext = fileExt(bannerPath)
+    if (ext && !IMAGE_EXTS.has(ext)) warns.push(`banner path uses unsupported extension "${ext}"`)
+    if (!mediaExists(bannerPath)) warns.push(`banner path "${bannerPath}" not found in media catalog (allowed placeholder)`)
+  }
+
+  const videoPath = typeof fm.video === 'string' ? fm.video.trim() : ''
+  if (videoPath) {
+    if (!videoPath.startsWith('/videos/')) warns.push('video path should usually start with /videos/')
+    const ext = fileExt(videoPath)
+    if (ext && !VIDEO_EXTS.has(ext)) warns.push(`video path uses unsupported extension "${ext}"`)
+    if (!mediaExists(videoPath)) warns.push(`video path "${videoPath}" not found in media catalog (allowed placeholder)`)
   }
 
   if (editBody.value.trim().startsWith('# ')) {
@@ -932,13 +971,32 @@ async function saveEntry() {
               />
             </div>
 
-            <div class="form-group">
+            <div class="form-group full-width">
               <label>Image Path</label>
-              <input v-model="editForm.image" type="text" />
+              <AdminMediaPathPicker
+                :model-value="editForm.image || ''"
+                preferred-type="image"
+                label=""
+                @update:model-value="(v) => setScalarField('image', v)"
+              />
             </div>
-            <div class="form-group">
+            <div class="form-group full-width">
               <label>Banner Path</label>
-              <input v-model="editForm.banner" type="text" />
+              <AdminMediaPathPicker
+                :model-value="editForm.banner || ''"
+                preferred-type="image"
+                label=""
+                @update:model-value="(v) => setScalarField('banner', v)"
+              />
+            </div>
+            <div class="form-group full-width">
+              <label>Video Path</label>
+              <AdminMediaPathPicker
+                :model-value="editForm.video || ''"
+                preferred-type="video"
+                label=""
+                @update:model-value="(v) => setScalarField('video', v)"
+              />
             </div>
             <div class="form-group full-width">
               <label>Source Notes</label>
