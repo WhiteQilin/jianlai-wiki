@@ -3,7 +3,7 @@ import { onMounted, ref } from 'vue'
 import { HOME_HERO_VIDEOS } from '~/constants/homeHeroVideos'
 import { pickRandomHeroVideo } from '~/composables/useRandomHeroVideo'
 
-const defaultHeroVideo = '/videos/curated/home-intro.mp4'
+const defaultHeroVideo = '/videos/curated/home-hero-01.mp4'
 const heroVideo = ref(defaultHeroVideo)
 const heroCandidates = [...HOME_HERO_VIDEOS]
 const activeCandidates = ref<string[]>([])

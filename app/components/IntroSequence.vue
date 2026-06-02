@@ -36,7 +36,7 @@ onMounted(() => {
         oncontextmenu="return false;"
         @ended="closeIntro"
       >
-        <source src="/videos/curated/home-intro.mp4" type="video/mp4" />
+        <source src="/videos/curated/intro-logo.mp4" type="video/mp4" />
       </video>
       
       <div class="intro-overlay"></div>

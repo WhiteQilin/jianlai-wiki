@@ -3,7 +3,7 @@ import VideoEmbed from './VideoEmbed.vue'
 
 const featuredVideo = {
   id: 'fight-scene',
-  url: '/videos/curated/fight-scene-safe.mp4',
+  url: '/videos/curated/home-hero-02.mp4',
   poster: '/images/banners/swordsmanship-banner.webp',
   title: 'Epic Confrontations',
   caption: 'Fluid combat sequences and breathtaking swordsmanship.',
@@ -16,7 +16,7 @@ const featuredVideo = {
 const supportingVideos = [
   {
     id: 'ink-wash',
-    url: '/videos/curated/ink-wash-pv-safe.mp4',
+    url: '/videos/curated/home-hero-03.mp4',
     poster: '/images/banners/world-banner.webp',
     title: 'Ink-Wash Aesthetic',
     caption: 'Experience the unique Donghua ink-wash style.',
@@ -27,7 +27,7 @@ const supportingVideos = [
   },
   {
     id: 'lore-secret',
-    url: '/videos/curated/lore-secret-safe.mp4',
+    url: '/videos/curated/home-hero-04.mp4',
     poster: '/images/banners/factions-banner.webp',
     title: 'Secrets of Lizhu',
     caption: 'Uncovering the truth behind the hidden realm.',
@@ -63,7 +63,7 @@ const supportingVideos = [
             :fit="featuredVideo.fit"
             :background="featuredVideo.bg"
             controlsVariant="hero"
-            fallbackVideo="/videos/curated/home-intro.mp4"
+            fallbackVideo="/videos/curated/home-hero-01.mp4"
           />
           <div class="card-content">
             <span class="card-eyebrow">{{ featuredVideo.eyebrow }}</span>
@@ -90,7 +90,7 @@ const supportingVideos = [
               :fit="video.fit"
               :background="video.bg"
               controlsVariant="rail"
-              fallbackVideo="/videos/curated/home-intro.mp4"
+              fallbackVideo="/videos/curated/home-hero-01.mp4"
             />
             <div class="card-content">
               <span class="card-eyebrow">{{ video.eyebrow }}</span>
