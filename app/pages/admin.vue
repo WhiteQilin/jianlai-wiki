@@ -232,7 +232,7 @@ async function createEntry() {
     isCreateWizardOpen.value = false
     importSuccess.value = null
   } catch (e: any) {
-    createWizardError.value = e?.data?.statusMessage || e?.message || 'Failed to create entry'
+    createWizardError.value = e?.data?.message || e?.data?.statusMessage || e?.message || 'Failed to create entry'
   } finally {
     isCreating.value = false
   }
@@ -293,7 +293,7 @@ async function parseImportMarkdown() {
     importBodyPreview.value = res.result.body
     importFrontmatterPreview.value = JSON.stringify(res.result.frontmatter, null, 2)
   } catch (e: any) {
-    importParseError.value = e?.data?.statusMessage || e?.message || 'Failed to parse markdown'
+    importParseError.value = e?.data?.message || e?.data?.statusMessage || e?.message || 'Failed to parse markdown'
   } finally {
     isImportParsing.value = false
   }
@@ -341,7 +341,7 @@ async function importAndSaveMarkdown() {
     }
     isImportModalOpen.value = false
   } catch (e: any) {
-    importParseError.value = e?.data?.statusMessage || e?.message || 'Import save failed'
+    importParseError.value = e?.data?.message || e?.data?.statusMessage || e?.message || 'Import save failed'
   } finally {
     isImportSaving.value = false
   }
@@ -356,6 +356,143 @@ const isSaving = ref(false)
 
 const referencesEditor = ref<{ parseBody: () => void } | null>(null)
 const referencesStatus = ref({ hasReferences: false, hasLowConfidence: false })
+
+const sectionStringArrayFieldMap: Record<string, string[]> = {
+  characters: ['titles', 'abilities'],
+  factions: ['teachings'],
+  teachings: ['keyFigures'],
+  glossary: ['relatedTerms'],
+}
+
+const sectionScalarFieldMap: Record<string, { key: string; label: string; type: 'text' | 'number' }[]> = {
+  characters: [
+    { key: 'origin', label: 'Origin', type: 'text' },
+    { key: 'realm', label: 'Realm', type: 'text' },
+  ],
+  factions: [{ key: 'factionType', label: 'Faction Type', type: 'text' }],
+  artifacts: [
+    { key: 'artifactType', label: 'Artifact Type', type: 'text' },
+    { key: 'tier', label: 'Tier', type: 'text' },
+    { key: 'origin', label: 'Origin', type: 'text' },
+  ],
+  world: [
+    { key: 'locationType', label: 'Location Type', type: 'text' },
+    { key: 'governingFaction', label: 'Governing Faction', type: 'text' },
+    { key: 'parentLocation', label: 'Parent Location', type: 'text' },
+  ],
+  cultivation: [
+    { key: 'pathType', label: 'Path Type', type: 'text' },
+    { key: 'realmLevel', label: 'Realm Level', type: 'number' },
+  ],
+  swordsmanship: [
+    { key: 'abilityType', label: 'Ability Type', type: 'text' },
+    { key: 'lineage', label: 'Lineage', type: 'text' },
+  ],
+  teachings: [{ key: 'teachingType', label: 'Teaching Type', type: 'text' }],
+  pantheon: [
+    { key: 'beingType', label: 'Being Type', type: 'text' },
+    { key: 'domain', label: 'Domain', type: 'text' },
+    { key: 'territory', label: 'Territory', type: 'text' },
+  ],
+  glossary: [{ key: 'termType', label: 'Term Type', type: 'text' }],
+  timeline: [
+    { key: 'date', label: 'Date', type: 'text' },
+    { key: 'era', label: 'Era', type: 'text' },
+    { key: 'eraOrder', label: 'Era Order', type: 'number' },
+  ],
+}
+
+const sectionPathArrayFieldMap: Record<string, string[]> = {
+  factions: ['members'],
+  cultivation: ['practitioners'],
+  swordsmanship: ['users'],
+  artifacts: ['owners'],
+  timeline: ['participants'],
+  teachings: ['relatedFactions'],
+  world: ['inhabitants'],
+}
+
+const shownStringArrayFields = computed(() => {
+  const section = editForm.value.section
+  if (!section) return [] as string[]
+  const sectionFields = sectionStringArrayFieldMap[section] || []
+  const presentFields = Object.keys(editForm.value).filter((k) => Array.isArray(editForm.value[k]) && ['titles', 'abilities', 'teachings', 'keyFigures', 'relatedTerms'].includes(k))
+  return Array.from(new Set([...sectionFields, ...presentFields]))
+})
+
+const shownScalarFields = computed(() => {
+  const section = editForm.value.section
+  if (!section) return [] as { key: string; label: string; type: 'text' | 'number' }[]
+  const configured = sectionScalarFieldMap[section] || []
+
+  const knownScalarMap = new Map<string, { key: string; label: string; type: 'text' | 'number' }>()
+  for (const list of Object.values(sectionScalarFieldMap)) {
+    for (const item of list) {
+      knownScalarMap.set(item.key, item)
+    }
+  }
+
+  const present = Object.keys(editForm.value)
+    .filter((k) => knownScalarMap.has(k) && editForm.value[k] != null)
+    .map((k) => knownScalarMap.get(k)!)
+
+  const merged = [...configured, ...present]
+  const seen = new Set<string>()
+  return merged.filter((f) => {
+    if (seen.has(f.key)) return false
+    seen.add(f.key)
+    return true
+  })
+})
+
+const shownPathArrayFields = computed(() => {
+  const section = editForm.value.section
+  if (!section) return [] as string[]
+  const sectionFields = sectionPathArrayFieldMap[section] || []
+  const presentFields = Object.keys(editForm.value).filter((k) => Array.isArray(editForm.value[k]) && ['members', 'practitioners', 'users', 'owners', 'participants', 'relatedFactions', 'inhabitants'].includes(k))
+  return Array.from(new Set([...sectionFields, ...presentFields]))
+})
+
+function arrayLabel(key: string): string {
+  const labels: Record<string, string> = {
+    titles: 'Titles',
+    abilities: 'Abilities',
+    teachings: 'Teachings',
+    keyFigures: 'Key Figures',
+    relatedTerms: 'Related Terms',
+    members: 'Members',
+    practitioners: 'Practitioners',
+    users: 'Users',
+    owners: 'Owners',
+    participants: 'Participants',
+    relatedFactions: 'Related Factions',
+    inhabitants: 'Inhabitants',
+  }
+  return labels[key] || key
+}
+
+function ensureArrayField(key: string) {
+  if (!Array.isArray(editForm.value[key])) {
+    editForm.value[key] = []
+  }
+}
+
+function setArrayField(key: string, value: string[]) {
+  editForm.value[key] = value
+}
+
+function setScalarField(key: string, value: string) {
+  editForm.value[key] = value
+}
+
+function setNumberField(key: string, value: string) {
+  if (value === '') {
+    editForm.value[key] = undefined
+    return
+  }
+  const num = Number(value)
+  editForm.value[key] = Number.isNaN(num) ? value : num
+}
 
 function handleReferencesStatus(status: { hasReferences: boolean, hasLowConfidence: boolean }) {
   referencesStatus.value = status
@@ -403,6 +540,15 @@ const validationErrors = computed(() => {
   if (!fm.chinese?.trim()) errs.push('Chinese name is required')
   if (!fm.description?.trim()) errs.push('Description is required')
   if (!fm.category) errs.push('Category is required')
+
+  if (Array.isArray(fm.entries)) {
+    fm.entries.forEach((row: any, idx: number) => {
+      if (!row?.name?.toString().trim()) {
+        errs.push(`entries[${idx}]: name is required`)
+      }
+    })
+  }
+
   return errs
 })
 
@@ -433,7 +579,7 @@ const validationWarnings = computed(() => {
   }
 
   // Relationship validation warnings
-  const relFields = ['related', 'affiliations', 'members', 'leader', 'headquarters', 'location', 'owners', 'users', 'practitioners']
+  const relFields = ['related', 'affiliations', 'members', 'leader', 'headquarters', 'location', 'owners', 'users', 'practitioners', 'relatedFactions', 'participants', 'inhabitants']
   for (const field of relFields) {
     const val = editForm.value[field]
     if (!val) continue
@@ -448,6 +594,41 @@ const validationWarnings = computed(() => {
       if (entries.value && !entries.value.some(e => e.routePath === p)) {
         warns.push(`${field}: Path "${p}" does not exist yet (Ghost Link)`)
       }
+    }
+  }
+
+  if (Array.isArray(fm.relationships)) {
+    fm.relationships.forEach((row: any, idx: number) => {
+      const link = typeof row?.link === 'string' ? row.link : ''
+      if (!link) return
+      if (!link.startsWith('/')) warns.push(`relationships[${idx}]: link must start with /`)
+      if (link.startsWith('/titles')) warns.push(`relationships[${idx}]: link points to internal /titles section`)
+      if (link.startsWith('/_')) warns.push(`relationships[${idx}]: link points to internal partial`)
+    })
+  }
+
+  if (Array.isArray(fm.entries)) {
+    fm.entries.forEach((row: any, idx: number) => {
+      const rank = row?.rank
+      if (rank == null || `${rank}`.trim() === '') {
+        warns.push(`entries[${idx}]: rank is recommended for ordered rankings`)
+      }
+      const link = typeof row?.link === 'string' ? row.link : ''
+      if (!link) {
+        warns.push(`entries[${idx}]: link is blank (allowed unresolved/manual entry)`)
+      } else if (!link.startsWith('/')) {
+        warns.push(`entries[${idx}]: link should be /section/slug when present`)
+      }
+    })
+  }
+
+  const numericFields = ['realmLevel', 'eraOrder']
+  for (const key of numericFields) {
+    const val = editForm.value[key]
+    if (val == null || val === '') continue
+    if (typeof val !== 'number') {
+      const n = Number(val)
+      if (Number.isNaN(n)) warns.push(`${key} should be numeric`)
     }
   }
 
@@ -708,9 +889,49 @@ async function saveEntry() {
               <textarea v-model="editForm.description" rows="2"></textarea>
             </div>
             <div class="form-group full-width">
-              <label>Tags (comma separated)</label>
-              <input v-model="tagsString" type="text" placeholder="e.g. sword-cultivator, fourteen-realm" />
+              <label>Tags</label>
+              <AdminTagEditor
+                :model-value="Array.isArray(editForm.tags) ? editForm.tags : []"
+                @update:model-value="(v) => setArrayField('tags', v)"
+                placeholder="Add tags..."
+              />
             </div>
+
+            <div v-for="field in shownStringArrayFields" :key="`arr-${field}`" class="form-group full-width">
+              <label>{{ arrayLabel(field) }}</label>
+              <AdminTagEditor
+                :model-value="Array.isArray(editForm[field]) ? editForm[field] : []"
+                @update:model-value="(v) => setArrayField(field, v)"
+                :placeholder="`Add ${arrayLabel(field).toLowerCase()}...`"
+              />
+            </div>
+
+            <div v-for="field in shownPathArrayFields" :key="`path-${field}`" class="form-group full-width">
+              <label>{{ arrayLabel(field) }}</label>
+              <AdminRelationshipPicker
+                :model-value="Array.isArray(editForm[field]) ? editForm[field] : []"
+                :entries="entries || []"
+                :multiple="true"
+                @update:model-value="(v) => setArrayField(field, Array.isArray(v) ? v : (v ? [v] : []))"
+              />
+            </div>
+
+            <div v-for="field in shownScalarFields" :key="`scalar-${field.key}`" class="form-group">
+              <label>{{ field.label }}</label>
+              <input
+                v-if="field.type === 'text'"
+                :value="(editForm[field.key] ?? '') as any"
+                type="text"
+                @input="setScalarField(field.key, ($event.target as HTMLInputElement).value)"
+              />
+              <input
+                v-else
+                :value="(editForm[field.key] ?? '') as any"
+                type="number"
+                @input="setNumberField(field.key, ($event.target as HTMLInputElement).value)"
+              />
+            </div>
+
             <div class="form-group">
               <label>Image Path</label>
               <input v-model="editForm.image" type="text" />
@@ -727,10 +948,29 @@ async function saveEntry() {
               </div>
             </div>
             <div class="form-group full-width">
-              <label>Related (comma separated paths)</label>
-              <input v-model="relatedString" type="text" placeholder="e.g. /characters/chen-pingan, /world/lizhu-grotto-heaven" />
+              <label>Related (path array)</label>
+              <AdminRelationshipPicker
+                :model-value="Array.isArray(editForm.related) ? editForm.related : []"
+                :entries="entries || []"
+                :multiple="true"
+                @update:model-value="(v) => setArrayField('related', Array.isArray(v) ? v : (v ? [v] : []))"
+              />
             </div>
           </div>
+
+          <AdminRankingEntriesEditor
+            v-if="editForm.section === 'rankings' || Array.isArray(editForm.entries)"
+            :model-value="Array.isArray(editForm.entries) ? editForm.entries : []"
+            :entries="entries || []"
+            @update:model-value="(v) => setArrayField('entries', v as any)"
+          />
+
+          <AdminLegacyRelationshipsEditor
+            v-if="Array.isArray(editForm.relationships) || editForm.section === 'rankings'"
+            :model-value="Array.isArray(editForm.relationships) ? editForm.relationships : []"
+            :entries="entries || []"
+            @update:model-value="(v) => setArrayField('relationships', v as any)"
+          />
 
           <details class="raw-json-details">
             <summary>View Raw Frontmatter JSON (Includes preserved complex fields)</summary>
