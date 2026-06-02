@@ -21,6 +21,8 @@ const props = withDefaults(defineProps<{
 })
 
 const videoRef = ref<HTMLVideoElement | null>(null)
+const trackRef = ref<HTMLElement | null>(null)
+
 const activeVideoSrc = ref(getMediaUrl(props.video))
 const isPlaying = ref(false)
 const isMuted = ref(false)
@@ -28,7 +30,8 @@ const hasStarted = ref(false)
 const showControls = ref(true)
 const currentTime = ref(0)
 const duration = ref(0)
-const isSeeking = ref(false)
+const bufferedEnd = ref(0)
+const isScrubbing = ref(false)
 const hasFallbackApplied = ref(false)
 // Once a real video frame has decoded we know the codec is supported and must
 // never fall back for visual reasons (prevents false positives mid-playback).
@@ -43,11 +46,13 @@ let visualCheckTimer: ReturnType<typeof setTimeout> | undefined
 const VISUAL_CHECK_INTERVAL = 400
 const VISUAL_CHECK_MAX_ATTEMPTS = 6
 
+const hasDuration = computed(() => duration.value > 0 && Number.isFinite(duration.value))
 const canShowControls = computed(() => hasStarted.value && (showControls.value || !isPlaying.value))
-const progressPercent = computed(() => duration.value > 0 ? (currentTime.value / duration.value) * 100 : 0)
+const progressPercent = computed(() => hasDuration.value ? Math.min(100, (currentTime.value / duration.value) * 100) : 0)
+const bufferedPercent = computed(() => hasDuration.value ? Math.min(100, (bufferedEnd.value / duration.value) * 100) : 0)
 
 const formatTime = (timeValue: number) => {
-  if (!Number.isFinite(timeValue)) return '0:00'
+  if (!Number.isFinite(timeValue) || timeValue < 0) return '0:00'
   const totalSeconds = Math.floor(timeValue)
   const hours = Math.floor(totalSeconds / 3600)
   const minutes = Math.floor((totalSeconds % 3600) / 60)
@@ -59,6 +64,31 @@ const formatTime = (timeValue: number) => {
   return `${minutes}:${String(seconds).padStart(2, '0')}`
 }
 
+// --- Duration capture -------------------------------------------------------
+// Re-reads the element's duration from any event that might surface it. Some
+// re-encoded/faststart MP4s do not expose a finite duration at loadedmetadata,
+// so we also listen to durationchange/canplay and re-check on timeupdate.
+const syncDuration = () => {
+  const el = videoRef.value
+  if (!el) return
+  if (Number.isFinite(el.duration) && el.duration > 0) {
+    duration.value = el.duration
+  }
+}
+
+const syncBuffered = () => {
+  const el = videoRef.value
+  if (!el) return
+  try {
+    if (el.buffered.length > 0) {
+      bufferedEnd.value = el.buffered.end(el.buffered.length - 1)
+    }
+  } catch {
+    /* buffered can throw if not ready; ignore */
+  }
+}
+
+// --- Controls visibility ----------------------------------------------------
 const clearControlsTimer = () => {
   if (controlsTimer) {
     clearTimeout(controlsTimer)
@@ -66,6 +96,20 @@ const clearControlsTimer = () => {
   }
 }
 
+const scheduleControlsHide = () => {
+  clearControlsTimer()
+  if (!isPlaying.value || isScrubbing.value) return
+  controlsTimer = setTimeout(() => {
+    showControls.value = false
+  }, 2200)
+}
+
+const revealControls = () => {
+  showControls.value = true
+  scheduleControlsHide()
+}
+
+// --- Visual health / codec fallback ----------------------------------------
 const clearVisualCheckTimer = () => {
   if (visualCheckTimer) {
     clearTimeout(visualCheckTimer)
@@ -86,65 +130,73 @@ const applyFallbackSource = async () => {
   const fallbackUrl = props.fallbackVideo ? getMediaUrl(props.fallbackVideo) : ''
   if (!fallbackUrl || hasFallbackApplied.value || activeVideoSrc.value === fallbackUrl) return
 
-  const previousTime = currentTime.value
   const shouldResume = isPlaying.value
   hasFallbackApplied.value = true
   hasHealthyVideo.value = false
   clearVisualCheckTimer()
+  currentTime.value = 0
+  duration.value = 0
+  bufferedEnd.value = 0
   activeVideoSrc.value = fallbackUrl
 
   await nextTick()
-
   if (!videoRef.value) return
 
-  const restorePlayback = () => {
+  const onReady = () => {
     if (!videoRef.value) return
-    if (Number.isFinite(videoRef.value.duration) && previousTime > 0) {
-      videoRef.value.currentTime = Math.min(previousTime, videoRef.value.duration || previousTime)
-      currentTime.value = videoRef.value.currentTime
-    }
-    if (shouldResume) {
-      void videoRef.value.play()
-    }
-    videoRef.value.removeEventListener('loadedmetadata', restorePlayback)
+    syncDuration()
+    if (shouldResume) void videoRef.value.play()
+    videoRef.value?.removeEventListener('loadedmetadata', onReady)
   }
-
-  videoRef.value.addEventListener('loadedmetadata', restorePlayback)
+  videoRef.value.addEventListener('loadedmetadata', onReady)
   videoRef.value.load()
 }
 
-const scheduleControlsHide = () => {
-  clearControlsTimer()
-  if (!isPlaying.value) return
-  controlsTimer = setTimeout(() => {
-    showControls.value = false
-  }, 1900)
-}
-
-const revealControls = () => {
-  showControls.value = true
-  scheduleControlsHide()
-}
-
-const togglePlay = async () => {
-  if (!videoRef.value) return
-
-  if (videoRef.value.paused) {
-    try {
-      await videoRef.value.play()
-    } catch {
+const runVisualCheck = (attempt: number) => {
+  clearVisualCheckTimer()
+  visualCheckTimer = setTimeout(() => {
+    const el = videoRef.value
+    if (!el) return
+    if (el.videoWidth > 0) {
+      hasHealthyVideo.value = true
       return
     }
-  } else {
-    videoRef.value.pause()
-  }
+    if (attempt + 1 < VISUAL_CHECK_MAX_ATTEMPTS) {
+      runVisualCheck(attempt + 1)
+      return
+    }
+    if (!el.paused) void applyFallbackSource()
+  }, VISUAL_CHECK_INTERVAL)
 }
 
-const seekBy = (seconds: number) => {
-  if (!videoRef.value || !duration.value) return
-  const nextTime = Math.max(0, Math.min(duration.value, videoRef.value.currentTime + seconds))
-  videoRef.value.currentTime = nextTime
-  currentTime.value = nextTime
+const scheduleVisualCheck = () => {
+  if (hasHealthyVideo.value) return
+  if (markHealthyIfVisible()) return
+  runVisualCheck(0)
+}
+
+// --- Media event handlers ---------------------------------------------------
+const handleLoadedMetadata = () => {
+  syncDuration()
+  markHealthyIfVisible()
+}
+
+const handleDurationChange = () => {
+  syncDuration()
+}
+
+const handleCanPlay = () => {
+  syncDuration()
+  syncBuffered()
+  markHealthyIfVisible()
+}
+
+const handleLoadedData = () => {
+  markHealthyIfVisible()
+}
+
+const handleProgress = () => {
+  syncBuffered()
 }
 
 const handlePlay = () => {
@@ -159,38 +211,96 @@ const handlePause = () => {
   clearControlsTimer()
 }
 
-const handleLoadedMetadata = () => {
-  if (!videoRef.value) return
-  duration.value = Number.isFinite(videoRef.value.duration) ? videoRef.value.duration : 0
-  // If frame dimensions are already known, the stream decodes fine.
-  markHealthyIfVisible()
-}
-
-const handleLoadedData = () => {
-  // loadeddata fires once the first frame is available — a strong signal the
-  // codec is supported and the video will render.
-  markHealthyIfVisible()
+const handleEnded = () => {
+  isPlaying.value = false
+  showControls.value = true
+  clearControlsTimer()
 }
 
 const handleTimeUpdate = () => {
-  if (!videoRef.value || isSeeking.value) return
-  currentTime.value = videoRef.value.currentTime
-  // Frames advancing with real dimensions confirms a healthy decode.
+  const el = videoRef.value
+  if (!el) return
+  if (!isScrubbing.value) currentTime.value = el.currentTime
+  // Defensive: capture duration if it only became known after playback started.
+  if (!hasDuration.value) syncDuration()
   markHealthyIfVisible()
 }
 
-const handleSeek = (value: string) => {
-  if (!videoRef.value) return
-  const nextTime = Number(value)
-  if (!Number.isFinite(nextTime)) return
-  videoRef.value.currentTime = nextTime
-  currentTime.value = nextTime
+const handleVideoError = () => {
+  void applyFallbackSource()
+}
+
+// --- Playback controls ------------------------------------------------------
+const togglePlay = async () => {
+  const el = videoRef.value
+  if (!el) return
+  if (el.paused) {
+    try {
+      await el.play()
+    } catch {
+      /* autoplay/gesture rejection — ignore */
+    }
+  } else {
+    el.pause()
+  }
+  revealControls()
+}
+
+const seekTo = (time: number) => {
+  const el = videoRef.value
+  if (!el || !hasDuration.value) return
+  const clamped = Math.max(0, Math.min(duration.value, time))
+  el.currentTime = clamped
+  currentTime.value = clamped
+}
+
+const seekBy = (seconds: number) => {
+  if (!hasDuration.value) return
+  seekTo(currentTime.value + seconds)
 }
 
 const toggleMute = () => {
-  if (!videoRef.value) return
-  videoRef.value.muted = !videoRef.value.muted
-  isMuted.value = videoRef.value.muted
+  const el = videoRef.value
+  if (!el) return
+  el.muted = !el.muted
+  isMuted.value = el.muted
+}
+
+// --- Custom seek bar (pointer driven) --------------------------------------
+const timeFromPointer = (clientX: number) => {
+  const track = trackRef.value
+  if (!track || !hasDuration.value) return 0
+  const rect = track.getBoundingClientRect()
+  if (rect.width === 0) return 0
+  const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width))
+  return ratio * duration.value
+}
+
+const onScrubMove = (event: PointerEvent) => {
+  if (!isScrubbing.value) return
+  currentTime.value = timeFromPointer(event.clientX)
+}
+
+const onScrubEnd = (event: PointerEvent) => {
+  if (!isScrubbing.value) return
+  isScrubbing.value = false
+  seekTo(timeFromPointer(event.clientX))
+  window.removeEventListener('pointermove', onScrubMove)
+  window.removeEventListener('pointerup', onScrubEnd)
+  window.removeEventListener('pointercancel', onScrubEnd)
+  scheduleControlsHide()
+}
+
+const onScrubStart = (event: PointerEvent) => {
+  if (!hasDuration.value) return
+  event.preventDefault()
+  isScrubbing.value = true
+  showControls.value = true
+  clearControlsTimer()
+  currentTime.value = timeFromPointer(event.clientX)
+  window.addEventListener('pointermove', onScrubMove)
+  window.addEventListener('pointerup', onScrubEnd)
+  window.addEventListener('pointercancel', onScrubEnd)
 }
 
 const handleKeydown = (event: KeyboardEvent) => {
@@ -199,7 +309,6 @@ const handleKeydown = (event: KeyboardEvent) => {
     case 'Enter':
       event.preventDefault()
       void togglePlay()
-      revealControls()
       break
     case 'ArrowRight':
       event.preventDefault()
@@ -220,50 +329,23 @@ const handleKeydown = (event: KeyboardEvent) => {
   }
 }
 
-const handleVideoError = () => {
-  void applyFallbackSource()
-}
-
-const runVisualCheck = (attempt: number) => {
-  clearVisualCheckTimer()
-  visualCheckTimer = setTimeout(() => {
-    const el = videoRef.value
-    if (!el) return
-    // A real frame decoded — healthy, stop checking.
-    if (el.videoWidth > 0) {
-      hasHealthyVideo.value = true
-      return
-    }
-    // Keep retrying within the grace window before declaring the codec dead.
-    if (attempt + 1 < VISUAL_CHECK_MAX_ATTEMPTS) {
-      runVisualCheck(attempt + 1)
-      return
-    }
-    // Grace exhausted: audio is playing but no picture ever appeared
-    // (e.g. unsupported codec like HEVC) — switch to the fallback video.
-    if (!el.paused) {
-      void applyFallbackSource()
-    }
-  }, VISUAL_CHECK_INTERVAL)
-}
-
-const scheduleVisualCheck = () => {
-  if (hasHealthyVideo.value) return
-  if (markHealthyIfVisible()) return
-  runVisualCheck(0)
-}
-
 watch(() => props.video, (newSource) => {
   // Route through getMediaUrl so the media base URL is preserved on change.
   activeVideoSrc.value = getMediaUrl(newSource)
   hasFallbackApplied.value = false
   hasHealthyVideo.value = false
+  currentTime.value = 0
+  duration.value = 0
+  bufferedEnd.value = 0
   clearVisualCheckTimer()
 })
 
 onBeforeUnmount(() => {
   clearControlsTimer()
   clearVisualCheckTimer()
+  window.removeEventListener('pointermove', onScrubMove)
+  window.removeEventListener('pointerup', onScrubEnd)
+  window.removeEventListener('pointercancel', onScrubEnd)
 })
 </script>
 
@@ -273,7 +355,7 @@ onBeforeUnmount(() => {
       class="video-wrapper"
       :class="[
         `controls-${props.controlsVariant}`,
-        { 'is-playing': isPlaying, 'has-started': hasStarted }
+        { 'is-playing': isPlaying, 'has-started': hasStarted, 'is-scrubbing': isScrubbing }
       ]"
       :style="{ aspectRatio: props.ratio, background: props.background }"
       tabindex="0"
@@ -293,9 +375,12 @@ onBeforeUnmount(() => {
         @click="togglePlay"
         @play="handlePlay"
         @pause="handlePause"
-        @ended="handlePause"
+        @ended="handleEnded"
         @loadedmetadata="handleLoadedMetadata"
+        @durationchange="handleDurationChange"
+        @canplay="handleCanPlay"
         @loadeddata="handleLoadedData"
+        @progress="handleProgress"
         @timeupdate="handleTimeUpdate"
         @playing="scheduleVisualCheck"
         @error="handleVideoError"
@@ -303,7 +388,7 @@ onBeforeUnmount(() => {
 
       <div class="custom-play-overlay" v-if="!isPlaying" @click="togglePlay">
         <button class="play-button" type="button" aria-label="Play video">
-          <span class="play-icon">></span>
+          <span class="play-icon">▶</span>
         </button>
       </div>
 
@@ -315,34 +400,45 @@ onBeforeUnmount(() => {
       <div v-show="canShowControls" class="controls-bar" @click.stop>
         <button
           type="button"
-          class="control-btn"
+          class="control-btn icon-btn"
           :aria-label="isPlaying ? 'Pause video' : 'Play video'"
           @click="togglePlay"
         >
-          {{ isPlaying ? 'Pause' : 'Play' }}
+          {{ isPlaying ? '❚❚' : '▶' }}
         </button>
-        <div class="timeline-wrap">
-          <input
-            class="timeline"
-            type="range"
-            min="0"
-            :max="duration || 0"
-            step="0.1"
-            :value="currentTime"
-            :style="{ '--progress': `${progressPercent}%` }"
-            @pointerdown="isSeeking = true"
-            @pointerup="isSeeking = false"
-            @input="handleSeek(($event.target as HTMLInputElement).value)"
-          />
-          <span class="timecode">{{ formatTime(currentTime) }} / {{ formatTime(duration) }}</span>
+
+        <span class="timecode">{{ formatTime(currentTime) }}</span>
+
+        <div
+          ref="trackRef"
+          class="seek"
+          :class="{ 'is-disabled': !hasDuration }"
+          role="slider"
+          aria-label="Seek"
+          :aria-valuemin="0"
+          :aria-valuemax="hasDuration ? Math.floor(duration) : 0"
+          :aria-valuenow="Math.floor(currentTime)"
+          tabindex="0"
+          @pointerdown="onScrubStart"
+          @keydown.left.prevent="seekBy(-5)"
+          @keydown.right.prevent="seekBy(5)"
+        >
+          <div class="seek-rail">
+            <div class="seek-buffered" :style="{ width: `${bufferedPercent}%` }"></div>
+            <div class="seek-progress" :style="{ width: `${progressPercent}%` }"></div>
+            <div class="seek-handle" :style="{ left: `${progressPercent}%` }"></div>
+          </div>
         </div>
+
+        <span class="timecode timecode-duration">{{ formatTime(duration) }}</span>
+
         <button
           type="button"
-          class="control-btn"
+          class="control-btn icon-btn"
           :aria-label="isMuted ? 'Unmute video' : 'Mute video'"
           @click="toggleMute"
         >
-          {{ isMuted ? 'Unmute' : 'Mute' }}
+          {{ isMuted ? '🔇' : '🔊' }}
         </button>
       </div>
     </div>
@@ -418,8 +514,9 @@ onBeforeUnmount(() => {
 
 .play-icon {
   color: white;
-  font-size: 1.5rem;
-  margin-left: 4px;
+  font-size: 1.35rem;
+  line-height: 1;
+  margin-left: 3px;
 }
 
 .media-attribution {
@@ -463,80 +560,118 @@ onBeforeUnmount(() => {
   z-index: 11;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.45rem 0.55rem;
-  border-radius: 8px;
+  gap: 0.6rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: 10px;
   background: rgba(10, 10, 10, 0.62);
   backdrop-filter: blur(10px);
+  transition: opacity 0.3s ease;
 }
 
 .control-btn {
   border: none;
   border-radius: 6px;
   height: 30px;
-  padding: 0 0.6rem;
+  min-width: 30px;
+  padding: 0 0.5rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   background: rgba(255, 255, 255, 0.14);
   color: #fff;
-  font-size: 0.66rem;
+  font-size: 0.7rem;
   font-family: var(--font-mono);
   letter-spacing: 0.06em;
-  text-transform: uppercase;
   white-space: nowrap;
   cursor: pointer;
+  transition: background 0.2s ease;
 }
 
 .control-btn:hover {
-  background: rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.26);
 }
 
-.timeline-wrap {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.timeline {
-  width: 100%;
-  appearance: none;
-  height: 3px;
-  border-radius: 999px;
-  background: linear-gradient(
-    to right,
-    var(--c-seal-red) 0%,
-    var(--c-seal-red) var(--progress, 0%),
-    rgba(255, 255, 255, 0.28) var(--progress, 0%),
-    rgba(255, 255, 255, 0.28) 100%
-  );
-  cursor: pointer;
-}
-
-.timeline::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  border: none;
-  background: #fff;
-}
-
-.timeline::-moz-range-thumb {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  border: none;
-  background: #fff;
+.icon-btn {
+  font-size: 0.8rem;
+  line-height: 1;
 }
 
 .timecode {
   font-family: var(--font-mono);
-  color: rgba(255, 255, 255, 0.88);
-  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.64rem;
   letter-spacing: 0.03em;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.timecode-duration {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Custom seek bar */
+.seek {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 22px;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.seek.is-disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.seek-rail {
+  position: relative;
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  overflow: visible;
+}
+
+.seek-buffered {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.32);
+  transition: width 0.2s linear;
+}
+
+.seek-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--c-seal-red);
+}
+
+.seek:not(.is-scrubbing) .seek-progress {
+  transition: width 0.08s linear;
+}
+
+.seek-handle {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.15s ease;
+  pointer-events: none;
+}
+
+.seek:hover .seek-handle,
+.is-scrubbing .seek-handle {
+  transform: translate(-50%, -50%) scale(1);
 }
 
 .controls-hero .controls-bar {
@@ -552,23 +687,23 @@ onBeforeUnmount(() => {
   left: 0.55rem;
   right: 0.55rem;
   bottom: 0.55rem;
-  padding: 0.33rem 0.42rem;
-  gap: 0.35rem;
-  justify-content: initial;
+  padding: 0.4rem 0.5rem;
+  gap: 0.45rem;
 }
 
 .controls-rail .control-btn {
-  height: 24px;
-  padding: 0 0.45rem;
-  font-size: 0.56rem;
+  height: 26px;
+  min-width: 26px;
+  padding: 0 0.4rem;
+  font-size: 0.62rem;
 }
 
-.controls-rail .timeline-wrap {
-  display: flex;
+.controls-rail .icon-btn {
+  font-size: 0.72rem;
 }
 
 .controls-rail .timecode {
-  font-size: 0.52rem;
+  font-size: 0.56rem;
 }
 
 .video-caption {
@@ -596,6 +731,11 @@ onBeforeUnmount(() => {
     left: 0.5rem;
     right: 0.5rem;
     bottom: 0.5rem;
+    gap: 0.4rem;
+  }
+
+  .controls-rail .timecode-duration {
+    display: none;
   }
 }
 </style>
