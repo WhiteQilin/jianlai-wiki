@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { getMediaUrl } from '~/constants/homeHeroVideos'
+
 defineProps<{
   titleEn: string
   titleZh: string
@@ -15,9 +17,9 @@ defineProps<{
   <section class="featured-section" :class="{ 'is-reversed': reverse }">
     <div class="featured-media">
       <video v-if="video" autoplay loop muted playsinline class="media-content">
-        <source :src="video" type="video/mp4" />
+        <source :src="getMediaUrl(video)" type="video/mp4" />
       </video>
-      <img v-else-if="image" :src="image" :alt="titleEn" class="media-content" />
+      <img v-else-if="image" :src="getMediaUrl(image)" :alt="titleEn" class="media-content" />
       <div class="media-overlay"></div>
     </div>
     

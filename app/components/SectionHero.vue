@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { getMediaUrl } from '~/constants/homeHeroVideos'
+
 defineProps<{
   titleEn?: string
   titleZh?: string
@@ -14,9 +16,9 @@ defineProps<{
   <div class="section-hero animate-fade-in-up">
     <div v-if="video || bannerImage" class="hero-banner animate-ken-burns">
       <video v-if="video" autoplay loop muted playsinline controlslist="nodownload" oncontextmenu="return false;" class="banner-video">
-        <source :src="video" type="video/mp4" />
+        <source :src="getMediaUrl(video)" type="video/mp4" />
       </video>
-      <img v-else-if="bannerImage" :src="bannerImage" alt="" class="banner-img" />
+      <img v-else-if="bannerImage" :src="getMediaUrl(bannerImage)" alt="" class="banner-img" />
       <div class="banner-overlay"></div>
     </div>
     <div v-else class="hero-bg"></div>

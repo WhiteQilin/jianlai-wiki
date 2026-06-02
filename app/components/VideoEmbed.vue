@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { getMediaUrl } from '~/constants/homeHeroVideos'
 
 const props = withDefaults(defineProps<{
   video: string
@@ -20,7 +21,7 @@ const props = withDefaults(defineProps<{
 })
 
 const videoRef = ref<HTMLVideoElement | null>(null)
-const activeVideoSrc = ref(props.video)
+const activeVideoSrc = ref(getMediaUrl(props.video))
 const isPlaying = ref(false)
 const isMuted = ref(false)
 const hasStarted = ref(false)
@@ -64,12 +65,13 @@ const clearVisualCheckTimer = () => {
 }
 
 const applyFallbackSource = async () => {
-  if (!props.fallbackVideo || hasFallbackApplied.value || activeVideoSrc.value === props.fallbackVideo) return
+  const fallbackUrl = props.fallbackVideo ? getMediaUrl(props.fallbackVideo) : ''
+  if (!fallbackUrl || hasFallbackApplied.value || activeVideoSrc.value === fallbackUrl) return
 
   const previousTime = currentTime.value
   const shouldResume = isPlaying.value
   hasFallbackApplied.value = true
-  activeVideoSrc.value = props.fallbackVideo
+  activeVideoSrc.value = fallbackUrl
 
   await nextTick()
 

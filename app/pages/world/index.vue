@@ -24,11 +24,11 @@ useSeoMeta({
 <template>
   <div class="page-container">
     <ScrollReveal animation="reveal-fade-up">
-      <SectionHero 
-        titleEn="The World" 
-        titleZh="天下图志" 
+      <SectionHero
+        titleEn="The World"
+        titleZh="天下图志"
         desc="Explore the vast realms, continents, and secret realms of Jian Lai."
-        video="/videos/ink-wash-pv.mp4"
+        video="/videos/curated/home-hero-13.mp4"
         bannerImage="/images/banners/world-banner.webp"
         credit="Tencent Video / Jian Lai Animation"
         :isOfficial="true"
