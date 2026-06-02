@@ -48,8 +48,12 @@ public/images/weibo-draft/
 # Raw/draft image dumps
 public/images/banners/pinterest_*.jpg
 
-# Local font experiments - commit only licensed production fonts intentionally
-public/fonts/
+# Local font experiments
+public/fonts/*
+
+# Allow deployed production fonts only
+!public/fonts/production/
+!public/fonts/production/**
 
 # Local AI prompt packs
 .github/prompts/ui-ux-pro-max/
@@ -61,10 +65,10 @@ public/fonts/
 *.avi
 *.webm
 
-# Allow only curated optimized videos if needed
+# Allow only curated optimized videos
+!public/videos/
 !public/videos/curated/
-!public/videos/curated/*.webm
-!public/videos/curated/*.mp4
+!public/videos/curated/**
 
 # Python/cache
 __pycache__/
