@@ -30,9 +30,18 @@ const currentTime = ref(0)
 const duration = ref(0)
 const isSeeking = ref(false)
 const hasFallbackApplied = ref(false)
+// Once a real video frame has decoded we know the codec is supported and must
+// never fall back for visual reasons (prevents false positives mid-playback).
+const hasHealthyVideo = ref(false)
 
 let controlsTimer: ReturnType<typeof setTimeout> | undefined
 let visualCheckTimer: ReturnType<typeof setTimeout> | undefined
+
+// The visual-health check retries within a grace window instead of swapping to
+// the fallback the instant videoWidth reads 0 (which can happen transiently
+// before the first frame is decoded on a perfectly valid video).
+const VISUAL_CHECK_INTERVAL = 400
+const VISUAL_CHECK_MAX_ATTEMPTS = 6
 
 const canShowControls = computed(() => hasStarted.value && (showControls.value || !isPlaying.value))
 const progressPercent = computed(() => duration.value > 0 ? (currentTime.value / duration.value) * 100 : 0)
@@ -64,6 +73,15 @@ const clearVisualCheckTimer = () => {
   }
 }
 
+const markHealthyIfVisible = () => {
+  if (videoRef.value && videoRef.value.videoWidth > 0) {
+    hasHealthyVideo.value = true
+    clearVisualCheckTimer()
+    return true
+  }
+  return false
+}
+
 const applyFallbackSource = async () => {
   const fallbackUrl = props.fallbackVideo ? getMediaUrl(props.fallbackVideo) : ''
   if (!fallbackUrl || hasFallbackApplied.value || activeVideoSrc.value === fallbackUrl) return
@@ -71,6 +89,8 @@ const applyFallbackSource = async () => {
   const previousTime = currentTime.value
   const shouldResume = isPlaying.value
   hasFallbackApplied.value = true
+  hasHealthyVideo.value = false
+  clearVisualCheckTimer()
   activeVideoSrc.value = fallbackUrl
 
   await nextTick()
@@ -142,14 +162,21 @@ const handlePause = () => {
 const handleLoadedMetadata = () => {
   if (!videoRef.value) return
   duration.value = Number.isFinite(videoRef.value.duration) ? videoRef.value.duration : 0
-  if (duration.value > 0 && videoRef.value.videoWidth === 0) {
-    void applyFallbackSource()
-  }
+  // If frame dimensions are already known, the stream decodes fine.
+  markHealthyIfVisible()
+}
+
+const handleLoadedData = () => {
+  // loadeddata fires once the first frame is available — a strong signal the
+  // codec is supported and the video will render.
+  markHealthyIfVisible()
 }
 
 const handleTimeUpdate = () => {
   if (!videoRef.value || isSeeking.value) return
   currentTime.value = videoRef.value.currentTime
+  // Frames advancing with real dimensions confirms a healthy decode.
+  markHealthyIfVisible()
 }
 
 const handleSeek = (value: string) => {
@@ -197,19 +224,41 @@ const handleVideoError = () => {
   void applyFallbackSource()
 }
 
-const scheduleVisualCheck = () => {
+const runVisualCheck = (attempt: number) => {
   clearVisualCheckTimer()
   visualCheckTimer = setTimeout(() => {
-    if (!videoRef.value) return
-    if (!videoRef.value.paused && videoRef.value.videoWidth === 0) {
+    const el = videoRef.value
+    if (!el) return
+    // A real frame decoded — healthy, stop checking.
+    if (el.videoWidth > 0) {
+      hasHealthyVideo.value = true
+      return
+    }
+    // Keep retrying within the grace window before declaring the codec dead.
+    if (attempt + 1 < VISUAL_CHECK_MAX_ATTEMPTS) {
+      runVisualCheck(attempt + 1)
+      return
+    }
+    // Grace exhausted: audio is playing but no picture ever appeared
+    // (e.g. unsupported codec like HEVC) — switch to the fallback video.
+    if (!el.paused) {
       void applyFallbackSource()
     }
-  }, 800)
+  }, VISUAL_CHECK_INTERVAL)
+}
+
+const scheduleVisualCheck = () => {
+  if (hasHealthyVideo.value) return
+  if (markHealthyIfVisible()) return
+  runVisualCheck(0)
 }
 
 watch(() => props.video, (newSource) => {
-  activeVideoSrc.value = newSource
+  // Route through getMediaUrl so the media base URL is preserved on change.
+  activeVideoSrc.value = getMediaUrl(newSource)
   hasFallbackApplied.value = false
+  hasHealthyVideo.value = false
+  clearVisualCheckTimer()
 })
 
 onBeforeUnmount(() => {
@@ -246,6 +295,7 @@ onBeforeUnmount(() => {
         @pause="handlePause"
         @ended="handlePause"
         @loadedmetadata="handleLoadedMetadata"
+        @loadeddata="handleLoadedData"
         @timeupdate="handleTimeUpdate"
         @playing="scheduleVisualCheck"
         @error="handleVideoError"
