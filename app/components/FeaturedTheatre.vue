@@ -29,7 +29,7 @@ const supportingVideos = [
   },
   {
     id: 'lore-secret',
-    url: '/videos/lore-secret-pv.mp4',
+    url: '/videos/lore-secret.mp4',
     poster: '/images/banners/factions-banner.webp',
     title: 'Secrets of Lizhu',
     caption: 'Uncovering the truth behind the hidden realm.',
