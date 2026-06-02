@@ -20,11 +20,15 @@ useSeoMeta({
 
 <template>
   <div class="article-page">
-    <SectionHero
+    <CharacterHero
       v-if="(page as any)?.video"
       :video="(page as any).video"
+      :poster="(page as any)?.image"
       :titleEn="page?.title"
       :titleZh="(page as any)?.chinese"
+      :pinyin="(page as any)?.pinyin"
+      :seal="(page as any)?.seal"
+      :isOfficial="true"
     />
     <div class="mdc-content">
       <ScrollReveal animation="reveal-fade-up">
@@ -35,14 +39,14 @@ useSeoMeta({
         </div>
       </ScrollReveal>
 
-      <ScrollReveal v-if="page && !(page as any)?.video" animation="reveal-fade-up" delay="stagger-1">
+      <ScrollReveal v-if="page" animation="reveal-fade-up" delay="stagger-1">
         <NameBlock 
           :nameEn="page.title || 'Unknown'" 
           :nameZh="(page as any).chinese || ''" 
           :pinyin="(page as any).pinyin"
           :seal="(page as any).seal"
         />
-        <p class="character-desc-lead">{{ page.description }}</p>
+        <p v-if="page.description" class="character-desc-lead">{{ page.description }}</p>
       </ScrollReveal>
 
       <div class="article-layout">
