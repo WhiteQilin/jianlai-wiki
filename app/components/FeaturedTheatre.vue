@@ -5,7 +5,7 @@ import { getMediaUrl } from '~/constants/homeHeroVideos'
 
 const featuredVideo = {
   id: 'fight-scene',
-  url: '/videos/curated/home-hero-07.mp4',
+  url: '/videos/fight-scene.mp4',
   poster: '/images/banners/swordsmanship-banner.webp',
   title: 'Epic Confrontations',
   caption: 'Fluid combat sequences and breathtaking swordsmanship.',
@@ -18,7 +18,7 @@ const featuredVideo = {
 const supportingVideos = [
   {
     id: 'ink-wash',
-    url: '/videos/curated/home-hero-13.mp4',
+    url: '/videos/ink-wash-pv.mp4',
     poster: '/images/banners/world-banner.webp',
     title: 'Ink-Wash Aesthetic',
     caption: 'Experience the unique Donghua ink-wash style.',
@@ -29,7 +29,7 @@ const supportingVideos = [
   },
   {
     id: 'lore-secret',
-    url: '/videos/curated/home-hero-04.mp4',
+    url: '/videos/lore-secret-pv.mp4',
     poster: '/images/banners/factions-banner.webp',
     title: 'Secrets of Lizhu',
     caption: 'Uncovering the truth behind the hidden realm.',
