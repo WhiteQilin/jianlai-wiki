@@ -971,7 +971,11 @@ async function saveEntry() {
             <!-- Body editor + references -->
             <section class="body-section">
               <h3>Body Markdown</h3>
-              <textarea v-model="editBody" class="body-textarea"></textarea>
+              <AdminBodyEditor
+                v-model="editBody"
+                :verification-status="editForm.verificationStatus"
+                :has-references="referencesStatus.hasReferences"
+              />
               <AdminReferencesEditor
                 ref="referencesEditor"
                 v-model="editBody"
