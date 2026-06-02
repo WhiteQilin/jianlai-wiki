@@ -4,6 +4,17 @@ if (!import.meta.dev) {
   throw createError({ statusCode: 404, statusMessage: 'Page Not Found', fatal: true })
 }
 
+import {
+  PUBLIC_SECTIONS,
+  IMPORTANCE_VALUES,
+  VERIFICATION_VALUES,
+  CATEGORY_MAP,
+  categoriesForSection,
+  groupsForSection,
+  unknownFieldKeys,
+  knownFieldKeys,
+} from '~/data/fieldRegistry'
+
 useSeoMeta({
   title: 'Local Editor | Jian Lai Wiki'
 })
@@ -60,26 +71,8 @@ const previewUrl = computed(() => {
   return `${previewRoute.value}${previewRoute.value.includes('?') ? '&' : '?'}preview=${previewNonce.value}`
 })
 
-const PUBLIC_SECTIONS = ['characters', 'world', 'cultivation', 'swordsmanship', 'factions', 'artifacts', 'timeline', 'glossary', 'rankings', 'teachings', 'pantheon'] as const
-const IMPORTANCE_VALUES = ['primary', 'major', 'minor', 'background'] as const
-const VERIFICATION_VALUES = ['verified', 'to-be-verified', 'disputed', 'speculative'] as const
-
 const IMAGE_EXTS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg'])
 const VIDEO_EXTS = new Set(['.mp4', '.webm', '.mov'])
-
-const CATEGORY_MAP: Record<string, string[]> = {
-  characters: ['Character', 'Major', 'Minor', 'Gods'],
-  world: ['World', 'Continent', 'Grotto-Heaven', 'Blessed Land', 'City', 'Landmark', 'Sword-Qi-Great-Wall'],
-  cultivation: ['Realm', 'Path', 'Method', 'Concept'],
-  swordsmanship: ['Technique', 'Flying-Sword-Art', 'Ability', 'Sword-Style'],
-  factions: ['Sect', 'Dynasty', 'Academy', 'Clan', 'Alliance'],
-  artifacts: ['Weapon', 'Flying-Sword', 'Sword-Nurturing-Gourd', 'Treasure', 'Material', 'Talisman'],
-  timeline: ['Era', 'Event', 'Arc'],
-  rankings: ['Tier-List', 'Realm-Ladder', 'Named-List'],
-  teachings: ['Teaching', 'School'],
-  pantheon: ['God', 'Demon', 'Spirit', 'Mountain-Water-Deity'],
-  glossary: ['Term', 'Concept', 'Phrase']
-}
 
 interface TaxonomyReview {
   section: string
@@ -396,148 +389,111 @@ async function importAndSaveMarkdown() {
 // --- Editor State ---
 const editForm = ref<Record<string, any>>({})
 const editBody = ref('')
-const tagsString = ref('')
-const relatedString = ref('')
 const isSaving = ref(false)
 
 const referencesEditor = ref<{ parseBody: () => void } | null>(null)
 const referencesStatus = ref({ hasReferences: false, hasLowConfidence: false })
 
-const sectionStringArrayFieldMap: Record<string, string[]> = {
-  characters: ['titles', 'abilities'],
-  factions: ['teachings'],
-  teachings: ['keyFigures'],
-  glossary: ['relatedTerms'],
+// --- Registry-driven field layout ---
+const currentSection = computed(() => editForm.value.section || '')
+
+const customKeys = computed(() => unknownFieldKeys(editForm.value))
+
+const fieldGroups = computed(() =>
+  groupsForSection(currentSection.value, Object.keys(editForm.value)),
+)
+
+const collapsedGroups = ref<Record<string, boolean>>({})
+
+function toggleGroup(id: string) {
+  collapsedGroups.value[id] = !collapsedGroups.value[id]
 }
 
-const sectionScalarFieldMap: Record<string, { key: string; label: string; type: 'text' | 'number' }[]> = {
-  characters: [
-    { key: 'origin', label: 'Origin', type: 'text' },
-    { key: 'realm', label: 'Realm', type: 'text' },
-  ],
-  factions: [{ key: 'factionType', label: 'Faction Type', type: 'text' }],
-  artifacts: [
-    { key: 'artifactType', label: 'Artifact Type', type: 'text' },
-    { key: 'tier', label: 'Tier', type: 'text' },
-    { key: 'origin', label: 'Origin', type: 'text' },
-  ],
-  world: [
-    { key: 'locationType', label: 'Location Type', type: 'text' },
-    { key: 'governingFaction', label: 'Governing Faction', type: 'text' },
-    { key: 'parentLocation', label: 'Parent Location', type: 'text' },
-  ],
-  cultivation: [
-    { key: 'pathType', label: 'Path Type', type: 'text' },
-    { key: 'realmLevel', label: 'Realm Level', type: 'number' },
-  ],
-  swordsmanship: [
-    { key: 'abilityType', label: 'Ability Type', type: 'text' },
-    { key: 'lineage', label: 'Lineage', type: 'text' },
-  ],
-  teachings: [{ key: 'teachingType', label: 'Teaching Type', type: 'text' }],
-  pantheon: [
-    { key: 'beingType', label: 'Being Type', type: 'text' },
-    { key: 'domain', label: 'Domain', type: 'text' },
-    { key: 'territory', label: 'Territory', type: 'text' },
-  ],
-  glossary: [{ key: 'termType', label: 'Term Type', type: 'text' }],
-  timeline: [
-    { key: 'date', label: 'Date', type: 'text' },
-    { key: 'era', label: 'Era', type: 'text' },
-    { key: 'eraOrder', label: 'Era Order', type: 'number' },
-  ],
+function expandAllGroups() {
+  collapsedGroups.value = {}
 }
 
-const sectionPathArrayFieldMap: Record<string, string[]> = {
-  factions: ['members'],
-  cultivation: ['practitioners'],
-  swordsmanship: ['users'],
-  artifacts: ['owners'],
-  timeline: ['participants'],
-  teachings: ['relatedFactions'],
-  world: ['inhabitants'],
+function collapseAllGroups() {
+  const next: Record<string, boolean> = {}
+  for (const g of fieldGroups.value) next[g.id] = true
+  collapsedGroups.value = next
 }
 
-const shownStringArrayFields = computed(() => {
-  const section = editForm.value.section
-  if (!section) return [] as string[]
-  const sectionFields = sectionStringArrayFieldMap[section] || []
-  const presentFields = Object.keys(editForm.value).filter((k) => Array.isArray(editForm.value[k]) && ['titles', 'abilities', 'teachings', 'keyFigures', 'relatedTerms'].includes(k))
-  return Array.from(new Set([...sectionFields, ...presentFields]))
-})
-
-const shownScalarFields = computed(() => {
-  const section = editForm.value.section
-  if (!section) return [] as { key: string; label: string; type: 'text' | 'number' }[]
-  const configured = sectionScalarFieldMap[section] || []
-
-  const knownScalarMap = new Map<string, { key: string; label: string; type: 'text' | 'number' }>()
-  for (const list of Object.values(sectionScalarFieldMap)) {
-    for (const item of list) {
-      knownScalarMap.set(item.key, item)
-    }
-  }
-
-  const present = Object.keys(editForm.value)
-    .filter((k) => knownScalarMap.has(k) && editForm.value[k] != null)
-    .map((k) => knownScalarMap.get(k)!)
-
-  const merged = [...configured, ...present]
-  const seen = new Set<string>()
-  return merged.filter((f) => {
-    if (seen.has(f.key)) return false
-    seen.add(f.key)
-    return true
-  })
-})
-
-const shownPathArrayFields = computed(() => {
-  const section = editForm.value.section
-  if (!section) return [] as string[]
-  const sectionFields = sectionPathArrayFieldMap[section] || []
-  const presentFields = Object.keys(editForm.value).filter((k) => Array.isArray(editForm.value[k]) && ['members', 'practitioners', 'users', 'owners', 'participants', 'relatedFactions', 'inhabitants'].includes(k))
-  return Array.from(new Set([...sectionFields, ...presentFields]))
-})
-
-function arrayLabel(key: string): string {
-  const labels: Record<string, string> = {
-    titles: 'Titles',
-    abilities: 'Abilities',
-    teachings: 'Teachings',
-    keyFigures: 'Key Figures',
-    relatedTerms: 'Related Terms',
-    members: 'Members',
-    practitioners: 'Practitioners',
-    users: 'Users',
-    owners: 'Owners',
-    participants: 'Participants',
-    relatedFactions: 'Related Factions',
-    inhabitants: 'Inhabitants',
-  }
-  return labels[key] || key
+function groupFilledCount(fields: { key: string }[]): number {
+  return fields.filter((f) => {
+    const v = editForm.value[f.key]
+    if (Array.isArray(v)) return v.length > 0
+    return v != null && `${v}`.trim() !== ''
+  }).length
 }
 
-function ensureArrayField(key: string) {
-  if (!Array.isArray(editForm.value[key])) {
-    editForm.value[key] = []
-  }
+function groupMissingRequired(fields: any[]): number {
+  return fields.filter((f) => {
+    if (!f.required) return false
+    const v = editForm.value[f.key]
+    if (Array.isArray(v)) return v.length === 0
+    return v == null || `${v}`.trim() === ''
+  }).length
 }
 
-function setArrayField(key: string, value: string[]) {
-  editForm.value[key] = value
-}
-
-function setScalarField(key: string, value: string) {
-  editForm.value[key] = value
-}
-
-function setNumberField(key: string, value: string) {
-  if (value === '') {
-    editForm.value[key] = undefined
+/** Update a known field in place (preserves all other keys, incl. unknown). */
+function updateField(key: string, value: any) {
+  if (value === undefined || value === '' || (Array.isArray(value) && value.length === 0)) {
+    delete editForm.value[key]
     return
   }
-  const num = Number(value)
-  editForm.value[key] = Number.isNaN(num) ? value : num
+  editForm.value[key] = value
+}
+
+function jumpToField(anchorKey: string) {
+  if (import.meta.client) {
+    const el = document.getElementById(`field-${anchorKey}`) || document.getElementById(anchorKey)
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }
+}
+
+// --- Custom / Advanced field handling ---
+const newCustomKey = ref('')
+const customFieldWarning = ref('')
+
+function updateCustomField(key: string, value: string) {
+  if (value === '') {
+    delete editForm.value[key]
+    return
+  }
+  editForm.value[key] = value
+}
+
+function removeCustomField(key: string) {
+  delete editForm.value[key]
+}
+
+function addCustomField() {
+  customFieldWarning.value = ''
+  const key = newCustomKey.value.trim()
+  if (!key) return
+  if (!/^[a-zA-Z][a-zA-Z0-9_]*$/.test(key)) {
+    customFieldWarning.value = 'Key must start with a letter and contain only letters, numbers, or underscores.'
+    return
+  }
+  if (knownFieldKeys().has(key)) {
+    customFieldWarning.value = `"${key}" is a known registry field. Use its dedicated editor instead of a custom field.`
+    return
+  }
+  if (key in editForm.value) {
+    customFieldWarning.value = `"${key}" already exists on this entry.`
+    return
+  }
+  editForm.value[key] = ''
+  newCustomKey.value = ''
+  nextTick(() => jumpToField(`custom-${key}`))
+}
+
+function customValueIsScalar(key: string): boolean {
+  const v = editForm.value[key]
+  return v == null || typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean'
 }
 
 function handleReferencesStatus(status: { hasReferences: boolean, hasLowConfidence: boolean }) {
@@ -554,10 +510,9 @@ watch(selectedEntry, (newVal) => {
     // Deep clone to avoid mutating the fetch cache directly
     editForm.value = JSON.parse(JSON.stringify(newVal.frontmatter))
     editBody.value = newVal.body || ''
-
-    // Convert arrays to comma-separated strings for simple text inputs
-    tagsString.value = Array.isArray(editForm.value.tags) ? editForm.value.tags.join(', ') : ''
-    relatedString.value = Array.isArray(editForm.value.related) ? editForm.value.related.join(', ') : ''
+    collapsedGroups.value = {}
+    customFieldWarning.value = ''
+    newCustomKey.value = ''
 
     referencesStatus.value = { hasReferences: hasReferencesSection(editBody.value), hasLowConfidence: false }
 
@@ -567,8 +522,6 @@ watch(selectedEntry, (newVal) => {
   } else {
     editForm.value = {}
     editBody.value = ''
-    tagsString.value = ''
-    relatedString.value = ''
     referencesStatus.value = { hasReferences: false, hasLowConfidence: false }
   }
 }, { immediate: true })
@@ -576,7 +529,7 @@ watch(selectedEntry, (newVal) => {
 // --- Validation ---
 const availableCategories = computed(() => {
   if (!editForm.value.section) return []
-  return CATEGORY_MAP[editForm.value.section] || []
+  return categoriesForSection(editForm.value.section)
 })
 
 const validationErrors = computed(() => {
@@ -920,7 +873,7 @@ async function saveEntry() {
 
       <div v-if="entryPending" class="loading">Loading entry...</div>
 
-      <div v-else-if="selectedEntry" class="editor-panels">
+      <div v-else-if="selectedEntry" class="editor-body">
         <!-- Validation Panel -->
         <div v-if="validationErrors.length || validationWarnings.length" class="validation-panel">
           <div v-if="validationErrors.length" class="errors">
@@ -937,183 +890,108 @@ async function saveEntry() {
           </div>
         </div>
 
-        <div class="panel frontmatter-panel">
-          <h3>Frontmatter</h3>
-          <div class="form-grid">
-            <div class="form-group">
-              <label>Title *</label>
-              <input v-model="editForm.title" type="text" />
-            </div>
-            <div class="form-group">
-              <label>Chinese *</label>
-              <input v-model="editForm.chinese" type="text" />
-            </div>
-            <div class="form-group">
-              <label>Pinyin</label>
-              <input v-model="editForm.pinyin" type="text" />
-            </div>
-            <div class="form-group">
-              <label>Section (Read-Only)</label>
-              <input :value="editForm.section" type="text" disabled />
-            </div>
-            <div class="form-group">
-              <label>Category *</label>
-              <select v-model="editForm.category">
-                <option v-for="cat in availableCategories" :key="cat" :value="cat">{{ cat }}</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Status</label>
-              <input v-model="editForm.status" type="text" placeholder="e.g. Alive, Active" />
-            </div>
-            <div class="form-group">
-              <label>Importance</label>
-              <select v-model="editForm.importance">
-                <option value="primary">primary</option>
-                <option value="major">major</option>
-                <option value="minor">minor</option>
-                <option value="background">background</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Verification Status</label>
-              <select v-model="editForm.verificationStatus">
-                <option value="verified">verified</option>
-                <option value="to-be-verified">to-be-verified</option>
-                <option value="disputed">disputed</option>
-                <option value="speculative">speculative</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Seal</label>
-              <input v-model="editForm.seal" type="text" />
-            </div>
-            <div class="form-group full-width">
-              <label>Description *</label>
-              <textarea v-model="editForm.description" rows="2"></textarea>
-            </div>
-            <div class="form-group full-width">
-              <label>Tags</label>
-              <AdminTagEditor
-                :model-value="Array.isArray(editForm.tags) ? editForm.tags : []"
-                @update:model-value="(v) => setArrayField('tags', v)"
-                placeholder="Add tags..."
-              />
-            </div>
+        <!-- 3-column Fandom-like layout -->
+        <div class="editor-grid">
+          <!-- Left: Field Navigator -->
+          <div class="col-nav">
+            <AdminFieldsFieldNavigator
+              :groups="fieldGroups"
+              :frontmatter="editForm"
+              :custom-keys="customKeys"
+              @jump="jumpToField"
+              @expand-all="expandAllGroups"
+              @collapse-all="collapseAllGroups"
+            />
+          </div>
 
-            <div v-for="field in shownStringArrayFields" :key="`arr-${field}`" class="form-group full-width">
-              <label>{{ arrayLabel(field) }}</label>
-              <AdminTagEditor
-                :model-value="Array.isArray(editForm[field]) ? editForm[field] : []"
-                @update:model-value="(v) => setArrayField(field, v)"
-                :placeholder="`Add ${arrayLabel(field).toLowerCase()}...`"
-              />
-            </div>
-
-            <div v-for="field in shownPathArrayFields" :key="`path-${field}`" class="form-group full-width">
-              <label>{{ arrayLabel(field) }}</label>
-              <AdminRelationshipPicker
-                :model-value="Array.isArray(editForm[field]) ? editForm[field] : []"
+          <!-- Center: grouped fields + body -->
+          <div class="col-fields">
+            <AdminFieldsFieldGroup
+              v-for="group in fieldGroups"
+              :key="group.id"
+              :label="group.label"
+              :total="group.fields.length"
+              :filled="groupFilledCount(group.fields)"
+              :missing-required="groupMissingRequired(group.fields)"
+              :open="!collapsedGroups[group.id]"
+              @toggle="toggleGroup(group.id)"
+            >
+              <AdminFieldsFieldRenderer
+                v-for="field in group.fields"
+                :key="field.key"
+                :field="field"
+                :model-value="editForm[field.key]"
+                :section="currentSection"
                 :entries="entries || []"
-                :multiple="true"
-                @update:model-value="(v) => setArrayField(field, Array.isArray(v) ? v : (v ? [v] : []))"
+                @update="updateField"
               />
-            </div>
+            </AdminFieldsFieldGroup>
 
-            <div v-for="field in shownScalarFields" :key="`scalar-${field.key}`" class="form-group">
-              <label>{{ field.label }}</label>
-              <input
-                v-if="field.type === 'text'"
-                :value="(editForm[field.key] ?? '') as any"
-                type="text"
-                @input="setScalarField(field.key, ($event.target as HTMLInputElement).value)"
-              />
-              <input
-                v-else
-                :value="(editForm[field.key] ?? '') as any"
-                type="number"
-                @input="setNumberField(field.key, ($event.target as HTMLInputElement).value)"
-              />
-            </div>
+            <!-- Advanced / Custom Fields -->
+            <section class="advanced-fields">
+              <h3>Advanced / Custom Fields</h3>
+              <p class="advanced-note">
+                Unknown fields are preserved on save and never deleted. Add a simple scalar field if needed.
+              </p>
 
-            <div class="form-group full-width">
-              <label>Image Path</label>
-              <AdminMediaPathPicker
-                :model-value="editForm.image || ''"
-                preferred-type="image"
-                label=""
-                @update:model-value="(v) => setScalarField('image', v)"
+              <div v-for="key in customKeys" :id="`custom-${key}`" :key="`custom-${key}`" class="custom-field-row">
+                <div class="custom-field-head">
+                  <code>{{ key }}</code>
+                  <button type="button" class="remove-custom" @click="removeCustomField(key)">Remove</button>
+                </div>
+                <input
+                  v-if="customValueIsScalar(key)"
+                  :value="editForm[key] ?? ''"
+                  type="text"
+                  @input="updateCustomField(key, ($event.target as HTMLInputElement).value)"
+                />
+                <div v-else class="custom-complex">
+                  <span class="custom-complex-note">Complex value (preserved as-is, edit via raw JSON below):</span>
+                  <pre>{{ editForm[key] }}</pre>
+                </div>
+              </div>
+
+              <div class="add-custom-row">
+                <input
+                  v-model="newCustomKey"
+                  type="text"
+                  placeholder="newFieldKey"
+                  @keyup.enter="addCustomField"
+                />
+                <button type="button" class="create-btn" @click="addCustomField">Add custom field</button>
+              </div>
+              <div v-if="customFieldWarning" class="custom-warning">⚠️ {{ customFieldWarning }}</div>
+            </section>
+
+            <details class="raw-json-details">
+              <summary>View Raw Frontmatter JSON (Includes preserved complex fields)</summary>
+              <pre>{{ editForm }}</pre>
+            </details>
+
+            <!-- Body editor + references -->
+            <section class="body-section">
+              <h3>Body Markdown</h3>
+              <textarea v-model="editBody" class="body-textarea"></textarea>
+              <AdminReferencesEditor
+                ref="referencesEditor"
+                v-model="editBody"
+                @status-change="handleReferencesStatus"
               />
-            </div>
-            <div class="form-group full-width">
-              <label>Banner Path</label>
-              <AdminMediaPathPicker
-                :model-value="editForm.banner || ''"
-                preferred-type="image"
-                label=""
-                @update:model-value="(v) => setScalarField('banner', v)"
-              />
-            </div>
-            <div class="form-group full-width">
-              <label>Video Path</label>
-              <AdminMediaPathPicker
-                :model-value="editForm.video || ''"
-                preferred-type="video"
-                label=""
-                @update:model-value="(v) => setScalarField('video', v)"
-              />
-            </div>
-            <div class="form-group full-width">
-              <label>Source Notes</label>
-              <textarea v-model="editForm.sourceNotes" rows="3"></textarea>
               <div v-if="verificationHints.length" class="source-hints">
                 <div v-for="hint in verificationHints" :key="hint" class="hint-item">⚠️ {{ hint }}</div>
               </div>
-            </div>
-            <div class="form-group full-width">
-              <label>Related (path array)</label>
-              <AdminRelationshipPicker
-                :model-value="Array.isArray(editForm.related) ? editForm.related : []"
-                :entries="entries || []"
-                :multiple="true"
-                @update:model-value="(v) => setArrayField('related', Array.isArray(v) ? v : (v ? [v] : []))"
-              />
-            </div>
+            </section>
           </div>
 
-          <AdminRankingEntriesEditor
-            v-if="editForm.section === 'rankings' || Array.isArray(editForm.entries)"
-            :model-value="Array.isArray(editForm.entries) ? editForm.entries : []"
-            :entries="entries || []"
-            @update:model-value="(v) => setArrayField('entries', v as any)"
-          />
+          <!-- Right: live card preview + iframe -->
+          <div class="col-preview">
+            <AdminEntryCardPreview :frontmatter="editForm" />
 
-          <AdminLegacyRelationshipsEditor
-            v-if="Array.isArray(editForm.relationships) || editForm.section === 'rankings'"
-            :model-value="Array.isArray(editForm.relationships) ? editForm.relationships : []"
-            :entries="entries || []"
-            @update:model-value="(v) => setArrayField('relationships', v as any)"
-          />
-
-          <details class="raw-json-details">
-            <summary>View Raw Frontmatter JSON (Includes preserved complex fields)</summary>
-            <pre>{{ editForm }}</pre>
-          </details>
-        </div>
-
-        <div class="panel body-panel">
-          <h3>Body Markdown</h3>
-          <textarea v-model="editBody" class="body-textarea"></textarea>
-          <AdminReferencesEditor
-            ref="referencesEditor"
-            v-model="editBody"
-            @status-change="handleReferencesStatus"
-          />
-        </div>
-
-        <div v-if="showPreviewPanel && previewUrl" class="panel preview-panel">
-          <h3>Live Preview (saved route)</h3>
-          <iframe :src="previewUrl" class="preview-iframe" />
+            <div v-if="showPreviewPanel && previewUrl" class="preview-panel">
+              <h4>Live Page Preview</h4>
+              <iframe :src="previewUrl" class="preview-iframe" />
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1299,7 +1177,7 @@ async function saveEntry() {
 
 <style scoped>
 .admin-page {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 2rem;
   padding-top: calc(var(--header-height) + 2rem);
@@ -1373,48 +1251,235 @@ async function saveEntry() {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
-.editor-panels {
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.save-btn {
+  padding: 0.5rem 1rem;
+  background: var(--c-seal-red);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.save-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.validation-panel {
+  margin-bottom: 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 0.75rem;
 }
 
-.panel {
-  border: 1px solid var(--c-border);
-  border-radius: 4px;
-  padding: 1rem;
+.validation-panel .errors {
+  border: 1px solid #f2b8b5;
+  background: #fdecec;
+  color: #8f1d18;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+}
+
+.validation-panel .warnings {
+  border: 1px solid #ecd98a;
+  background: #fff8df;
+  color: #5f4300;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+}
+
+.validation-panel h4 {
+  margin: 0 0 0.4rem;
+}
+
+.validation-panel ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+/* --- 3-column editor grid --- */
+.editor-grid {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) 320px;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.col-nav,
+.col-preview {
+  position: relative;
+}
+
+.col-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.col-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (max-width: 1200px) {
+  .editor-grid {
+    grid-template-columns: minmax(0, 1fr) 300px;
+  }
+  .col-nav {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .editor-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .col-preview {
+    display: none;
+  }
+}
+
+/* --- Advanced / custom fields --- */
+.advanced-fields {
+  border: 1px dashed var(--c-border);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
   background: var(--c-bg-soft);
 }
 
-.panel pre {
-  white-space: pre-wrap;
-  word-wrap: break-word;
+.advanced-fields h3 {
+  margin: 0 0 0.3rem;
+  font-size: 1rem;
 }
 
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem 1rem;
+.advanced-note {
+  margin: 0 0 0.75rem;
+  font-size: 0.78rem;
+  color: var(--c-text-3);
 }
 
-.form-group {
+.custom-field-row {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
+  margin-bottom: 0.65rem;
+  scroll-margin-top: calc(var(--header-height, 64px) + 1rem);
 }
 
-.form-group.full-width {
-  grid-column: 1 / -1;
+.custom-field-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.form-group input,
-.form-group select,
-.form-group textarea {
+.custom-field-head code {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--c-ink);
+}
+
+.remove-custom {
+  border: 1px solid var(--c-border);
+  background: var(--c-bg);
+  border-radius: 4px;
+  font-size: 0.7rem;
+  padding: 0.15rem 0.5rem;
+  cursor: pointer;
+  color: #8f1d18;
+}
+
+.custom-field-row input[type='text'] {
   padding: 0.45rem 0.55rem;
   border: 1px solid var(--c-border);
   border-radius: 4px;
+  background: var(--c-bg);
+  color: var(--c-ink);
+}
+
+.custom-complex {
+  font-size: 0.78rem;
+  color: var(--c-text-3);
+}
+
+.custom-complex pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  background: var(--c-bg);
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  padding: 0.5rem;
+}
+
+.add-custom-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.add-custom-row input {
+  flex: 1;
+  padding: 0.4rem 0.55rem;
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+.custom-warning {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: #8f1d18;
+}
+
+.raw-json-details {
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  background: var(--c-bg-soft);
+}
+
+.raw-json-details pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-size: 0.78rem;
+}
+
+/* --- Body section --- */
+.body-section {
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  background: var(--c-bg);
+}
+
+.body-section h3 {
+  margin: 0 0 0.6rem;
+  font-size: 1rem;
+}
+
+.body-textarea {
+  width: 100%;
+  min-height: 360px;
+  font-family: var(--font-mono);
+  padding: 1rem;
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  resize: vertical;
+  background: var(--c-bg);
+  color: var(--c-ink);
 }
 
 .source-hints {
@@ -1429,22 +1494,32 @@ async function saveEntry() {
   color: #856404;
 }
 
-.body-textarea {
-  width: 100%;
-  min-height: 400px;
-  font-family: var(--font-mono);
-  padding: 1rem;
-  border: 1px solid var(--c-border);
-  border-radius: 4px;
-  resize: vertical;
-  background: var(--c-bg);
-  color: var(--c-ink);
-}
-
 .error-text {
   color: #b3261e;
 }
 
+/* --- Preview --- */
+.preview-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.preview-panel h4 {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--c-text-2);
+}
+
+.preview-iframe {
+  width: 100%;
+  min-height: 420px;
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  background: #fff;
+}
+
+/* --- Modals (unchanged behavior) --- */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -1491,6 +1566,30 @@ async function saveEntry() {
   background: transparent;
   font-size: 1.1rem;
   cursor: pointer;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 0.45rem 0.55rem;
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
 }
 
 .import-actions-row {
@@ -1547,20 +1646,6 @@ async function saveEntry() {
   color: #8f1d18;
   background: #fdecec;
   border-color: #f2b8b5;
-}
-
-.preview-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.preview-iframe {
-  width: 100%;
-  min-height: 520px;
-  border: 1px solid var(--c-border);
-  border-radius: 6px;
-  background: #fff;
 }
 
 .create-error {
