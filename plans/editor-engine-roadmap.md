@@ -1,6 +1,6 @@
 # Jian Lai Wiki — Editor Engine Roadmap
 
-**Status:** Stage 8K Complete — Editor MVP audited and documented  
+**Status:** Stage 12C Complete — Private R2 Media Library Manager added to the local editor
 **Goal:** Keep Markdown + Nuxt Content as the source of truth while providing a safe, local-only editor workflow for Jian Lai wiki contributors.
 
 ---
@@ -82,6 +82,7 @@ The selected MVP strategy remains **local Markdown file-backed editing**.
 - **Stage 8I — Advanced field editors:** Added section-aware scalar fields, path arrays, ranking entries, and legacy relationship rows.
 - **Stage 8J — Media path helper:** Added existing media picker for images and curated videos only.
 - **Stage 8K — Audit/documentation:** Audited safety/workflows/build, documented usage, added minimal dev-only delete endpoint for temporary cleanup, and confirmed generate output remains stable.
+- **Stage 12C — Private R2 Media Library Manager:** Added a dev-only Media Library panel to the editor backed by a curated, paths-only R2 manifest (`app/data/mediaLibrary.ts`). Lists/searches/filters media grouped by type, previews images/videos through `getMediaUrl`, copies the public R2 URL and the relative path, and inserts selected media into the Markdown body and frontmatter media fields. Fonts are copy-only. No uploads, no Cloudflare API keys, no new routes.
 
 ---
 
@@ -100,6 +101,11 @@ The editor must continue to satisfy these constraints:
 9. Deletes create backups before removing local test files.
 10. `.editor-backups/` is gitignored.
 11. Media picker lists curated videos only from `public/videos/curated`.
+12. The Media Library and its manifest (`app/data/mediaLibrary.ts`) are dev-only, paths/metadata only, and ship no binary assets.
+13. The Media Library performs no uploads and requires no Cloudflare API keys.
+14. Media URLs resolve only through `getMediaUrl` + `NUXT_PUBLIC_MEDIA_BASE_URL` (the R2 host).
+15. Fonts are copy-only; they are never inserted into Markdown body or frontmatter.
+16. Frontmatter insertion targets only known media fields (`image`, `banner`, `video`).
 
 ---
 
@@ -111,7 +117,11 @@ The editor must continue to satisfy these constraints:
 - `DELETE /api/editor/entry` — dev-only cleanup helper; backup, then delete an editable entry.
 - `POST /api/editor/create-entry` — create a new entry without overwrite.
 - `POST /api/editor/import-markdown` — parse or create from NotebookLM-style Markdown.
-- `GET /api/editor/media` — list existing images and curated videos.
+- `GET /api/editor/media` — list existing images and curated videos (local scan; unioned with the curated R2 manifest client-side by the Media Library).
+
+### Editor data sources (non-API)
+
+- `app/data/mediaLibrary.ts` — curated, paths-only R2 media manifest consumed by the Media Library panel and the frontmatter media path picker. Unioned and deduped with the local scan via `mergeWithScan`. Contains no binary assets.
 
 ---
 

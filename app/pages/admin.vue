@@ -773,6 +773,37 @@ function closeEditor() {
   selectedEntryPath.value = ''
 }
 
+// --- Media Library (Stage 12C) ---
+const bodyEditorRef = ref<{ insertMediaSnippet: (p: { path: string; type: 'image' | 'video'; alt?: string }) => void } | null>(null)
+const isMediaLibraryOpen = ref(false)
+
+/** Frontmatter media field keys for the current section (image/banner/video). */
+const mediaFieldKeys = computed(() => {
+  const keys: string[] = []
+  for (const group of fieldGroups.value) {
+    for (const field of group.fields as Array<{ key: string; type: string }>) {
+      if (field.type === 'media') keys.push(field.key)
+    }
+  }
+  return keys
+})
+
+function openMediaLibrary() {
+  isMediaLibraryOpen.value = true
+}
+
+function closeMediaLibrary() {
+  isMediaLibraryOpen.value = false
+}
+
+function handleMediaInsertBody(payload: { path: string; type: 'image' | 'video'; alt?: string }) {
+  bodyEditorRef.value?.insertMediaSnippet(payload)
+}
+
+function handleMediaSetField(payload: { key: string; path: string }) {
+  updateField(payload.key, payload.path)
+}
+
 async function saveEntry() {
   if (validationErrors.value.length > 0) {
     alert('Please fix validation errors before saving.')
@@ -864,6 +895,7 @@ async function saveEntry() {
           </span>
           <button @click="openPublicPage" class="create-btn" :disabled="!previewRoute">Open Public Page</button>
           <button @click="refreshPreview" class="create-btn" :disabled="!previewRoute">Refresh Preview</button>
+          <button @click="openMediaLibrary" class="create-btn">Media Library</button>
           <button @click="saveEntry" class="save-btn" :disabled="isSaving || !canSave">
             {{ isSaving ? 'Saving...' : 'Save Changes' }}
           </button>
@@ -972,6 +1004,7 @@ async function saveEntry() {
             <section class="body-section">
               <h3>Body Markdown</h3>
               <AdminBodyEditor
+                ref="bodyEditorRef"
                 v-model="editBody"
                 :verification-status="editForm.verificationStatus"
                 :has-references="referencesStatus.hasReferences"
@@ -999,6 +1032,15 @@ async function saveEntry() {
         </div>
       </div>
     </div>
+
+    <!-- Media Library Drawer (Stage 12C) -->
+    <AdminMediaLibrary
+      :open="isMediaLibraryOpen"
+      :media-field-keys="mediaFieldKeys"
+      @close="closeMediaLibrary"
+      @insert-body="handleMediaInsertBody"
+      @set-field="handleMediaSetField"
+    />
 
     <!-- Create Entry Wizard Modal -->
     <div v-if="isCreateWizardOpen" class="modal-overlay" @click.self="closeCreateWizard">

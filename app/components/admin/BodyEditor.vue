@@ -14,6 +14,18 @@ const emit = defineEmits<{
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 const viewMode = ref<'edit' | 'split' | 'preview'>('edit')
 
+// Remember the last caret position so modal-driven inserts (e.g. the Media
+// Library) land where the user was typing rather than appending to the end.
+let lastCaretStart: number | null = null
+let lastCaretEnd: number | null = null
+
+function rememberCaret() {
+  const el = textareaRef.value
+  if (!el) return
+  lastCaretStart = el.selectionStart
+  lastCaretEnd = el.selectionEnd
+}
+
 // --- Counts ---
 const charCount = computed(() => (props.modelValue || '').length)
 const wordCount = computed(() => {
@@ -89,23 +101,50 @@ function applyLinePrefix(prefix: string) {
   })
 }
 
-function insertAtCursor(text: string) {
+function insertAtCursor(text: string, opts: { useRemembered?: boolean } = {}) {
   const el = textareaRef.value
   const value = props.modelValue || ''
   if (!el) {
     updateValue(value + text)
     return
   }
-  const start = el.selectionStart ?? value.length
-  const end = el.selectionEnd ?? value.length
+  // When invoked from outside the textarea (e.g. the Media Library modal), the
+  // textarea has lost focus, so fall back to the last remembered caret.
+  const start = opts.useRemembered && lastCaretStart != null
+    ? lastCaretStart
+    : (el.selectionStart ?? value.length)
+  const end = opts.useRemembered && lastCaretEnd != null
+    ? lastCaretEnd
+    : (el.selectionEnd ?? value.length)
   const next = value.slice(0, start) + text + value.slice(end)
   updateValue(next)
   nextTick(() => {
     el.focus()
     const pos = start + text.length
     el.setSelectionRange(pos, pos)
+    lastCaretStart = pos
+    lastCaretEnd = pos
   })
 }
+
+/**
+ * Build and insert a Markdown media snippet at the remembered caret.
+ * Images use standard Markdown; videos use a raw <video> tag so the media
+ * still renders in the public Nuxt Content output. Used by the Media Library.
+ */
+function insertMediaSnippet(payload: { path: string; type: 'image' | 'video'; alt?: string }) {
+  const path = (payload?.path || '').trim()
+  if (!path) return
+  const alt = (payload.alt || '').trim()
+  const snippet = payload.type === 'video'
+    ? `\n<video src="${path}" controls playsinline></video>\n`
+    : `![${alt}](${path})`
+  // Ensure the editor is on a pane that shows the textarea.
+  if (viewMode.value === 'preview') viewMode.value = 'split'
+  insertAtCursor(snippet, { useRemembered: true })
+}
+
+defineExpose({ insertMediaSnippet, insertReferencesHeading })
 
 function insertReferencesHeading() {
   const value = props.modelValue || ''
@@ -283,6 +322,10 @@ const previewHtml = computed(() => renderMarkdown(props.modelValue || ''))
         spellcheck="false"
         placeholder="Write Markdown body here. Use ## for section headings."
         @input="onInput"
+        @blur="rememberCaret"
+        @select="rememberCaret"
+        @keyup="rememberCaret"
+        @mouseup="rememberCaret"
       />
       <!-- eslint-disable vue/no-v-html -->
       <div
