@@ -24,11 +24,11 @@ useSeoMeta({
 <template>
   <div class="page-container">
     <ScrollReveal animation="reveal-fade-up">
-      <SectionHero 
-        titleEn="Characters" 
-        titleZh="人物志" 
+      <SectionHero
+        titleEn="Characters"
+        titleZh="人物志"
         desc="The heroes, villains, and legends of the Jian Lai universe."
-        video="/videos/fight-scene.mp4"
+        video="/videos/curated/home-hero-07.mp4"
         bannerImage="/images/banners/characters-banner.webp"
         credit="Tencent Video / Jian Lai Animation"
         :isOfficial="true"

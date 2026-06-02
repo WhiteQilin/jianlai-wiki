@@ -20,8 +20,8 @@ useSeoMeta({
 
 <template>
   <div class="article-page">
-    <SectionHero 
-      v-if="(page as any)?.video" 
+    <SectionHero
+      v-if="(page as any)?.video"
       :video="(page as any).video"
       :titleEn="page?.title"
       :titleZh="(page as any)?.chinese"
