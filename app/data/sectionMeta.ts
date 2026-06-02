@@ -30,7 +30,7 @@ export const SECTION_META: Record<string, RawSectionMeta> = {
     title: 'World',
     chinese: '天下图志',
     description: 'Explore the vast realms, continents, and secret realms of Jian Lai.',
-    categories: ['Continent', 'Grotto-Heaven', 'Blessed Land', 'City', 'Landmark', 'Sword-Qi-Great-Wall'],
+    categories: ['World', 'Continent', 'Grotto-Heaven', 'Blessed Land', 'City', 'Landmark', 'Sword-Qi-Great-Wall'],
   },
   cultivation: {
     title: 'Cultivation',

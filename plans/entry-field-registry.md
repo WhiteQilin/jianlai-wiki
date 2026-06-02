@@ -74,7 +74,7 @@ Verbatim from [`sectionMeta.ts`](../jianlai-wiki-nuxt/app/data/sectionMeta.ts). 
 | Section | Valid `category` values |
 |---|---|
 | characters | `Character`, `Major`, `Minor`, `Gods` |
-| world | `Continent`, `Grotto-Heaven`, `Blessed Land`, `City`, `Landmark`, `Sword-Qi-Great-Wall` |
+| world | `World`, `Continent`, `Grotto-Heaven`, `Blessed Land`, `City`, `Landmark`, `Sword-Qi-Great-Wall` |
 | cultivation | `Realm`, `Path`, `Method`, `Concept` |
 | swordsmanship | `Technique`, `Flying-Sword-Art`, `Ability`, `Sword-Style` |
 | factions | `Sect`, `Dynasty`, `Academy`, `Clan`, `Alliance` |
@@ -322,7 +322,7 @@ title: Location Name
 chinese: 地点中文名
 pinyin: Pinyin Romanization
 section: world
-category: Landmark         # Continent | Grotto-Heaven | Blessed Land | City | Landmark | Sword-Qi-Great-Wall
+category: Landmark         # World | Continent | Grotto-Heaven | Blessed Land | City | Landmark | Sword-Qi-Great-Wall
 subcategory: ""
 status: Unknown
 importance: minor

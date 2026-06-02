@@ -14,6 +14,7 @@ import {
   EDITOR_RELATIONSHIP_PATH_FIELDS,
   validateEditorRelationshipPath,
 } from '../../utils/editor'
+import { normalizeImportedTaxonomy, type TaxonomyNormalizationReview } from '../../utils/taxonomy'
 
 type Mode = 'parse' | 'save'
 
@@ -36,6 +37,7 @@ interface ImportResult {
   errors: string[]
   warnings: string[]
   hasReferences: boolean
+  taxonomyReview: TaxonomyNormalizationReview | null
 }
 
 function asString(value: unknown): string {
@@ -56,16 +58,18 @@ function splitMarkdown(markdown: string): { frontmatterText: string; body: strin
 }
 
 async function buildParseResult(frontmatter: Record<string, any>, body: string): Promise<ImportResult> {
+  const taxonomy = normalizeImportedTaxonomy(frontmatter)
+  const normalizedFrontmatter = taxonomy.frontmatter
   const errors: string[] = []
-  const warnings: string[] = []
+  const warnings: string[] = [...taxonomy.warnings]
 
-  const title = asString(frontmatter.title).trim()
-  const chinese = asString(frontmatter.chinese).trim()
-  const description = asString(frontmatter.description).trim()
-  const section = asString(frontmatter.section).trim()
-  const category = asString(frontmatter.category).trim()
+  const title = asString(normalizedFrontmatter.title).trim()
+  const chinese = asString(normalizedFrontmatter.chinese).trim()
+  const description = asString(normalizedFrontmatter.description).trim()
+  const section = asString(normalizedFrontmatter.section).trim()
+  const category = asString(normalizedFrontmatter.category).trim()
 
-  let slug = asString(frontmatter.slug).trim()
+  let slug = asString(normalizedFrontmatter.slug).trim()
   if (!slug && title) slug = slugifyTitle(title)
 
   if (!title) errors.push('title is required')
@@ -80,6 +84,7 @@ async function buildParseResult(frontmatter: Record<string, any>, body: string):
 
   const slugError = validateCreateSlug(slug)
   if (slugError) errors.push(slugError)
+  const canResolveTarget = Boolean(section && slug && !slugError && (EDITOR_SECTIONS as readonly string[]).includes(section))
 
   if (section) {
     const validCategories = categoriesForSection(section)
@@ -90,24 +95,24 @@ async function buildParseResult(frontmatter: Record<string, any>, body: string):
     }
   }
 
-  const importance = asString(frontmatter.importance)
+  const importance = asString(normalizedFrontmatter.importance)
   if (importance && !(IMPORTANCE_VALUES as readonly string[]).includes(importance)) {
     errors.push(`importance "${importance}" must be one of: ${IMPORTANCE_VALUES.join(', ')}`)
   }
 
-  const verificationStatus = asString(frontmatter.verificationStatus)
+  const verificationStatus = asString(normalizedFrontmatter.verificationStatus)
   if (verificationStatus && !(VERIFICATION_VALUES as readonly string[]).includes(verificationStatus)) {
     errors.push(`verificationStatus "${verificationStatus}" must be one of: ${VERIFICATION_VALUES.join(', ')}`)
   }
 
-  const tags = frontmatter.tags
+  const tags = normalizedFrontmatter.tags
   if (Array.isArray(tags)) {
     const hasInvalidTag = tags.some((t) => typeof t === 'string' && !/^[a-z0-9-]+$/.test(t))
     if (hasInvalidTag) warnings.push('Tags should be lowercase and hyphenated')
   }
 
   for (const field of EDITOR_RELATIONSHIP_PATH_FIELDS) {
-    const val = frontmatter[field]
+    const val = normalizedFrontmatter[field]
     if (!val) continue
     const paths = Array.isArray(val) ? val : [val]
     for (const p of paths) {
@@ -116,16 +121,16 @@ async function buildParseResult(frontmatter: Record<string, any>, body: string):
     }
   }
 
-  if (Array.isArray(frontmatter.entries)) {
-    frontmatter.entries.forEach((row: any, idx: number) => {
+  if (Array.isArray(normalizedFrontmatter.entries)) {
+    normalizedFrontmatter.entries.forEach((row: any, idx: number) => {
       const link = typeof row?.link === 'string' ? row.link : ''
       if (!link.trim()) return
       errors.push(...validateEditorRelationshipPath(`entries[${idx}].link`, link))
     })
   }
 
-  if (Array.isArray(frontmatter.relationships)) {
-    frontmatter.relationships.forEach((row: any, idx: number) => {
+  if (Array.isArray(normalizedFrontmatter.relationships)) {
+    normalizedFrontmatter.relationships.forEach((row: any, idx: number) => {
       const link = typeof row?.link === 'string' ? row.link : ''
       if (!link.trim()) return
       errors.push(...validateEditorRelationshipPath(`relationships[${idx}].link`, link))
@@ -146,7 +151,7 @@ async function buildParseResult(frontmatter: Record<string, any>, body: string):
   let fileRelPath = ''
   let exists = false
 
-  if (section && slug && !errors.length) {
+  if (canResolveTarget) {
     const resolved = resolveEntryPath(`/${section}/${slug}`)
     if ('error' in resolved) {
       errors.push(resolved.error)
@@ -164,7 +169,7 @@ async function buildParseResult(frontmatter: Record<string, any>, body: string):
   }
 
   return {
-    frontmatter,
+    frontmatter: normalizedFrontmatter,
     body,
     section,
     slug,
@@ -174,6 +179,7 @@ async function buildParseResult(frontmatter: Record<string, any>, body: string):
     errors,
     warnings,
     hasReferences,
+    taxonomyReview: taxonomy.review,
   }
 }
 
@@ -265,7 +271,7 @@ export default defineEventHandler(async (event) => {
     if (e?.statusCode === 409) throw e
   }
 
-  const fileContent = buildMarkdown(frontmatter, body)
+  const fileContent = buildMarkdown(parseResult.frontmatter, body)
 
   try {
     await mkdir(dirname(resolved.fileAbsPath), { recursive: true })

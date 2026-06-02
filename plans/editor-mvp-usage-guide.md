@@ -1,6 +1,6 @@
-# Jian Lai Wiki — Local Editor MVP Usage Guide (Stage 8K)
+# Jian Lai Wiki — Local Editor MVP Usage Guide (Stage 9A)
 
-**Status:** Editor MVP audited and documented  
+**Status:** Editor MVP audited, hardened, and taxonomy-normalized
 **Scope:** Local-only Markdown editor for development contributors  
 **Route:** `/admin` in `npm run dev` only
 
@@ -130,9 +130,11 @@ Steps in the editor:
    - Target file
    - Parsed frontmatter
    - Body preview
+   - Taxonomy Review, if shown
    - Import errors/warnings
-5. If the target does not exist, click **Import and Save**.
-6. If the target exists, the UI requires an explicit overwrite phrase and then routes the overwrite through the normal save endpoint so a backup is created first.
+5. If Taxonomy Review appears, confirm the normalized site category and preserved canon type field.
+6. If the target does not exist, click **Import and Save**.
+7. If the target exists, the UI requires an explicit overwrite phrase and then routes the overwrite through the normal save endpoint so a backup is created first.
 
 Required fields are still enforced:
 
@@ -144,7 +146,59 @@ Required fields are still enforced:
 
 ---
 
-## 6. Edit Frontmatter
+## 6. Category vs Canon Type Fields
+
+The editor separates public filter taxonomy from canon-specific classifications.
+
+- `category` is the stable site filter bucket shown in public category tabs.
+- Section-specific type fields preserve novel/canon labels without creating unlimited public tabs.
+
+Current section-specific type fields:
+
+| Section | Canon type field |
+|---|---|
+| `world` | `locationType` |
+| `factions` | `factionType` |
+| `artifacts` | `artifactType` |
+| `cultivation` | `pathType` |
+| `swordsmanship` | `abilityType` |
+| `teachings` | `teachingType` |
+| `pantheon` | `beingType` |
+| `glossary` | `termType` |
+
+NotebookLM may output canon labels as `category`, such as:
+
+```yaml
+section: world
+category: Heaven
+locationType: Heaven
+```
+
+This is canonically useful but not always a valid site filter category. During import, the editor normalizes recognized aliases to valid site categories and preserves the original canon label in the section-specific type field when that field is blank.
+
+For world entries, these imported categories currently map to `World`:
+
+- `Heaven`
+- `World`
+- `天下`
+- `Major World`
+- `Realm`
+- `Macrocosm`
+
+Example result:
+
+```yaml
+category: World
+locationType: Heaven
+```
+
+Unknown imported categories are not silently accepted and are not added to public tabs. The import preview shows **Taxonomy Review**, preserves the original imported category in the canon type field or `subcategory`, and requires choosing a valid site category before final save.
+
+New public categories should be added manually and intentionally in both runtime metadata and `_meta` content files; the editor must not create unlimited public category tabs automatically.
+
+---
+
+## 7. Edit Frontmatter
 
 Open an entry and edit the form fields.
 
@@ -168,7 +222,7 @@ Unknown or complex fields are preserved because the editor saves the full frontm
 
 ---
 
-## 7. Edit Relationships
+## 8. Edit Relationships
 
 Relationship fields use the relationship picker.
 
@@ -188,7 +242,7 @@ Safety notes:
 
 ---
 
-## 8. Edit Tags and Simple Arrays
+## 9. Edit Tags and Simple Arrays
 
 Tag-style fields use the tag editor.
 
@@ -201,7 +255,7 @@ This is used for tags and some section-specific arrays such as titles, abilities
 
 ---
 
-## 9. Edit References
+## 10. Edit References
 
 The body textarea remains the canonical Markdown source. The references editor helps structure the `## References` section.
 
@@ -224,7 +278,7 @@ The editor preserves unparsed reference lines as raw fallback text rather than d
 
 ---
 
-## 10. Edit Advanced Fields
+## 11. Edit Advanced Fields
 
 Stage 8I added section-aware fields beyond the basic frontmatter:
 
@@ -237,7 +291,7 @@ These fields are MVP helpers, not a complete schema-management system. Always re
 
 ---
 
-## 11. Use the Media Path Picker
+## 12. Use the Media Path Picker
 
 The media picker helps choose existing media paths. It does not upload files.
 
@@ -260,7 +314,7 @@ Media rules:
 
 ---
 
-## 12. Preview and Public Page Workflow
+## 13. Preview and Public Page Workflow
 
 The editor provides:
 
@@ -272,7 +326,7 @@ Save first, then refresh preview.
 
 ---
 
-## 13. Backups
+## 14. Backups
 
 Backups are stored under `.editor-backups/`.
 
@@ -304,7 +358,7 @@ How to recover from `.editor-backups/`:
 
 ---
 
-## 14. What Not to Commit
+## 15. What Not to Commit
 
 Do not commit:
 
@@ -323,7 +377,7 @@ The `.gitignore` already excludes these local/build/backup paths and raw media a
 
 ---
 
-## 15. Known Limitations
+## 16. Known Limitations
 
 - Local single-user editor only.
 - No authentication.
@@ -340,7 +394,7 @@ The `.gitignore` already excludes these local/build/backup paths and raw media a
 
 ---
 
-## 16. Required QA Before Committing Editor or Content Changes
+## 17. Required QA Before Committing Editor or Content Changes
 
 Quick checklist:
 
@@ -375,3 +429,5 @@ Confirm:
 - Temporary test entries are removed.
 - Public wiki routes still render at `http://localhost:3000/`.
 - The local editor still opens at `http://localhost:3000/admin`.
+- Haoran-style NotebookLM imports map `category: Heaven` to `category: World` and preserve `locationType: Heaven`.
+- Public world filter tabs include `World` without adding unlimited NotebookLM categories.

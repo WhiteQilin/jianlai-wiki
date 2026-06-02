@@ -69,7 +69,7 @@ const VIDEO_EXTS = new Set(['.mp4', '.webm', '.mov'])
 
 const CATEGORY_MAP: Record<string, string[]> = {
   characters: ['Character', 'Major', 'Minor', 'Gods'],
-  world: ['Continent', 'Grotto-Heaven', 'Blessed Land', 'City', 'Landmark', 'Sword-Qi-Great-Wall'],
+  world: ['World', 'Continent', 'Grotto-Heaven', 'Blessed Land', 'City', 'Landmark', 'Sword-Qi-Great-Wall'],
   cultivation: ['Realm', 'Path', 'Method', 'Concept'],
   swordsmanship: ['Technique', 'Flying-Sword-Art', 'Ability', 'Sword-Style'],
   factions: ['Sect', 'Dynasty', 'Academy', 'Clan', 'Alliance'],
@@ -79,6 +79,17 @@ const CATEGORY_MAP: Record<string, string[]> = {
   teachings: ['Teaching', 'School'],
   pantheon: ['God', 'Demon', 'Spirit', 'Mountain-Water-Deity'],
   glossary: ['Term', 'Concept', 'Phrase']
+}
+
+interface TaxonomyReview {
+  section: string
+  originalCategory: string
+  normalizedCategory: string
+  typeField: string
+  preservedTypeValue: string
+  mapped: boolean
+  reviewNeeded: boolean
+  message: string
 }
 
 interface ImportParseResult {
@@ -92,6 +103,7 @@ interface ImportParseResult {
   errors: string[]
   warnings: string[]
   hasReferences: boolean
+  taxonomyReview: TaxonomyReview | null
 }
 
 // --- Create Wizard State ---
@@ -263,14 +275,44 @@ const expectedOverwritePhrase = computed(() => {
   return `OVERWRITE ${importParseResult.value.routePath}`
 })
 
+const importAvailableCategories = computed(() => {
+  const section = importParseResult.value?.section || importParseResult.value?.frontmatter?.section || ''
+  return CATEGORY_MAP[section] || []
+})
+
+const importValidationErrors = computed(() => {
+  if (!importParseResult.value) return [] as string[]
+  const category = importParseResult.value.frontmatter?.category
+  const hasValidManualCategory = typeof category === 'string' && importAvailableCategories.value.includes(category)
+
+  return importParseResult.value.errors.filter((err) => {
+    if (!hasValidManualCategory) return true
+    return err !== 'category is required' && !/^category ".+" is not valid for section/.test(err)
+  })
+})
+
 const canSaveImport = computed(() => {
   if (!importParseResult.value) return false
-  if (importParseResult.value.errors.length > 0) return false
+  if (importValidationErrors.value.length > 0) return false
   if (importParseResult.value.exists) {
     return importOverwritePhrase.value.trim() === expectedOverwritePhrase.value
   }
   return true
 })
+
+function refreshImportFrontmatterPreview() {
+  importFrontmatterPreview.value = JSON.stringify(importParseResult.value?.frontmatter || {}, null, 2)
+}
+
+function setImportCategory(category: string) {
+  if (!importParseResult.value) return
+  importParseResult.value.frontmatter.category = category
+  if (importParseResult.value.taxonomyReview) {
+    importParseResult.value.taxonomyReview.normalizedCategory = category
+    importParseResult.value.taxonomyReview.reviewNeeded = !category
+  }
+  refreshImportFrontmatterPreview()
+}
 
 async function parseImportMarkdown() {
   importParseError.value = ''
@@ -295,7 +337,7 @@ async function parseImportMarkdown() {
 
     importParseResult.value = res.result
     importBodyPreview.value = res.result.body
-    importFrontmatterPreview.value = JSON.stringify(res.result.frontmatter, null, 2)
+    refreshImportFrontmatterPreview()
   } catch (e: any) {
     importParseError.value = e?.data?.message || e?.data?.statusMessage || e?.message || 'Failed to parse markdown'
   } finally {
@@ -1190,10 +1232,32 @@ async function saveEntry() {
               </div>
             </div>
 
-            <div v-if="importParseResult.errors.length" class="validation-panel errors">
+            <div v-if="importParseResult.taxonomyReview" class="taxonomy-review-box">
+              <h4>Taxonomy Review</h4>
+              <p>{{ importParseResult.taxonomyReview.message }}</p>
+              <div class="taxonomy-review-grid">
+                <div><strong>Imported category:</strong> <code>{{ importParseResult.taxonomyReview.originalCategory }}</code></div>
+                <div><strong>Site category:</strong> <code>{{ importParseResult.frontmatter.category || '(choose below)' }}</code></div>
+                <div><strong>Preserved field:</strong> <code>{{ importParseResult.taxonomyReview.typeField }}</code></div>
+                <div><strong>Preserved value:</strong> <code>{{ importParseResult.frontmatter[importParseResult.taxonomyReview.typeField] || importParseResult.taxonomyReview.preservedTypeValue }}</code></div>
+              </div>
+              <div class="form-group full-width">
+                <label>Override Site Category</label>
+                <select
+                  :value="importParseResult.frontmatter.category || ''"
+                  @change="setImportCategory(($event.target as HTMLSelectElement).value)"
+                >
+                  <option value="">Choose valid site category...</option>
+                  <option v-for="cat in importAvailableCategories" :key="cat" :value="cat">{{ cat }}</option>
+                </select>
+                <small>Site category controls public filter tabs. The imported canon label remains in the preserved type field.</small>
+              </div>
+            </div>
+
+            <div v-if="importValidationErrors.length" class="validation-panel errors">
               <h4>❌ Import Errors</h4>
               <ul>
-                <li v-for="err in importParseResult.errors" :key="err">{{ err }}</li>
+                <li v-for="err in importValidationErrors" :key="err">{{ err }}</li>
               </ul>
             </div>
 
@@ -1440,6 +1504,25 @@ async function saveEntry() {
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
+}
+
+.taxonomy-review-box {
+  padding: 0.75rem;
+  border: 1px solid #d9c27a;
+  background: #fff8df;
+  color: #5f4300;
+  border-radius: 4px;
+}
+
+.taxonomy-review-box h4 {
+  margin: 0 0 0.45rem;
+}
+
+.taxonomy-review-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem 0.8rem;
+  margin: 0.6rem 0;
 }
 
 .preview-group code {

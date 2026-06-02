@@ -6,6 +6,8 @@ const BASE_URL = process.env.EDITOR_QA_BASE_URL || 'http://localhost:3000'
 const ROOT = process.cwd()
 const TEMP_ROUTE = '/glossary/stage-8l-qa-temp-entry'
 const TEMP_FILE = join(ROOT, 'content', 'glossary', 'stage-8l-qa-temp-entry.md')
+const TAXONOMY_TEMP_ROUTE = '/world/haoran-heaven'
+const TAXONOMY_TEMP_FILE = join(ROOT, 'content', 'world', 'haoran-heaven.md')
 
 const results = []
 
@@ -54,12 +56,17 @@ async function status(path) {
   }
 }
 
-async function cleanupTemp() {
+async function cleanupRoute(route, file) {
   try {
-    await jsonFetch('/api/editor/entry', { method: 'DELETE', body: { path: TEMP_ROUTE } })
+    await jsonFetch('/api/editor/entry', { method: 'DELETE', body: { path: route } })
   } catch {
-    if (existsSync(TEMP_FILE)) await rm(TEMP_FILE, { force: true })
+    if (existsSync(file)) await rm(file, { force: true })
   }
+}
+
+async function cleanupTemp() {
+  await cleanupRoute(TEMP_ROUTE, TEMP_FILE)
+  await cleanupRoute(TAXONOMY_TEMP_ROUTE, TAXONOMY_TEMP_FILE)
 }
 
 function editorApiFiles() {
@@ -132,8 +139,66 @@ async function main() {
   assert('delete creates backup before removal', Boolean(deleted.backup && existsSync(join(ROOT, deleted.backup))))
   assert('temporary QA entry is removed', !existsSync(TEMP_FILE))
 
+  const taxonomyMarkdown = [
+    '---',
+    'title: Haoran Heaven',
+    'chinese: 浩然天下',
+    'pinyin: Hao Ran Tian Xia',
+    'section: world',
+    'category: Heaven',
+    'locationType: Heaven',
+    'status: published',
+    'importance: primary',
+    'verificationStatus: verified',
+    'image: ""',
+    'banner: ""',
+    'video: ""',
+    'seal: 浩',
+    'description: One of the primary worlds in the universe.',
+    'tags:',
+    '  - haoran-heaven',
+    'related:',
+    '  - /world/sword-qi-great-wall',
+    'sourceNotes: Test taxonomy normalization.',
+    'firstAppearance: ""',
+    'lastUpdated: 2026-06-02',
+    '---',
+    '## Overview',
+    '',
+    'Test body.',
+    '',
+    '## References',
+    '',
+    '- **Source reference needed:** Supports test import only.',
+    '',
+  ].join('\n')
+
+  const parsedTaxonomy = await jsonFetch('/api/editor/import-markdown', {
+    method: 'POST',
+    body: { mode: 'parse', markdown: taxonomyMarkdown },
+  })
+  assert('Haoran taxonomy maps Heaven to World', parsedTaxonomy.result.frontmatter.category === 'World')
+  assert('Haoran taxonomy preserves locationType', parsedTaxonomy.result.frontmatter.locationType === 'Heaven')
+  assert('Haoran taxonomy warning is returned', parsedTaxonomy.result.warnings.some((warning) => warning.includes('Mapped imported category "Heaven"')))
+  assert('Haoran taxonomy review payload is returned', parsedTaxonomy.result.taxonomyReview?.originalCategory === 'Heaven')
+
+  await jsonFetch('/api/editor/import-markdown', {
+    method: 'POST',
+    body: {
+      mode: 'save',
+      path: parsedTaxonomy.result.routePath,
+      frontmatter: parsedTaxonomy.result.frontmatter,
+      body: parsedTaxonomy.result.body,
+    },
+  })
+  assert('Haoran taxonomy temp file created', existsSync(TAXONOMY_TEMP_FILE))
+
+  await cleanupRoute(TAXONOMY_TEMP_ROUTE, TAXONOMY_TEMP_FILE)
+  assert('Haoran taxonomy temp file removed', !existsSync(TAXONOMY_TEMP_FILE))
+
   const entries = await jsonFetch('/api/editor/entries')
   assert('temporary QA entry not listed after cleanup', !entries.some((entry) => entry.routePath === TEMP_ROUTE))
+  assert('Haoran taxonomy temp entry not listed after cleanup', !entries.some((entry) => entry.routePath === TAXONOMY_TEMP_ROUTE))
 
   const failed = results.filter((result) => result.status === 'FAIL')
   console.table(results)
