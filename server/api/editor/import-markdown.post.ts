@@ -11,6 +11,8 @@ import {
   resolveEntryPath,
   slugifyTitle,
   validateCreateSlug,
+  EDITOR_RELATIONSHIP_PATH_FIELDS,
+  validateEditorRelationshipPath,
 } from '../../utils/editor'
 
 type Mode = 'parse' | 'save'
@@ -102,6 +104,32 @@ async function buildParseResult(frontmatter: Record<string, any>, body: string):
   if (Array.isArray(tags)) {
     const hasInvalidTag = tags.some((t) => typeof t === 'string' && !/^[a-z0-9-]+$/.test(t))
     if (hasInvalidTag) warnings.push('Tags should be lowercase and hyphenated')
+  }
+
+  for (const field of EDITOR_RELATIONSHIP_PATH_FIELDS) {
+    const val = frontmatter[field]
+    if (!val) continue
+    const paths = Array.isArray(val) ? val : [val]
+    for (const p of paths) {
+      if (typeof p !== 'string') continue
+      errors.push(...validateEditorRelationshipPath(field, p))
+    }
+  }
+
+  if (Array.isArray(frontmatter.entries)) {
+    frontmatter.entries.forEach((row: any, idx: number) => {
+      const link = typeof row?.link === 'string' ? row.link : ''
+      if (!link.trim()) return
+      errors.push(...validateEditorRelationshipPath(`entries[${idx}].link`, link))
+    })
+  }
+
+  if (Array.isArray(frontmatter.relationships)) {
+    frontmatter.relationships.forEach((row: any, idx: number) => {
+      const link = typeof row?.link === 'string' ? row.link : ''
+      if (!link.trim()) return
+      errors.push(...validateEditorRelationshipPath(`relationships[${idx}].link`, link))
+    })
   }
 
   if (body.trim().startsWith('# ')) {

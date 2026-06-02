@@ -32,6 +32,53 @@ export type EditorSection = (typeof EDITOR_SECTIONS)[number]
 export const IMPORTANCE_VALUES = ['primary', 'major', 'minor', 'background'] as const
 export const VERIFICATION_VALUES = ['verified', 'to-be-verified', 'disputed', 'speculative'] as const
 
+export const EDITOR_RELATIONSHIP_PATH_FIELDS = [
+  'related',
+  'affiliations',
+  'members',
+  'leader',
+  'headquarters',
+  'location',
+  'owners',
+  'users',
+  'practitioners',
+  'participants',
+  'relatedFactions',
+  'inhabitants',
+  'governingFaction',
+  'parentLocation',
+] as const
+
+export function validateEditorRelationshipPath(label: string, rawPath: string): string[] {
+  const errors: string[] = []
+  const path = rawPath.trim()
+
+  if (!path) return errors
+
+  if (path.includes('..') || path.includes('\0') || path.includes('\\')) {
+    errors.push(`${label}: Path "${path}" contains invalid traversal characters`)
+  }
+
+  if (!path.startsWith('/')) {
+    errors.push(`${label}: Path "${path}" must start with /`)
+  }
+
+  if (path.startsWith('/titles')) {
+    errors.push(`${label}: Path "${path}" points to internal /titles section`)
+  }
+
+  if (path.startsWith('/_') || path.includes('/_')) {
+    errors.push(`${label}: Path "${path}" points to internal partial`)
+  }
+
+  const segments = path.split('/').filter(Boolean)
+  if (segments.length !== 2) {
+    errors.push(`${label}: Path "${path}" must be /section/slug`)
+  }
+
+  return errors
+}
+
 /** Valid category list for a section, from the static section metadata mirror. */
 export function categoriesForSection(section: string): string[] {
   return SECTION_META[section]?.categories ?? []

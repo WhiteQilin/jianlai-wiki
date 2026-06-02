@@ -593,32 +593,55 @@ const validationWarnings = computed(() => {
     if (hasInvalidTag) warns.push('Tags should be lowercase and hyphenated')
   }
 
+  function warnRelationshipPath(label: string, path: string) {
+    const p = path.trim()
+    if (!p) return
+
+    if (p.includes('..') || p.includes('\\') || p.includes('\0')) warns.push(`${label}: Path "${p}" contains invalid traversal characters`)
+    if (!p.startsWith('/')) warns.push(`${label}: Path "${p}" must start with /`)
+    if (p.startsWith('/titles')) warns.push(`${label}: Path "${p}" points to internal /titles section`)
+    if (p.startsWith('/_') || p.includes('/_')) warns.push(`${label}: Path "${p}" points to internal partial`)
+
+    const segments = p.split('/').filter(Boolean)
+    if (segments.length !== 2) warns.push(`${label}: Path "${p}" should be /section/slug`)
+
+    // Check if it exists in entries list. Ghost links remain allowed, but visible.
+    if (entries.value && !entries.value.some(e => e.routePath === p)) {
+      warns.push(`${label}: Path "${p}" does not exist yet (Ghost Link)`)
+    }
+  }
+
   // Relationship validation warnings
-  const relFields = ['related', 'affiliations', 'members', 'leader', 'headquarters', 'location', 'owners', 'users', 'practitioners', 'relatedFactions', 'participants', 'inhabitants']
+  const relFields = [
+    'related',
+    'affiliations',
+    'members',
+    'leader',
+    'headquarters',
+    'location',
+    'owners',
+    'users',
+    'practitioners',
+    'participants',
+    'relatedFactions',
+    'inhabitants',
+    'governingFaction',
+    'parentLocation',
+  ]
   for (const field of relFields) {
     const val = editForm.value[field]
     if (!val) continue
     const paths = Array.isArray(val) ? val : [val]
     for (const p of paths) {
       if (typeof p !== 'string') continue
-      if (!p.startsWith('/')) warns.push(`${field}: Path "${p}" must start with /`)
-      if (p.startsWith('/titles')) warns.push(`${field}: Path "${p}" points to internal /titles section`)
-      if (p.startsWith('/_')) warns.push(`${field}: Path "${p}" points to internal partial`)
-
-      // Check if it exists in entries list
-      if (entries.value && !entries.value.some(e => e.routePath === p)) {
-        warns.push(`${field}: Path "${p}" does not exist yet (Ghost Link)`)
-      }
+      warnRelationshipPath(field, p)
     }
   }
 
   if (Array.isArray(fm.relationships)) {
     fm.relationships.forEach((row: any, idx: number) => {
       const link = typeof row?.link === 'string' ? row.link : ''
-      if (!link) return
-      if (!link.startsWith('/')) warns.push(`relationships[${idx}]: link must start with /`)
-      if (link.startsWith('/titles')) warns.push(`relationships[${idx}]: link points to internal /titles section`)
-      if (link.startsWith('/_')) warns.push(`relationships[${idx}]: link points to internal partial`)
+      warnRelationshipPath(`relationships[${idx}].link`, link)
     })
   }
 
@@ -629,10 +652,10 @@ const validationWarnings = computed(() => {
         warns.push(`entries[${idx}]: rank is recommended for ordered rankings`)
       }
       const link = typeof row?.link === 'string' ? row.link : ''
-      if (!link) {
+      if (!link.trim()) {
         warns.push(`entries[${idx}]: link is blank (allowed unresolved/manual entry)`)
-      } else if (!link.startsWith('/')) {
-        warns.push(`entries[${idx}]: link should be /section/slug when present`)
+      } else {
+        warnRelationshipPath(`entries[${idx}].link`, link)
       }
     })
   }
