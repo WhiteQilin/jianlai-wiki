@@ -27,14 +27,20 @@ export const HOME_HERO_VIDEOS = [
 ] as const
 
 export function getMediaUrl(path: string): string {
+  // If the path is already an absolute URL, return it unchanged to avoid
+  // double-prefixing the media base URL (e.g. media.jianlai.wiki/https://...)
+  if (/^https?:\/\//i.test(path)) {
+    return path
+  }
+
   const config = useRuntimeConfig()
-  const baseUrl = config.public.mediaBaseUrl as string
+  // Trim to guard against accidental whitespace in the env var value
+  const baseUrl = (config.public.mediaBaseUrl as string)?.trim()
   if (!baseUrl) return path
-  
+
   // Ensure no double slashes if baseUrl has trailing slash and path has leading slash
   const cleanBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl
   const cleanPath = path.startsWith('/') ? path : `/${path}`
-  
+
   return `${cleanBase}${cleanPath}`
 }
-
