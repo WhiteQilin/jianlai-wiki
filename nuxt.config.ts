@@ -1,5 +1,10 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  runtimeConfig: {
+    public: {
+      mediaBaseUrl: process.env.NUXT_PUBLIC_MEDIA_BASE_URL || '',
+    }
+  },
   modules: [
     '@nuxt/content',
     '@nuxt/image',

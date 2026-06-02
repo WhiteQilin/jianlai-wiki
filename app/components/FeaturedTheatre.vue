@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import VideoEmbed from './VideoEmbed.vue'
+import { getMediaUrl } from '~/constants/homeHeroVideos'
 
 const featuredVideo = {
   id: 'fight-scene',
@@ -56,14 +58,14 @@ const supportingVideos = [
       >
         <article class="video-card featured-card hover-lift">
           <VideoEmbed
-            :video="featuredVideo.url"
+            :video="getMediaUrl(featuredVideo.url)"
             :poster="featuredVideo.poster"
             :isOfficial="true"
             :ratio="featuredVideo.ratio"
             :fit="featuredVideo.fit"
             :background="featuredVideo.bg"
             controlsVariant="hero"
-            fallbackVideo="/videos/curated/home-hero-04.mp4"
+            :fallbackVideo="getMediaUrl('/videos/curated/home-hero-04.mp4')"
           />
           <div class="card-content">
             <span class="card-eyebrow">{{ featuredVideo.eyebrow }}</span>
@@ -83,14 +85,14 @@ const supportingVideos = [
         >
           <article class="video-card supporting-card hover-lift">
             <VideoEmbed
-              :video="video.url"
+              :video="getMediaUrl(video.url)"
               :poster="video.poster"
               :isOfficial="true"
               :ratio="video.ratio"
               :fit="video.fit"
               :background="video.bg"
               controlsVariant="rail"
-              fallbackVideo="/videos/curated/home-hero-04.mp4"
+              :fallbackVideo="getMediaUrl('/videos/curated/home-hero-04.mp4')"
             />
             <div class="card-content">
               <span class="card-eyebrow">{{ video.eyebrow }}</span>

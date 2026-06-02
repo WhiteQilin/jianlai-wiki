@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { HOME_HERO_VIDEOS } from '~/constants/homeHeroVideos'
+import { onMounted, ref, computed } from 'vue'
+import { HOME_HERO_VIDEOS, getMediaUrl } from '~/constants/homeHeroVideos'
 import { pickRandomHeroVideo } from '~/composables/useRandomHeroVideo'
 
 const defaultHeroVideo = '/videos/curated/home-hero-04.mp4'
 const heroVideo = ref(defaultHeroVideo)
+const heroVideoUrl = computed(() => getMediaUrl(heroVideo.value))
 const heroCandidates = [...HOME_HERO_VIDEOS]
 const activeCandidates = ref<string[]>([])
 
@@ -69,7 +70,7 @@ const spotlightItems = [
 <template>
   <div class="home-archive">
     <HeroMedia
-      :video="heroVideo"
+      :video="heroVideoUrl"
       image="/images/banners/home-hero.webp"
       alt="Jian Lai Official Animation Key Visual"
       credit="Tencent Video / Jian Lai Animation"

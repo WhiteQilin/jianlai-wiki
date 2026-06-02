@@ -3,7 +3,7 @@
    The official Jian Lai logo image is never affected by this font. */
 @font-face {
   font-family: 'HYDiShengHero';
-  src: url('/fonts/汉仪迪升英雄体W.TTF') format('truetype');
+  src: url('https://media.jianlai.wiki/fonts/production/汉仪迪升英雄体W.TTF') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;

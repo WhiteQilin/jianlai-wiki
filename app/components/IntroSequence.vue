@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { getMediaUrl } from '~/constants/homeHeroVideos'
 
 const isPlaying = ref(true)
+const videoUrl = computed(() => getMediaUrl('/videos/curated/intro-logo.mp4'))
 
 const closeIntro = () => {
   isPlaying.value = false
@@ -36,7 +38,7 @@ onMounted(() => {
         oncontextmenu="return false;"
         @ended="closeIntro"
       >
-        <source src="/videos/curated/intro-logo.mp4" type="video/mp4" />
+        <source :src="videoUrl" type="video/mp4" />
       </video>
       
       <div class="intro-overlay"></div>
