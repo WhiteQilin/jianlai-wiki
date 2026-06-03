@@ -22,6 +22,7 @@ practitioners:
 related:
   - /cultivation/qi-refiner
   - /cultivation/pure-martial-artist
+  - /cultivation/upper-five-realms
   - /artifacts/natal-flying-sword
   - /world/sword-qi-great-wall
 sourceNotes: >

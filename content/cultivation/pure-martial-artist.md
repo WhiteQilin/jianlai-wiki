@@ -22,6 +22,7 @@ practitioners:
   - /characters/lin-jiangxian
 related:
   - /cultivation/qi-refiner
+  - /cultivation/upper-five-realms
 sourceNotes: >
   Realms 1-3 detailed in Volume 1, Chapter 7. Realms 1-10 detailed comprehensively in Volume 46, Chapter 6. 11th Realm and origins detailed in Volume 26, Chapter 6 and Volume 51, Chapter 9.
 ---

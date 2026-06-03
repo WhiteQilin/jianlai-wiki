@@ -12,7 +12,6 @@ banner: ""
 seal: 谷
 description: A denomination of Immortal Money, the spiritual currency used by cultivators in the world of Jian Lai.
 termType: Currency
-denominations: []
 relatedTerms: []
 tags:
   - immortal-money

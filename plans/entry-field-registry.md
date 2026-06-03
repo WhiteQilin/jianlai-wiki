@@ -748,6 +748,20 @@ Early entries routinely ship with empty media. This is **expected and non-blocki
 
 ---
 
+## Stage 13D Addendum — Taxonomy Decisions (Content Graph QA)
+
+The open questions from Stage 13B/13C were resolved during the Stage 13D content-graph
+audit. These are conventions, not schema changes — all fields remain optional/additive.
+
+| Question | Decision |
+|---|---|
+| Should `denominations` be routed pages or inline strings? | **Routed pages are the preferred standard** when a denomination is meaningful enough to describe (as done for snowflake/grain-rain/golden-essence copper coins). The field stays free-string-tolerant for quick stubs, but the convention is: if it earns a `denominations` slot, give it a real `/glossary/...` page and reciprocal `related` links. |
+| Should `region` stay free text? | **Yes — `region` remains free text** until a routed `/world/...` entry exists for the place. When such an entry is created, the editor should migrate the value into `headquarters` (or a relationship field) and clear/keep `region` as prose context. No automatic promotion. |
+| How to model Dragon Spring County as the successor of Lizhu Grotto-Heaven? | **Use `parentLocation` + prose**, not a new relationship type. The successor/continuation relationship is expressed by pointing `parentLocation` at the predecessor and explaining the "became / was reorganized as" history in the body. A dedicated temporal "succeeds" relation is explicitly deferred as not worth the schema weight yet. |
+| Are both `contains` and `storedItems` needed? | **`contains` is the preferred field; `storedItems` is retained only as an optional alias.** Authors should default to `contains`. `storedItems` stays in the registry for import compatibility but should not be populated redundantly alongside `contains`. |
+
+---
+
 ## Appendix — Field Naming Conventions
 
 - **Slugs:** lowercase, hyphenated, ASCII (e.g. `sword-qi-great-wall`). File name = slug = route segment.

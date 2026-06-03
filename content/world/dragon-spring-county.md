@@ -16,14 +16,17 @@ governingFaction: /factions/great-li-dynasty
 parentLocation: /world/lizhu-grotto-heaven
 inhabitants:
   - /characters/chen-pingan
+  - /characters/ruan-qiong
 tags:
   - great-li-dynasty
   - lizhu-grotto-heaven
   - dragon-spring-county
+  - ruan-qiong
 related:
   - /world/lizhu-grotto-heaven
   - /factions/great-li-dynasty
   - /characters/chen-pingan
+  - /characters/ruan-qiong
 verificationStatus: to-be-verified
 sourceNotes: >
   After the Lizhu Grotto-Heaven shattered and descended, its territory was integrated

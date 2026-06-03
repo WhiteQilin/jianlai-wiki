@@ -12,7 +12,6 @@ banner: ""
 seal: 金
 description: A high-value denomination of Immortal Money used in the cultivation economy of Jian Lai, notably consumed when upgrading certain treasures.
 termType: Currency
-denominations: []
 relatedTerms: []
 tags:
   - immortal-money
