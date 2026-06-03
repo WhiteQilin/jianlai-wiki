@@ -16,6 +16,8 @@ tier: ""
 origin: ""
 owners:
   - /characters/chen-pingan
+contains:
+  - Flying swords (stored and nurtured within the vessel)
 tags:
   - sword-nurturing-gourd
   - flying-sword

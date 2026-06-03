@@ -13,6 +13,7 @@ seal: 风
 description: A prominent sword-cultivation sect known for its martial reputation within the cultivation world of Jian Lai.
 factionType: Sword-Cultivation Sect
 headquarters: ""
+region: ""
 leader: ""
 members: []
 teachings: []

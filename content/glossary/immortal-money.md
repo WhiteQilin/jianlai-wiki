@@ -12,16 +12,20 @@ banner: ""
 seal: 钱
 description: The umbrella term for the spiritual currencies used by cultivators across the cultivation world of Jian Lai.
 termType: Currency
-relatedTerms:
-  - snowflake-coin
-  - grain-rain-coin
-  - golden-essence-copper-coin
+denominations:
+  - /glossary/snowflake-coin
+  - /glossary/grain-rain-coin
+  - /glossary/golden-essence-copper-coin
+relatedTerms: []
 tags:
   - immortal-money
   - currency
   - economy
 related:
   - /glossary/natal-porcelain
+  - /glossary/snowflake-coin
+  - /glossary/grain-rain-coin
+  - /glossary/golden-essence-copper-coin
   - /artifacts/moon-in-the-well
 verificationStatus: to-be-verified
 sourceNotes: >
