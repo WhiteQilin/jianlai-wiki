@@ -15,6 +15,7 @@ import {
   validateEditorRelationshipPath,
 } from '../../utils/editor'
 import { normalizeImportedTaxonomy, type TaxonomyNormalizationReview } from '../../utils/taxonomy'
+import { normalizeImportedFields } from '../../utils/importNormalize'
 
 type Mode = 'parse' | 'save'
 
@@ -24,6 +25,12 @@ interface ImportPayload {
   path?: string
   frontmatter?: Record<string, any>
   body?: string
+}
+
+interface ImportFieldReview {
+  normalizedNullFields: string[]
+  normalizedRelationships: boolean
+  relationshipsConvertedCount: number
 }
 
 interface ImportResult {
@@ -38,6 +45,7 @@ interface ImportResult {
   warnings: string[]
   hasReferences: boolean
   taxonomyReview: TaxonomyNormalizationReview | null
+  importReview: ImportFieldReview
 }
 
 function asString(value: unknown): string {
@@ -59,9 +67,13 @@ function splitMarkdown(markdown: string): { frontmatterText: string; body: strin
 
 async function buildParseResult(frontmatter: Record<string, any>, body: string): Promise<ImportResult> {
   const taxonomy = normalizeImportedTaxonomy(frontmatter)
-  const normalizedFrontmatter = taxonomy.frontmatter
+  // Stage 13F: coerce null optional fields and normalize legacy relationship
+  // string arrays to schema-correct objects BEFORE validation. Unknown/custom
+  // fields are preserved untouched.
+  const fieldReview = normalizeImportedFields(taxonomy.frontmatter)
+  const normalizedFrontmatter = fieldReview.frontmatter
   const errors: string[] = []
-  const warnings: string[] = [...taxonomy.warnings]
+  const warnings: string[] = [...taxonomy.warnings, ...fieldReview.warnings]
 
   const title = asString(normalizedFrontmatter.title).trim()
   const chinese = asString(normalizedFrontmatter.chinese).trim()
@@ -180,6 +192,11 @@ async function buildParseResult(frontmatter: Record<string, any>, body: string):
     warnings,
     hasReferences,
     taxonomyReview: taxonomy.review,
+    importReview: {
+      normalizedNullFields: fieldReview.normalizedNullFields,
+      normalizedRelationships: fieldReview.normalizedRelationships,
+      relationshipsConvertedCount: fieldReview.relationshipsConvertedCount,
+    },
   }
 }
 

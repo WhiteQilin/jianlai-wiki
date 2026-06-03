@@ -241,6 +241,116 @@ async function main() {
   assert('Haoran taxonomy warning is returned', parsedTaxonomy.result.warnings.some((warning) => warning.includes('Mapped imported category "Heaven"')))
   assert('Haoran taxonomy review payload is returned', parsedTaxonomy.result.taxonomyReview?.originalCategory === 'Heaven')
 
+  // ---------------------------------------------------------------------------
+  // Stage 13F: NotebookLM import coercion (parse-only; no file writes).
+  // ---------------------------------------------------------------------------
+
+  // Fixture A: null optional fields + an unknown custom field that must survive.
+  const nullOptionalsMarkdown = [
+    '---',
+    'title: Stage 13F Null Optionals',
+    'chinese: 空值测试',
+    'pinyin: null',
+    'section: factions',
+    'category: Sect',
+    'description: NotebookLM emits null for empty optional fields.',
+    'importance: minor',
+    'verificationStatus: to-be-verified',
+    'region:',
+    'sourceNotes: null',
+    'firstAppearance:',
+    'tags:',
+    'related:',
+    'members:',
+    'leader:',
+    'customLore: keep-me-please',
+    '---',
+    '## Overview',
+    '',
+    'Body.',
+    '',
+  ].join('\n')
+
+  const parsedNulls = await jsonFetch('/api/editor/import-markdown', {
+    method: 'POST',
+    body: { mode: 'parse', markdown: nullOptionalsMarkdown },
+  })
+  const nullsFm = parsedNulls.result.frontmatter
+  assert('Stage 13F null string field (region) coerced to ""', nullsFm.region === '')
+  assert('Stage 13F null string field (sourceNotes) coerced to ""', nullsFm.sourceNotes === '')
+  assert('Stage 13F null string field (pinyin) coerced to ""', nullsFm.pinyin === '')
+  assert('Stage 13F null string field (firstAppearance) coerced to ""', nullsFm.firstAppearance === '')
+  assert('Stage 13F null array field (tags) coerced to []', Array.isArray(nullsFm.tags) && nullsFm.tags.length === 0)
+  assert('Stage 13F null array field (related) coerced to []', Array.isArray(nullsFm.related) && nullsFm.related.length === 0)
+  assert('Stage 13F null array field (members) coerced to []', Array.isArray(nullsFm.members) && nullsFm.members.length === 0)
+  assert('Stage 13F null union field (leader) coerced to ""', nullsFm.leader === '')
+  assert('Stage 13F unknown/custom field (customLore) preserved', nullsFm.customLore === 'keep-me-please')
+  assert(
+    'Stage 13F null-coercion warning is returned',
+    parsedNulls.result.warnings.some((w) => w.includes('Converted null optional fields')),
+    `warnings=${JSON.stringify(parsedNulls.result.warnings)}`,
+  )
+  assert(
+    'Stage 13F import review reports normalized null fields',
+    Array.isArray(parsedNulls.result.importReview?.normalizedNullFields) &&
+      parsedNulls.result.importReview.normalizedNullFields.includes('region'),
+  )
+
+  // Fixture B: string-array relationships → structured { name, relation, link }.
+  const relStringsMarkdown = [
+    '---',
+    'title: Stage 13F Rel Strings',
+    'chinese: 关系测试',
+    'pinyin: Guan Xi',
+    'section: characters',
+    'category: Character',
+    'description: NotebookLM emits relationships as plain string arrays.',
+    'importance: minor',
+    'verificationStatus: to-be-verified',
+    'relationships:',
+    '  - /characters/cui-chan',
+    '  - Old Scholar',
+    'customAside: also-keep-me',
+    '---',
+    '## Overview',
+    '',
+    'Body.',
+    '',
+  ].join('\n')
+
+  const parsedRels = await jsonFetch('/api/editor/import-markdown', {
+    method: 'POST',
+    body: { mode: 'parse', markdown: relStringsMarkdown },
+  })
+  const relsFm = parsedRels.result.frontmatter
+  const rels = relsFm.relationships
+  assert('Stage 13F relationships normalized to object array', Array.isArray(rels) && rels.length === 2)
+  assert(
+    'Stage 13F path-like relationship infers name + link',
+    rels?.[0]?.name === 'Cui Chan' && rels?.[0]?.link === '/characters/cui-chan' && rels?.[0]?.relation === '',
+    `row0=${JSON.stringify(rels?.[0])}`,
+  )
+  assert(
+    'Stage 13F plain-text relationship uses text as name with empty link',
+    rels?.[1]?.name === 'Old Scholar' && rels?.[1]?.link === '' && rels?.[1]?.relation === '',
+    `row1=${JSON.stringify(rels?.[1])}`,
+  )
+  assert(
+    'Stage 13F normalized relationships are schema-safe (every row has string name)',
+    Array.isArray(rels) && rels.every((r) => r && typeof r.name === 'string' && r.name.length > 0),
+  )
+  assert('Stage 13F relationship-string custom field preserved', relsFm.customAside === 'also-keep-me')
+  assert(
+    'Stage 13F relationship-conversion warning is returned',
+    parsedRels.result.warnings.some((w) => w.includes('Converted relationship string array')),
+    `warnings=${JSON.stringify(parsedRels.result.warnings)}`,
+  )
+  assert(
+    'Stage 13F import review reports relationship conversion count',
+    parsedRels.result.importReview?.normalizedRelationships === true &&
+      parsedRels.result.importReview?.relationshipsConvertedCount === 2,
+  )
+
   await jsonFetch('/api/editor/import-markdown', {
     method: 'POST',
     body: {

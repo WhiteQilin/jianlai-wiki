@@ -198,6 +198,31 @@ New public categories should be added manually and intentionally in both runtime
 
 ---
 
+## 6.5 NotebookLM Import Coercion (Stage 13F)
+
+NotebookLM frequently emits two shapes that do not match the content schema. The import parser now normalizes both automatically before validation, so future imports need less manual cleanup. Normalization only touches recognized schema fields; unknown/custom fields are always preserved untouched.
+
+**Null optional fields.** NotebookLM writes empty optional fields as YAML `null` (e.g. `region:` or `sourceNotes: null`). The parser coerces these to schema-safe empties:
+
+- string-like optional fields: `null` → `""` (e.g. `pinyin`, `region`, `sourceNotes`, `firstAppearance`, `lastUpdated`).
+- array-like optional fields: `null` → `[]` (e.g. `tags`, `related`, `members`, `affiliations`, `relationships`, `entries`).
+- number optional fields: `null` → field omitted (no fabricated `0`; e.g. `realmLevel`, `eraOrder`).
+- `leader` (string or string array): `null` → `""`.
+
+The preview shows the warning **"Converted null optional fields to safe empties"** listing exactly which fields were normalized.
+
+**Legacy string-array relationships.** NotebookLM often emits `relationships` as a plain string array instead of `{ name, relation, link }` objects. The parser converts each string element:
+
+- path-like (`/section/slug`): becomes `{ name: <inferred from slug>, relation: "", link: <path> }`. For example `/characters/cui-chan` → `{ name: "Cui Chan", relation: "", link: "/characters/cui-chan" }`.
+- plain text (not path-like): becomes `{ name: <text>, relation: "", link: "" }`.
+- existing object rows (already have a `name`) are left unchanged.
+
+The preview shows the warning **"Converted relationship string array to structured relationships"** with the converted item count.
+
+Other fields are deliberately not over-normalized: ranking `entries[]` string arrays are not auto-structured (rank/name/link must be authored), and `related`/`affiliations`/path arrays stay arrays. Always review the preview warnings before saving.
+
+---
+
 ## 7. Edit Frontmatter
 
 Open an entry and edit the form fields.
@@ -391,6 +416,9 @@ The `.gitignore` already excludes these local/build/backup paths and raw media a
 - References parsing supports known structured formats and preserves unknown lines as raw text.
 - Validation is strong enough for MVP safety but is not a full replacement for build verification.
 - The local delete endpoint exists only for dev/test cleanup and should not become a public moderation/delete system.
+- NotebookLM import coercion (Stage 13F) does not auto-structure ranking `entries[]` string arrays; rank/name/link must be authored manually.
+- Inferred relationship names come from the slug in Title Case; proper/Chinese names may need manual correction, and `relation` is always left empty for converted strings.
+- Null number fields are omitted rather than defaulted, so any display that expects a value must be filled in by the editor.
 
 ---
 
