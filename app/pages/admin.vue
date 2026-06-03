@@ -58,7 +58,9 @@ const { data: selectedEntry, pending: entryPending } = await useFetch<any>(() =>
 
 // --- Preview / UX polish state ---
 const previewNonce = ref(0)
-const showPreviewPanel = ref(true)
+const rightActiveTab = ref<'card' | 'preview' | 'validation'>('card')
+const previewViewportMode = ref<'desktop' | 'tablet' | 'mobile'>('desktop')
+const isFullscreenPreview = ref(false)
 const importSuccess = ref<null | {
   action: 'created' | 'updated'
   routePath: string
@@ -886,58 +888,59 @@ async function saveEntry() {
       </table>
     </div>
 
-    <div v-else class="editor-view">
-      <div class="editor-header">
-        <h2>Editing: {{ selectedEntry?.routePath }}</h2>
-        <div class="header-actions">
-          <span class="save-state" :class="canSave ? 'ok' : 'blocked'">
-            {{ canSave ? 'Can save' : 'Cannot save' }}
+    <div v-else class="workspace-root" :class="{ 'fullscreen-preview-active': isFullscreenPreview }">
+      <header class="workspace-header-sticky">
+        <div class="header-meta-block">
+          <span class="editing-tag">Editing</span>
+          <h2>{{ selectedEntry?.routePath || selectedEntryPath }}</h2>
+          <small class="route-slug-sub">Private local workspace · schema-preserving Markdown editor</small>
+        </div>
+
+        <div class="header-action-cluster">
+          <span class="status-badge" :class="canSave ? 'ready' : 'invalid'">
+            {{ canSave ? 'Ready to save' : 'Fix required fields' }}
           </span>
-          <button @click="openPublicPage" class="create-btn" :disabled="!previewRoute">Open Public Page</button>
-          <button @click="refreshPreview" class="create-btn" :disabled="!previewRoute">Refresh Preview</button>
-          <button @click="openMediaLibrary" class="create-btn">Media Library</button>
-          <button @click="saveEntry" class="save-btn" :disabled="isSaving || !canSave">
+          <button @click="openPublicPage" class="workspace-btn" :disabled="!previewRoute">Open Public Page</button>
+          <button @click="refreshPreview" class="workspace-btn" :disabled="!previewRoute">Refresh Preview</button>
+          <button @click="openMediaLibrary" class="workspace-btn assets-trigger">Media Library</button>
+          <button @click="saveEntry" class="workspace-btn save-trigger" :disabled="isSaving || !canSave">
             {{ isSaving ? 'Saving...' : 'Save Changes' }}
           </button>
-          <button @click="closeEditor" class="close-btn">Discard & Back</button>
+          <button @click="closeEditor" class="workspace-btn cancel-trigger">Discard & Back</button>
         </div>
-      </div>
+      </header>
 
       <div v-if="entryPending" class="loading">Loading entry...</div>
 
-      <div v-else-if="selectedEntry" class="editor-body">
-        <!-- Validation Panel -->
-        <div v-if="validationErrors.length || validationWarnings.length" class="validation-panel">
-          <div v-if="validationErrors.length" class="errors">
-            <h4>❌ Errors (Cannot Save)</h4>
-            <ul>
-              <li v-for="err in validationErrors" :key="err">{{ err }}</li>
-            </ul>
-          </div>
-          <div v-if="validationWarnings.length" class="warnings">
-            <h4>⚠️ Warnings (Can Save)</h4>
-            <ul>
-              <li v-for="warn in validationWarnings" :key="warn">{{ warn }}</li>
-            </ul>
-          </div>
-        </div>
+      <div v-else-if="selectedEntry" class="workspace-grid-layout">
+        <aside class="workspace-nav-rail">
+          <AdminFieldsFieldNavigator
+            :groups="fieldGroups"
+            :frontmatter="editForm"
+            :custom-keys="customKeys"
+            @jump="jumpToField"
+            @expand-all="expandAllGroups"
+            @collapse-all="collapseAllGroups"
+          />
+        </aside>
 
-        <!-- 3-column Fandom-like layout -->
-        <div class="editor-grid">
-          <!-- Left: Field Navigator -->
-          <div class="col-nav">
-            <AdminFieldsFieldNavigator
-              :groups="fieldGroups"
-              :frontmatter="editForm"
-              :custom-keys="customKeys"
-              @jump="jumpToField"
-              @expand-all="expandAllGroups"
-              @collapse-all="collapseAllGroups"
-            />
+        <main class="workspace-form-hub">
+          <div v-if="validationErrors.length || validationWarnings.length" class="inline-validation-card">
+            <div v-if="validationErrors.length" class="validation-error-list">
+              <h5>Required changes before save</h5>
+              <ul>
+                <li v-for="err in validationErrors" :key="err">{{ err }}</li>
+              </ul>
+            </div>
+            <div v-if="validationWarnings.length" class="validation-warning-list">
+              <h5>Non-blocking warnings</h5>
+              <ul>
+                <li v-for="warn in validationWarnings" :key="warn">{{ warn }}</li>
+              </ul>
+            </div>
           </div>
 
-          <!-- Center: grouped fields + body -->
-          <div class="col-fields">
+          <div class="form-groups-stack">
             <AdminFieldsFieldGroup
               v-for="group in fieldGroups"
               :key="group.id"
@@ -958,78 +961,120 @@ async function saveEntry() {
                 @update="updateField"
               />
             </AdminFieldsFieldGroup>
+          </div>
 
-            <!-- Advanced / Custom Fields -->
-            <section class="advanced-fields">
-              <h3>Advanced / Custom Fields</h3>
-              <p class="advanced-note">
-                Unknown fields are preserved on save and never deleted. Add a simple scalar field if needed.
-              </p>
+          <section class="custom-fields-panel">
+            <h3>Advanced / Custom Fields</h3>
+            <p class="section-explanation">
+              Unknown fields are preserved on save and never deleted. Scalar custom values can be edited here.
+            </p>
 
-              <div v-for="key in customKeys" :id="`custom-${key}`" :key="`custom-${key}`" class="custom-field-row">
-                <div class="custom-field-head">
-                  <code>{{ key }}</code>
-                  <button type="button" class="remove-custom" @click="removeCustomField(key)">Remove</button>
-                </div>
-                <input
-                  v-if="customValueIsScalar(key)"
-                  :value="editForm[key] ?? ''"
-                  type="text"
-                  @input="updateCustomField(key, ($event.target as HTMLInputElement).value)"
-                />
-                <div v-else class="custom-complex">
-                  <span class="custom-complex-note">Complex value (preserved as-is, edit via raw JSON below):</span>
-                  <pre>{{ editForm[key] }}</pre>
-                </div>
+            <div v-for="key in customKeys" :id="`custom-${key}`" :key="`custom-${key}`" class="custom-kv-row">
+              <div class="custom-kv-meta">
+                <code class="mono-key">{{ key }}</code>
+                <button type="button" class="remove-kv-btn" @click="removeCustomField(key)">Remove</button>
               </div>
-
-              <div class="add-custom-row">
-                <input
-                  v-model="newCustomKey"
-                  type="text"
-                  placeholder="newFieldKey"
-                  @keyup.enter="addCustomField"
-                />
-                <button type="button" class="create-btn" @click="addCustomField">Add custom field</button>
-              </div>
-              <div v-if="customFieldWarning" class="custom-warning">⚠️ {{ customFieldWarning }}</div>
-            </section>
-
-            <details class="raw-json-details">
-              <summary>View Raw Frontmatter JSON (Includes preserved complex fields)</summary>
-              <pre>{{ editForm }}</pre>
-            </details>
-
-            <!-- Body editor + references -->
-            <section class="body-section">
-              <h3>Body Markdown</h3>
-              <AdminBodyEditor
-                ref="bodyEditorRef"
-                v-model="editBody"
-                :verification-status="editForm.verificationStatus"
-                :has-references="referencesStatus.hasReferences"
+              <input
+                v-if="customValueIsScalar(key)"
+                :value="editForm[key] ?? ''"
+                type="text"
+                class="custom-scalar-input"
+                @input="updateCustomField(key, ($event.target as HTMLInputElement).value)"
               />
+              <div v-else class="custom-complex">
+                <span class="custom-complex-note">Complex value preserved as-is; edit via raw JSON workflow if needed:</span>
+                <pre>{{ editForm[key] }}</pre>
+              </div>
+            </div>
+
+            <div class="add-custom-parameter-form">
+              <input
+                v-model="newCustomKey"
+                type="text"
+                placeholder="newFieldKey"
+                @keyup.enter="addCustomField"
+              />
+              <button type="button" class="workspace-btn" @click="addCustomField">Add custom field</button>
+            </div>
+            <div v-if="customFieldWarning" class="custom-warning">⚠️ {{ customFieldWarning }}</div>
+          </section>
+
+          <section id="body-editor-block" class="workspace-body-container">
+            <h3>Body Markdown</h3>
+            <AdminBodyEditor
+              ref="bodyEditorRef"
+              v-model="editBody"
+              :verification-status="editForm.verificationStatus"
+              :has-references="referencesStatus.hasReferences"
+            />
+            <div id="references-editor-block">
               <AdminReferencesEditor
                 ref="referencesEditor"
                 v-model="editBody"
                 @status-change="handleReferencesStatus"
               />
-              <div v-if="verificationHints.length" class="source-hints">
-                <div v-for="hint in verificationHints" :key="hint" class="hint-item">⚠️ {{ hint }}</div>
-              </div>
-            </section>
-          </div>
+            </div>
+            <div v-if="verificationHints.length" class="source-hints">
+              <div v-for="hint in verificationHints" :key="hint" class="hint-item">⚠️ {{ hint }}</div>
+            </div>
+          </section>
 
-          <!-- Right: live card preview + iframe -->
-          <div class="col-preview">
-            <AdminEntryCardPreview :frontmatter="editForm" />
+          <details class="debug-json-accordion">
+            <summary>View Raw Frontmatter JSON (Includes preserved complex fields)</summary>
+            <pre>{{ editForm }}</pre>
+          </details>
+        </main>
 
-            <div v-if="showPreviewPanel && previewUrl" class="preview-panel">
-              <h4>Live Page Preview</h4>
-              <iframe :src="previewUrl" class="preview-iframe" />
+        <section class="workspace-preview-rail" :class="previewViewportMode">
+          <div class="rail-tab-header">
+            <div class="tabs-buttons-cluster">
+              <button :class="{ active: rightActiveTab === 'card' }" @click="rightActiveTab = 'card'">Entry Card</button>
+              <button :class="{ active: rightActiveTab === 'preview' }" @click="rightActiveTab = 'preview'">Live Preview</button>
+              <button :class="{ active: rightActiveTab === 'validation' }" @click="rightActiveTab = 'validation'">
+                Validation
+                <span v-if="validationErrors.length" class="tab-count danger">{{ validationErrors.length }}</span>
+                <span v-else-if="validationWarnings.length" class="tab-count warn">{{ validationWarnings.length }}</span>
+              </button>
+            </div>
+
+            <div v-if="rightActiveTab === 'preview'" class="emulator-controls-cluster">
+              <button :class="{ active: previewViewportMode === 'desktop' }" title="Desktop preview" @click="previewViewportMode = 'desktop'">Desktop</button>
+              <button :class="{ active: previewViewportMode === 'tablet' }" title="Tablet preview" @click="previewViewportMode = 'tablet'">Tablet</button>
+              <button :class="{ active: previewViewportMode === 'mobile' }" title="Mobile preview" @click="previewViewportMode = 'mobile'">Mobile</button>
+              <button class="fullscreen-toggle-btn" @click="isFullscreenPreview = !isFullscreenPreview">
+                {{ isFullscreenPreview ? 'Exit Full Preview' : 'Preview Fullscreen' }}
+              </button>
             </div>
           </div>
-        </div>
+
+          <div class="rail-scrollable-viewport">
+            <div v-if="rightActiveTab === 'card'" class="tab-pane-content card-center">
+              <AdminEntryCardPreview :frontmatter="editForm" />
+            </div>
+
+            <div v-if="rightActiveTab === 'preview'" class="tab-pane-content preview-iframe-pane">
+              <div class="iframe-wrapper-device" :class="previewViewportMode">
+                <iframe v-if="previewUrl" :src="previewUrl" class="live-iframe-sandbox" />
+                <div v-else class="empty-preview-state">No public route selected.</div>
+              </div>
+            </div>
+
+            <div v-if="rightActiveTab === 'validation'" class="tab-pane-content validation-pane-details">
+              <h4>Workspace Audits</h4>
+              <div v-if="!validationErrors.length && !validationWarnings.length" class="clean-state-notice">
+                ✅ No validation issues.
+              </div>
+              <div v-if="validationErrors.length" class="audit-block errors-container">
+                <h5>Errors (Cannot Save)</h5>
+                <p v-for="e in validationErrors" :key="e" class="audit-item">❌ {{ e }}</p>
+              </div>
+              <div v-if="validationWarnings.length" class="audit-block warnings-container">
+                <h5>Warnings (Can Save)</h5>
+                <p v-for="w in validationWarnings" :key="w" class="audit-item">⚠️ {{ w }}</p>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
 
@@ -1223,19 +1268,24 @@ async function saveEntry() {
 
 <style scoped>
 .admin-page {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 2rem;
-  padding-top: calc(var(--header-height) + 2rem);
+  width: 100%;
+  max-width: 100% !important;
+  margin: 0;
+  padding: calc(var(--header-height) + 1rem) 1.5rem 2rem;
+  box-sizing: border-box;
 }
 
 .admin-warning {
-  background-color: #fff3cd;
-  color: #856404;
-  padding: 1rem;
-  border-radius: 4px;
-  margin-bottom: 2rem;
-  border: 1px solid #ffeeba;
+  background: #111;
+  color: #ebc074;
+  padding: 0.5rem 1rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-align: center;
+  border-bottom: 1px solid #222;
+  margin: 0 -1.5rem 1.5rem;
 }
 
 .controls {
@@ -1301,6 +1351,112 @@ async function saveEntry() {
   flex-wrap: wrap;
 }
 
+.workspace-root {
+  display: flex;
+  flex-direction: column;
+  margin: 0 -1.5rem;
+}
+
+.workspace-header-sticky {
+  position: sticky;
+  top: var(--header-height, 64px);
+  z-index: 40;
+  background: color-mix(in srgb, var(--c-bg) 94%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--c-border);
+  padding: 0.85rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.25rem;
+  box-shadow: 0 10px 28px rgba(20, 18, 16, 0.08);
+}
+
+.header-meta-block h2 {
+  margin: 0.2rem 0 0;
+  font-family: var(--font-heading, serif);
+  font-size: 1.15rem;
+}
+
+.editing-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+  background: var(--c-seal-red);
+  color: #fff;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.route-slug-sub {
+  display: block;
+  margin-top: 0.15rem;
+  color: var(--c-text-3);
+  font-size: 0.76rem;
+}
+
+.header-action-cluster {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.status-badge {
+  padding: 0.28rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  border: 1px solid transparent;
+}
+
+.status-badge.ready {
+  color: #1b5e20;
+  background: #e8f5e9;
+  border-color: #c8e6c9;
+}
+
+.status-badge.invalid {
+  color: #8f1d18;
+  background: #fdecec;
+  border-color: #f2b8b5;
+}
+
+.workspace-btn {
+  padding: 0.48rem 0.78rem;
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  background: var(--c-bg-soft);
+  color: var(--c-ink);
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.workspace-btn:hover:not(:disabled) {
+  border-color: var(--c-seal-red);
+  color: var(--c-seal-red);
+}
+
+.workspace-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.workspace-btn.save-trigger {
+  background: var(--c-ink);
+  color: #fff;
+  border-color: var(--c-ink);
+}
+
+.workspace-btn.cancel-trigger {
+  background: #fff5f5;
+  color: #8f1d18;
+  border-color: #f2b8b5;
+}
+
 .header-actions {
   display: flex;
   align-items: center;
@@ -1355,11 +1511,13 @@ async function saveEntry() {
 }
 
 /* --- 3-column editor grid --- */
-.editor-grid {
+.editor-grid,
+.workspace-grid-layout {
   display: grid;
-  grid-template-columns: 220px minmax(0, 1fr) 320px;
+  grid-template-columns: 230px minmax(0, 1fr) 430px;
   gap: 1.25rem;
   align-items: start;
+  padding: 1.25rem 1.5rem;
 }
 
 .col-nav,
@@ -1367,39 +1525,202 @@ async function saveEntry() {
   position: relative;
 }
 
-.col-fields {
+.workspace-nav-rail {
+  position: sticky;
+  top: calc(var(--header-height, 64px) + 5.4rem);
+  max-height: calc(100vh - var(--header-height, 64px) - 6rem);
+  overflow: auto;
+}
+
+.col-fields,
+.workspace-form-hub,
+.form-groups-stack {
   display: flex;
   flex-direction: column;
   gap: 1rem;
   min-width: 0;
 }
 
-.col-preview {
+.col-preview,
+.workspace-preview-rail {
+  position: sticky;
+  top: calc(var(--header-height, 64px) + 5.4rem);
+  height: calc(100vh - var(--header-height, 64px) - 6rem);
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  border: 1px solid var(--c-border);
+  border-radius: 10px;
+  background: var(--c-bg);
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba(20, 18, 16, 0.08);
 }
 
-@media (max-width: 1200px) {
-  .editor-grid {
-    grid-template-columns: minmax(0, 1fr) 300px;
+.rail-tab-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding: 0.55rem;
+  border-bottom: 1px solid var(--c-border);
+  background: var(--c-bg-soft);
+}
+
+.tabs-buttons-cluster,
+.emulator-controls-cluster {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.tabs-buttons-cluster button,
+.emulator-controls-cluster button {
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  background: var(--c-bg);
+  color: var(--c-text-2);
+  cursor: pointer;
+  font-size: 0.72rem;
+  padding: 0.3rem 0.5rem;
+}
+
+.tabs-buttons-cluster button.active,
+.emulator-controls-cluster button.active {
+  background: var(--c-ink);
+  border-color: var(--c-ink);
+  color: #fff;
+}
+
+.tab-count {
+  margin-left: 0.25rem;
+  padding: 0.02rem 0.32rem;
+  border-radius: 999px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.65rem;
+}
+
+.tab-count.danger { background: #fdecec; color: #8f1d18; }
+.tab-count.warn { background: #fff8df; color: #5f4300; }
+
+.rail-scrollable-viewport {
+  flex: 1;
+  overflow: auto;
+  padding: 1rem;
+}
+
+.tab-pane-content {
+  min-height: 100%;
+}
+
+.card-center {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.preview-iframe-pane {
+  display: flex;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(0,0,0,0.04), rgba(0,0,0,0.01));
+  border-radius: 8px;
+}
+
+.iframe-wrapper-device {
+  width: 100%;
+  min-height: 100%;
+  background: #fff;
+  transition: width 0.24s ease;
+}
+
+.iframe-wrapper-device.tablet { width: min(768px, 100%); }
+.iframe-wrapper-device.mobile { width: min(390px, 100%); }
+
+.live-iframe-sandbox {
+  width: 100%;
+  height: 100%;
+  min-height: calc(100vh - var(--header-height, 64px) - 10rem);
+  border: none;
+  background: #fff;
+}
+
+.empty-preview-state,
+.clean-state-notice {
+  display: grid;
+  place-items: center;
+  min-height: 12rem;
+  color: var(--c-text-3);
+  font-size: 0.9rem;
+}
+
+.audit-block {
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  padding: 0.8rem;
+  margin-top: 0.8rem;
+  background: var(--c-bg-soft);
+}
+
+.audit-block h5 {
+  margin: 0 0 0.45rem;
+}
+
+.audit-item {
+  margin: 0.35rem 0;
+  font-size: 0.84rem;
+}
+
+.fullscreen-preview-active .workspace-grid-layout {
+  grid-template-columns: minmax(0, 1fr);
+  padding: 0;
+}
+
+.fullscreen-preview-active .workspace-nav-rail,
+.fullscreen-preview-active .workspace-form-hub {
+  display: none;
+}
+
+.fullscreen-preview-active .workspace-preview-rail {
+  position: fixed;
+  inset: calc(var(--header-height, 64px) + 3.7rem) 0 0;
+  z-index: 45;
+  height: auto;
+  border-radius: 0;
+}
+
+@media (max-width: 1300px) {
+  .editor-grid,
+  .workspace-grid-layout {
+    grid-template-columns: minmax(0, 1fr) 380px;
   }
-  .col-nav {
+  .col-nav,
+  .workspace-nav-rail {
     display: none;
   }
 }
 
-@media (max-width: 900px) {
-  .editor-grid {
+@media (max-width: 960px) {
+  .editor-grid,
+  .workspace-grid-layout {
     grid-template-columns: minmax(0, 1fr);
   }
-  .col-preview {
-    display: none;
+  .col-preview,
+  .workspace-preview-rail {
+    position: static;
+    height: min(520px, 80vh);
+  }
+  .workspace-header-sticky {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .header-action-cluster {
+    justify-content: flex-start;
   }
 }
 
 /* --- Advanced / custom fields --- */
-.advanced-fields {
+.advanced-fields,
+.custom-fields-panel,
+.inline-validation-card {
   border: 1px dashed var(--c-border);
   border-radius: 8px;
   padding: 0.85rem 1rem;
@@ -1417,7 +1738,8 @@ async function saveEntry() {
   color: var(--c-text-3);
 }
 
-.custom-field-row {
+.custom-field-row,
+.custom-kv-row {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
@@ -1425,7 +1747,8 @@ async function saveEntry() {
   scroll-margin-top: calc(var(--header-height, 64px) + 1rem);
 }
 
-.custom-field-head {
+.custom-field-head,
+.custom-kv-meta {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1437,7 +1760,8 @@ async function saveEntry() {
   color: var(--c-ink);
 }
 
-.remove-custom {
+.remove-custom,
+.remove-kv-btn {
   border: 1px solid var(--c-border);
   background: var(--c-bg);
   border-radius: 4px;
@@ -1447,7 +1771,9 @@ async function saveEntry() {
   color: #8f1d18;
 }
 
-.custom-field-row input[type='text'] {
+.custom-field-row input[type='text'],
+.custom-scalar-input,
+.add-custom-parameter-form input {
   padding: 0.45rem 0.55rem;
   border: 1px solid var(--c-border);
   border-radius: 4px;
@@ -1469,7 +1795,8 @@ async function saveEntry() {
   padding: 0.5rem;
 }
 
-.add-custom-row {
+.add-custom-row,
+.add-custom-parameter-form {
   display: flex;
   gap: 0.5rem;
   margin-top: 0.5rem;
@@ -1490,7 +1817,8 @@ async function saveEntry() {
   color: #8f1d18;
 }
 
-.raw-json-details {
+.raw-json-details,
+.debug-json-accordion {
   border: 1px solid var(--c-border);
   border-radius: 6px;
   padding: 0.6rem 0.8rem;
@@ -1504,7 +1832,8 @@ async function saveEntry() {
 }
 
 /* --- Body section --- */
-.body-section {
+.body-section,
+.workspace-body-container {
   border: 1px solid var(--c-border);
   border-radius: 8px;
   padding: 0.85rem 1rem;

@@ -116,6 +116,15 @@ function copyPath(entry: ResolvedMediaEntry) {
   copyText(entry.path, entry.path, 'path')
 }
 
+const actionToast = ref('')
+let actionToastTimer: ReturnType<typeof setTimeout> | null = null
+
+function showActionToast(message: string) {
+  actionToast.value = message
+  if (actionToastTimer) clearTimeout(actionToastTimer)
+  actionToastTimer = setTimeout(() => { actionToast.value = '' }, 2200)
+}
+
 function insertBody(entry: ResolvedMediaEntry) {
   if (entry.type === 'font') return
   emit('insert-body', {
@@ -123,6 +132,7 @@ function insertBody(entry: ResolvedMediaEntry) {
     type: entry.type,
     alt: entry.label || entry.fileName,
   })
+  showActionToast('Inserted Markdown at cursor')
 }
 
 function setField(entry: ResolvedMediaEntry) {
@@ -130,6 +140,7 @@ function setField(entry: ResolvedMediaEntry) {
   const key = fieldFor(entry.path)
   if (!key) return
   emit('set-field', { key, path: entry.path })
+  showActionToast(`Updated ${key}: ${entry.path}`)
 }
 
 function isCopied(path: string, kind: 'url' | 'path') {
@@ -141,6 +152,7 @@ function isCopied(path: string, kind: 'url' | 'path') {
   <transition name="ml-fade">
     <div v-if="open" class="ml-overlay" @click.self="emit('close')">
       <aside class="ml-drawer" role="dialog" aria-label="Media Library">
+        <div v-if="actionToast" class="ml-toast" role="status">{{ actionToast }}</div>
         <header class="ml-header">
           <div class="ml-title">
             <span class="ml-seal">媒</span>
@@ -230,23 +242,36 @@ function isCopied(path: string, kind: 'url' | 'path') {
               </div>
 
               <div v-if="entry.type !== 'font'" class="ml-insert">
-                <button type="button" class="ml-btn primary" @click="insertBody(entry)">Insert in body</button>
-                <div class="ml-field-insert">
-                  <select
-                    v-if="canInsertField"
-                    :value="fieldFor(entry.path)"
-                    class="ml-field-select"
-                    @change="fieldChoice[entry.path] = ($event.target as HTMLSelectElement).value"
-                  >
-                    <option v-for="key in mediaFieldKeys" :key="key" :value="key">{{ key }}</option>
-                  </select>
-                  <button
-                    type="button"
-                    class="ml-btn"
-                    :disabled="!canInsertField"
-                    :title="canInsertField ? 'Set this frontmatter field' : 'No media fields for this section'"
-                    @click="setField(entry)"
-                  >Set field</button>
+                <div class="ml-action-zone markdown-zone">
+                  <div>
+                    <strong>Insert into Markdown at cursor</strong>
+                    <p>Markdown insert affects the body editor cursor.</p>
+                  </div>
+                  <button type="button" class="ml-btn primary" @click="insertBody(entry)">Insert into Markdown</button>
+                </div>
+
+                <div class="ml-action-zone field-zone">
+                  <div>
+                    <strong>Set frontmatter field</strong>
+                    <p>Frontmatter assignment updates image/banner/video fields.</p>
+                  </div>
+                  <div class="ml-field-insert">
+                    <select
+                      v-if="canInsertField"
+                      :value="fieldFor(entry.path)"
+                      class="ml-field-select"
+                      @change="fieldChoice[entry.path] = ($event.target as HTMLSelectElement).value"
+                    >
+                      <option v-for="key in mediaFieldKeys" :key="key" :value="key">{{ key }}</option>
+                    </select>
+                    <button
+                      type="button"
+                      class="ml-btn"
+                      :disabled="!canInsertField"
+                      :title="canInsertField ? 'Set this frontmatter field' : 'No media fields for this section'"
+                      @click="setField(entry)"
+                    >Set selected field</button>
+                  </div>
                 </div>
               </div>
               <div v-else class="ml-insert font-note">Copy-only — fonts are not inserted into content.</div>
@@ -269,13 +294,30 @@ function isCopied(path: string, kind: 'url' | 'path') {
 }
 
 .ml-drawer {
-  width: min(560px, 96vw);
+  position: relative;
+  width: min(640px, 96vw);
   height: 100%;
   background: var(--c-bg, #fff);
   border-left: 1px solid var(--c-border, #ddd);
   box-shadow: -16px 0 48px rgba(0, 0, 0, 0.18);
   display: flex;
   flex-direction: column;
+}
+
+.ml-toast {
+  position: absolute;
+  top: 0.9rem;
+  left: 1rem;
+  right: 3.8rem;
+  z-index: 3;
+  padding: 0.55rem 0.7rem;
+  border-radius: 6px;
+  background: rgba(17, 17, 17, 0.94);
+  color: #fff;
+  border-left: 3px solid #4caf50;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
 }
 
 /* --- Header --- */
@@ -497,8 +539,37 @@ function isCopied(path: string, kind: 'url' | 'path') {
 .ml-insert {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.55rem;
   padding: 0 0.6rem 0.6rem;
+}
+
+.ml-action-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 0.38rem;
+  padding: 0.55rem;
+  border: 1px solid var(--c-border, #ddd);
+  border-radius: 6px;
+  background: var(--c-bg-soft, #f5f5f5);
+}
+
+.ml-action-zone strong {
+  font-size: 0.76rem;
+}
+
+.ml-action-zone p {
+  margin: 0.1rem 0 0;
+  color: var(--c-text-3, #888);
+  font-size: 0.68rem;
+  line-height: 1.35;
+}
+
+.markdown-zone {
+  border-left: 3px solid var(--c-ink, #222);
+}
+
+.field-zone {
+  border-left: 3px solid var(--c-seal-red, #8a1f1f);
 }
 
 .ml-insert.font-note {

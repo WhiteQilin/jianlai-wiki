@@ -289,6 +289,11 @@ const previewHtml = computed(() => renderMarkdown(props.modelValue || ''))
 
 <template>
   <section class="body-editor">
+    <div class="be-editor-heading">
+      <span class="be-kicker">Article body</span>
+      <strong>Markdown workspace</strong>
+      <small>Use split view for lightweight Markdown preview; public rendering remains unchanged.</small>
+    </div>
     <div class="be-toolbar">
       <div class="be-tools" role="toolbar" aria-label="Markdown formatting">
         <button type="button" class="be-btn" title="Heading 2" @click="h2">H2</button>
@@ -348,7 +353,35 @@ const previewHtml = computed(() => renderMarkdown(props.modelValue || ''))
 .body-editor {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.75rem;
+}
+
+.be-editor-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--c-bg-soft), color-mix(in srgb, var(--c-bg-soft) 72%, #fff));
+}
+
+.be-editor-heading strong {
+  font-family: var(--font-heading, serif);
+  font-size: 1rem;
+}
+
+.be-editor-heading small {
+  color: var(--c-text-3);
+  font-size: 0.76rem;
+}
+
+.be-kicker {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.62rem;
+  color: var(--c-seal-red);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 /* --- Toolbar --- */
@@ -361,10 +394,11 @@ const previewHtml = computed(() => renderMarkdown(props.modelValue || ''))
   justify-content: space-between;
   gap: 0.75rem;
   flex-wrap: wrap;
-  padding: 0.4rem 0.5rem;
-  background: var(--c-bg-soft);
+  padding: 0.5rem 0.6rem;
+  background: color-mix(in srgb, var(--c-bg-soft) 88%, #fff);
   border: 1px solid var(--c-border);
-  border-radius: 6px;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(20, 18, 16, 0.06);
 }
 
 .be-tools,
@@ -454,7 +488,7 @@ const previewHtml = computed(() => renderMarkdown(props.modelValue || ''))
 
 .be-textarea {
   width: 100%;
-  min-height: 460px;
+  min-height: 560px;
   font-family: var(--font-mono);
   font-size: 0.9rem;
   line-height: 1.6;
@@ -467,7 +501,7 @@ const previewHtml = computed(() => renderMarkdown(props.modelValue || ''))
 }
 
 .be-preview {
-  min-height: 460px;
+  min-height: 560px;
   max-height: 70vh;
   overflow: auto;
   padding: 1rem 1.25rem;
