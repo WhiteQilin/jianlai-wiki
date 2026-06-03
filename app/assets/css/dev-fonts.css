@@ -1,0 +1,14 @@
+/* Stage 14A — dev-only font override.
+   Loaded ONLY in `npm run dev` via nuxt.config.ts.
+
+   In local dev, NUXT_PUBLIC_MEDIA_BASE_URL is usually empty, so the decorative
+   @font-face in main.css still points at the R2 CDN
+   (https://media.jianlai.wiki/fonts/production/...). The browser then logs CORS
+   / font-fetch noise on localhost.
+
+   This override redefines --font-zh-display to a local system serif stack so
+   localhost stops fetching the remote font. Production is unaffected because
+   this file is never included in the static build. */
+:root {
+  --font-zh-display: 'STKaiti', 'KaiTi', 'Noto Serif SC', 'Songti SC', serif;
+}

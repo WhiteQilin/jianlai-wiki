@@ -624,10 +624,9 @@ const validationWarnings = computed(() => {
     const segments = p.split('/').filter(Boolean)
     if (segments.length !== 2) warns.push(`${label}: Path "${p}" should be /section/slug`)
 
-    // Check if it exists in entries list. Ghost links remain allowed, but visible.
-    if (entries.value && !entries.value.some(e => e.routePath === p)) {
-      warns.push(`${label}: Path "${p}" does not exist yet (Ghost Link)`)
-    }
+    // Ghost links (paths that don't resolve to an existing entry) are allowed
+    // but surfaced. They are reported once as a single grouped warning below
+    // (see ghostLinks) instead of one noisy row per field.
   }
 
   // Relationship validation warnings
@@ -723,6 +722,15 @@ const validationWarnings = computed(() => {
 
   if (editForm.value.verificationStatus === 'verified' && referencesStatus.value.hasLowConfidence) {
     warns.push('Status is "verified" but references include low confidence / needs verification rows.')
+  }
+
+  // Ghost relationship links are surfaced as a single grouped warning instead of
+  // one row per link, so entries with many unresolved links stay readable.
+  const ghosts = ghostLinks.value
+  if (ghosts.length) {
+    warns.push(
+      `${ghosts.length} ghost relationship link${ghosts.length === 1 ? '' : 's'} (allowed, unresolved): ${ghosts.join(', ')}`,
+    )
   }
 
   return warns
@@ -1199,14 +1207,19 @@ async function copyCommitCommands() {
         <div class="save-status-grid">
           <div>Entry: <code>{{ lastSave.routePath }}</code></div>
           <div>File: <code>content/{{ lastSave.fileRelPath }}</code></div>
-          <div>Backup: <code>{{ lastSave.backup }}</code></div>
-          <div>Bytes written: <code>{{ lastSave.bytesWritten }}</code></div>
           <div v-if="lastSave.summary">Summary: <code>{{ lastSave.summary }}</code></div>
         </div>
-        <p class="backup-note">
-          Backups are stored under <code>.editor-backups/</code> (timestamped, dev-only). To recover, copy a
-          <code>.bak</code> file back over the entry manually. No automatic restore is performed.
-        </p>
+        <details class="save-backup-details">
+          <summary>Backup &amp; recovery details</summary>
+          <div class="save-status-grid">
+            <div>Backup: <code>{{ lastSave.backup }}</code></div>
+            <div>Bytes written: <code>{{ lastSave.bytesWritten }}</code></div>
+          </div>
+          <p class="backup-note">
+            Backups are stored under <code>.editor-backups/</code> (timestamped, dev-only). To recover, copy a
+            <code>.bak</code> file back over the entry manually. No automatic restore is performed.
+          </p>
+        </details>
       </div>
 
       <div v-if="entryPending" class="loading">Loading entry...</div>
@@ -1305,6 +1318,7 @@ async function copyCommitCommands() {
               v-model="editBody"
               :verification-status="editForm.verificationStatus"
               :has-references="referencesStatus.hasReferences"
+              @open-media-library="openMediaLibrary"
             />
             <div id="references-editor-block">
               <AdminReferencesEditor
@@ -1506,6 +1520,15 @@ async function copyCommitCommands() {
         </div>
 
         <div class="modal-body">
+          <ol class="import-steps">
+            <li><strong>1 · Paste</strong> NotebookLM Markdown (YAML frontmatter + body) below.</li>
+            <li><strong>2 · Parse</strong> to normalize fields and preview the target route, taxonomy &amp; warnings.</li>
+            <li><strong>3 · Review &amp; Save</strong> — fix any errors, pick a valid site category, then “Import and Save”.</li>
+          </ol>
+          <p class="import-steps-note">
+            Keep <code>verificationStatus: to-be-verified</code> until sources are checked. “Import and Save” stays disabled until parsing succeeds and required fields are valid.
+          </p>
+
           <div class="form-group full-width">
             <label>Raw Markdown (frontmatter + body)</label>
             <textarea v-model="importRawMarkdown" rows="12" class="body-textarea"></textarea>
@@ -2303,6 +2326,26 @@ async function copyCommitCommands() {
   border-radius: 4px;
 }
 
+.import-steps {
+  margin: 0 0 0.6rem;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.82rem;
+  color: var(--c-text-2);
+}
+
+.import-steps-note {
+  margin: 0 0 0.5rem;
+  font-size: 0.76rem;
+  color: var(--c-text-3);
+}
+
+.import-steps-note code {
+  font-family: var(--font-mono, monospace);
+}
+
 .import-actions-row {
   display: flex;
   justify-content: flex-start;
@@ -2434,6 +2477,17 @@ async function copyCommitCommands() {
   margin-top: 0.5rem;
   font-size: 0.74rem;
   opacity: 0.85;
+}
+
+.save-backup-details {
+  margin-top: 0.5rem;
+}
+
+.save-backup-details > summary {
+  cursor: pointer;
+  font-size: 0.74rem;
+  font-weight: 600;
+  opacity: 0.8;
 }
 
 .checklist-pane {

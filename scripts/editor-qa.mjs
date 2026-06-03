@@ -1,6 +1,7 @@
 import { existsSync, readdirSync } from 'node:fs'
 import { copyFile, mkdir, readFile, rm } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
+import { execSync } from 'node:child_process'
 
 const BASE_URL = process.env.EDITOR_QA_BASE_URL || 'http://localhost:3000'
 const ROOT = process.cwd()
@@ -368,6 +369,71 @@ async function main() {
   const entries = await jsonFetch('/api/editor/entries')
   assert('temporary QA entry not listed after cleanup', !entries.some((entry) => entry.routePath === TEMP_ROUTE))
   assert('Haoran taxonomy temp entry not listed after cleanup', !entries.some((entry) => entry.routePath === TAXONOMY_TEMP_ROUTE))
+
+  // ---------------------------------------------------------------------------
+  // Stage 14A: editor stabilization & guidance (static source assertions only;
+  // no file writes, no content creation).
+  // ---------------------------------------------------------------------------
+
+  // Dev-only font override exists and drops the remote R2 font from the stack.
+  const devFontsPath = join(ROOT, 'app', 'assets', 'css', 'dev-fonts.css')
+  assert('Stage 14A dev-only font override file exists', existsSync(devFontsPath))
+  if (existsSync(devFontsPath)) {
+    const devFontsSource = await readFile(devFontsPath, 'utf-8')
+    assert(
+      'Stage 14A dev font override redefines --font-zh-display without the R2 font',
+      devFontsSource.includes('--font-zh-display') && !devFontsSource.includes('HYDiShengHero'),
+    )
+  }
+
+  // nuxt.config wires the dev font override behind a dev-only condition, so the
+  // production static build keeps the original R2 @font-face behavior.
+  const nuxtConfigSource = await readFile(join(ROOT, 'nuxt.config.ts'), 'utf-8')
+  assert(
+    'Stage 14A dev font override is dev-only in nuxt.config',
+    nuxtConfigSource.includes('dev-fonts.css') && nuxtConfigSource.includes('import.meta.dev'),
+  )
+  assert(
+    'Stage 14A production CSS still includes main.css',
+    nuxtConfigSource.includes("'~/assets/css/main.css'"),
+  )
+
+  // BodyEditor exposes an open-media-library action (so the toolbar can route to
+  // the Media Library instead of only inserting a raw placeholder).
+  const bodyEditorSource = await readFile(join(ROOT, 'app', 'components', 'admin', 'BodyEditor.vue'), 'utf-8')
+  assert(
+    'Stage 14A BodyEditor emits open-media-library',
+    bodyEditorSource.includes("'open-media-library'") && bodyEditorSource.includes('openMediaLibrary'),
+  )
+
+  // Guidance copy: verificationStatus + media fields carry help text clarifying
+  // verified vs to-be-verified and the placeholder convention.
+  const registrySource14a = await readFile(join(ROOT, 'app', 'data', 'fieldRegistry.ts'), 'utf-8')
+  assert(
+    'Stage 14A verificationStatus has helper text',
+    /verificationStatus[^\n]*help:/.test(registrySource14a),
+  )
+  assert(
+    'Stage 14A media fields document the empty-placeholder convention',
+    /key: 'image'[^\n]*placeholder/.test(registrySource14a) && /allowed placeholder/i.test(registrySource14a),
+  )
+
+  // Ghost relationship links are grouped into a single validation warning.
+  const adminSource = await readFile(join(ROOT, 'app', 'pages', 'admin.vue'), 'utf-8')
+  assert(
+    'Stage 14A ghost links are reported as one grouped warning',
+    adminSource.includes('ghost relationship link'),
+  )
+
+  // public/fonts must never be committable (local-only experiments).
+  let fontsIgnored = false
+  try {
+    execSync('git check-ignore public/fonts/__stage14a_probe.ttf', { cwd: ROOT, stdio: 'ignore' })
+    fontsIgnored = true
+  } catch {
+    fontsIgnored = false
+  }
+  assert('Stage 14A public/fonts is git-ignored (no font staging)', fontsIgnored)
 
   const failed = results.filter((result) => result.status === 'FAIL')
   console.table(results)

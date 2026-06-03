@@ -133,15 +133,15 @@ export const GLOBAL_FIELDS: FieldDef[] = [
   { key: 'tags', label: 'Tags', type: 'tags', group: 'classification', recommended: true, help: 'Lowercase, hyphenated keywords.' },
 
   // Media
-  { key: 'image', label: 'Image Path', type: 'media', group: 'media', mediaType: 'image', placeholder: '/images/...' },
-  { key: 'banner', label: 'Banner Path', type: 'media', group: 'media', mediaType: 'image', placeholder: '/images/...' },
-  { key: 'video', label: 'Video Path', type: 'media', group: 'media', mediaType: 'video', placeholder: '/videos/...', help: 'Optional PV. Renders a cinematic hero on character pages.' },
+  { key: 'image', label: 'Image Path', type: 'media', group: 'media', mediaType: 'image', placeholder: '/images/...', help: 'Frontmatter media path (e.g. /images/...). An empty path is an allowed placeholder — add the real asset later. To put an image inside the article body instead, use the Media Library “Insert into Markdown” action.' },
+  { key: 'banner', label: 'Banner Path', type: 'media', group: 'media', mediaType: 'image', placeholder: '/images/...', help: 'Wide hero/banner image path. Empty is an allowed placeholder. This sets the frontmatter field only — it does not insert into the body.' },
+  { key: 'video', label: 'Video Path', type: 'media', group: 'media', mediaType: 'video', placeholder: '/videos/...', help: 'Optional PV. Renders a cinematic hero on character pages. Empty is an allowed placeholder.' },
 
   // Relationships (global)
   { key: 'related', label: 'Related Entries', type: 'relationship-multi', group: 'relationships', recommended: true, help: 'Cross-links to any routed entry.' },
 
   // Sourcing & Verification
-  { key: 'verificationStatus', label: 'Verification Status', type: 'select', group: 'sourcing', recommended: true, options: [...VERIFICATION_VALUES] },
+  { key: 'verificationStatus', label: 'Verification Status', type: 'select', group: 'sourcing', recommended: true, options: [...VERIFICATION_VALUES], help: 'Use "to-be-verified" until canon sources are checked (the default and safest choice). Set "verified" only when the body has a ## References section with volume/chapter sources — the checklist will flag verified entries that have no references.' },
   { key: 'sourceNotes', label: 'Source Notes', type: 'textarea', group: 'sourcing', recommended: true, help: 'Volume/chapter notes. Powers the Source Verification notice.' },
   { key: 'firstAppearance', label: 'First Appearance', type: 'text', group: 'sourcing', placeholder: 'e.g. Volume 1, Chapter 1' },
   { key: 'lastUpdated', label: 'Last Updated', type: 'text', group: 'sourcing', placeholder: 'YYYY-MM-DD' },

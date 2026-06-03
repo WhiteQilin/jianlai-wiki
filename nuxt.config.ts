@@ -11,7 +11,13 @@ export default defineNuxtConfig({
     '@nuxt/icon',
     '@nuxt/fonts',
   ],
-  css: ['~/assets/css/main.css'],
+  // The dev-only font override stops localhost from fetching the decorative R2
+  // font (and the resulting CORS/font console noise). `import.meta.dev` is false
+  // during `nuxt generate`, so it is never added to the static build and the
+  // production R2 font behavior is unchanged.
+  css: import.meta.dev
+    ? ['~/assets/css/main.css', '~/assets/css/dev-fonts.css']
+    : ['~/assets/css/main.css'],
   app: {
     pageTransition: { name: 'page', mode: 'out-in' },
     layoutTransition: { name: 'page', mode: 'out-in' }

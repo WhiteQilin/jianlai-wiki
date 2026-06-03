@@ -185,6 +185,13 @@ function isCopied(path: string, kind: 'url' | 'path') {
           >Fonts <span class="ml-count">{{ tabCounts.font }}</span></button>
         </div>
 
+        <p class="ml-help-banner">
+          <strong>Two ways to use an asset:</strong>
+          <span><em>Insert into Markdown</em> drops a snippet into the article <strong>body</strong> at your cursor.</span>
+          <span><em>Set frontmatter field</em> writes the path into <code>image</code>/<code>banner</code>/<code>video</code> (no body change).</span>
+          Fonts are <strong>copy-only</strong> and are never inserted.
+        </p>
+
         <div class="ml-filters">
           <input v-model="query" type="text" class="ml-search" placeholder="Search by name, path, group..." />
           <select v-model="groupFilter" class="ml-group-select">
@@ -404,6 +411,26 @@ function isCopied(path: string, kind: 'url' | 'path') {
   font-family: var(--font-mono, monospace);
   font-size: 0.68rem;
   opacity: 0.8;
+}
+
+/* --- Help banner --- */
+.ml-help-banner {
+  margin: 0 1rem 0.6rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  background: var(--c-bg-soft);
+  font-size: 0.74rem;
+  line-height: 1.45;
+  color: var(--c-text-2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.ml-help-banner code {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.9em;
 }
 
 /* --- Filters --- */

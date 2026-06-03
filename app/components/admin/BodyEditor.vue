@@ -9,6 +9,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
+  'open-media-library': []
 }>()
 
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
@@ -171,7 +172,11 @@ function h3() { applyLinePrefix('### ') }
 function bold() { applyWrap('**', '**', 'bold text') }
 function italic() { applyWrap('*', '*', 'italic text') }
 function link() { applyWrap('[', '](/section/slug)', 'link text') }
+// Insert a raw inline image placeholder at the caret. Kept for users who want a
+// quick body image without opening the Media Library. The "Media…" button (which
+// opens the picker) is the recommended path; it inserts a resolved snippet.
 function mediaSnippet() { insertAtCursor('![alt text](/images/...)') }
+function openMediaLibrary() { emit('open-media-library') }
 
 // --- Lightweight, dependency-free Markdown preview ---
 function escapeHtml(s: string): string {
@@ -292,7 +297,7 @@ const previewHtml = computed(() => renderMarkdown(props.modelValue || ''))
     <div class="be-editor-heading">
       <span class="be-kicker">Article body</span>
       <strong>Markdown workspace</strong>
-      <small>Use split view for lightweight Markdown preview; public rendering remains unchanged.</small>
+      <small>Toolbar actions insert Markdown into the article body at your cursor. To set frontmatter media fields (image / banner / video) instead, use the Media Library. Use split view for a lightweight preview; public rendering is unchanged.</small>
     </div>
     <div class="be-toolbar">
       <div class="be-tools" role="toolbar" aria-label="Markdown formatting">
@@ -302,7 +307,8 @@ const previewHtml = computed(() => renderMarkdown(props.modelValue || ''))
         <button type="button" class="be-btn" title="Bold" @click="bold"><strong>B</strong></button>
         <button type="button" class="be-btn" title="Italic" @click="italic"><em>I</em></button>
         <button type="button" class="be-btn" title="Inline code link" @click="link">Link</button>
-        <button type="button" class="be-btn" title="Insert image / media path" @click="mediaSnippet">Image</button>
+        <button type="button" class="be-btn" title="Insert a blank image placeholder into the body at the cursor" @click="mediaSnippet">Image ph.</button>
+        <button type="button" class="be-btn" title="Open the Media Library to insert a resolved image/video into the body" @click="openMediaLibrary">Media…</button>
         <span class="be-sep" />
         <button type="button" class="be-btn" title="Insert References heading" @click="insertReferencesHeading">References</button>
       </div>

@@ -402,6 +402,47 @@ The `.gitignore` already excludes these local/build/backup paths and raw media a
 
 ---
 
+## 15.5 Stage 14A — Editor Stabilization & Real-Use Polish
+
+Stage 14A focused on stabilizing the existing editor based on real content-production pain points. No new content, lore, auth, database, uploads, or public-editing surfaces were added. Existing save/import/backup behavior and unknown/custom-field preservation are unchanged.
+
+**Bugs / behavior fixes**
+
+- **Body media button clarity.** The Body editor toolbar now distinguishes inserting into the article body from setting frontmatter fields. The old `Image` button is now `Image ph.` (inserts a blank `![alt](/images/...)` placeholder), and a new `Media…` button opens the Media Library to insert a resolved image/video at the cursor. Both still insert into the body only.
+- **Ghost-link warning noise.** Unresolved relationship links are now reported as a single grouped warning (`N ghost relationship links (allowed, unresolved): ...`) instead of one row per link. Ghost links remain allowed and visible; they are not blocked.
+
+**UX polish**
+
+- **Save confirmation card.** The saved card now leads with Entry / File (and Summary if set). Backup path and bytes-written moved into a collapsible "Backup & recovery details" disclosure to cut repeated noise.
+- **NotebookLM import modal.** The modal now opens with a `1 Paste → 2 Parse → 3 Review & Save` step banner plus a reminder that "Import and Save" stays disabled until parsing succeeds and required fields are valid.
+- **Media Library banner.** A help banner clarifies the two actions: *Insert into Markdown* (body snippet at cursor) vs *Set frontmatter field* (`image`/`banner`/`video`), and reiterates that fonts are copy-only.
+- **Field guidance.** `verificationStatus` now carries helper text explaining `to-be-verified` (default/safest) vs `verified` (requires a `## References` section). `image` / `banner` / `video` field help documents the empty-path placeholder convention and that they set frontmatter, not the body.
+
+**Local dev experience**
+
+- **R2 font CORS noise on localhost.** A dev-only stylesheet (`app/assets/css/dev-fonts.css`) redefines `--font-zh-display` to a local system serif stack so localhost stops fetching the decorative R2 font (`media.jianlai.wiki/fonts/production/...`) and its CORS console noise. It is wired in `nuxt.config.ts` behind `import.meta.dev`, so it is never included in `nuxt generate`. The production `@font-face` in `main.css` and the live R2 font behavior are unchanged.
+
+**Media staging safety**
+
+- `public/fonts/` is git-ignored (local-only experiments) and cannot be accidentally staged.
+- `public/videos/curated/**` remains intentionally allowed by `.gitignore` (a few curated hero videos are already committed). Stage 14A did not change this policy and did not stage any additional video or font files. The Checklist tab still warns: "Do NOT commit `public/videos` or `public/fonts`."
+
+**Verification results**
+
+- `npm run editor:qa`: all checks pass, including 9 new Stage 14A static-source assertions (dev font override, dev-only wiring, BodyEditor media event, field helper text, grouped ghost-link warning, fonts ignored).
+- `NUXT_PUBLIC_MEDIA_BASE_URL=https://media.jianlai.wiki npm run generate`: succeeds; 113 routes prerendered (stable); `/admin` not prerendered; `/titles` not generated; no `public/videos` or `public/fonts` newly staged.
+
+**Remaining editor issues (deferred)**
+
+- Preview still reflects saved content only, not unsaved edits (by design).
+- No WYSIWYG; Markdown body remains a textarea with a lightweight preview.
+- Inferred relationship names from imports may still need manual correction.
+- Ghost links are surfaced but not auto-resolved (intentional; ghost-link management is a later concern).
+
+**Editor readiness:** The editor is stable and ready for the next content batch. Content creation was intentionally paused in this stage.
+
+---
+
 ## 16. Known Limitations
 
 - Local single-user editor only.
