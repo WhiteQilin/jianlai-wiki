@@ -10,7 +10,17 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxt/icon',
     '@nuxt/fonts',
+    '@nuxtjs/sitemap',
   ],
+  site: {
+    url: 'https://jianlai.wiki',
+    name: 'Jian Lai Wiki',
+  },
+  sitemap: {
+    // /admin is an editor-only route (never prerendered) and /titles is an
+    // intentionally ungenerated section — keep both out of the sitemap.
+    exclude: ['/admin', '/titles', '/titles/**'],
+  },
   // The dev-only font override stops localhost from fetching the decorative R2
   // font (and the resulting CORS/font console noise). `import.meta.dev` is false
   // during `nuxt generate`, so it is never added to the static build and the

@@ -17,7 +17,10 @@ const filteredItems = computed(() =>
 )
 
 useSeoMeta({
-  title: 'Characters | Jian Lai Wiki'
+  title: meta.title,
+  description: meta.description,
+  ogTitle: meta.title,
+  ogDescription: meta.description,
 })
 </script>
 

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { getMediaUrl } from '~/constants/homeHeroVideos'
+
 const route = useRoute()
 
 const { data: page } = await useAsyncData(`page-${route.path}`, () => {
@@ -11,8 +13,20 @@ if (!page.value) {
 
 const { groups: relatedGroups } = await useRelatedEntries(route.path)
 
+const ogImageSrc = (page.value as any)?.banner || (page.value as any)?.image
+const ogImage = ogImageSrc
+  ? (() => {
+      const resolved = getMediaUrl(ogImageSrc)
+      return resolved.startsWith('/') ? new URL(resolved, 'https://jianlai.wiki').href : resolved
+    })()
+  : undefined
+
 useSeoMeta({
-  title: `${page.value?.title} | Jian Lai Wiki`
+  title: () => page.value?.title,
+  description: () => page.value?.description,
+  ogTitle: () => page.value?.title,
+  ogDescription: () => page.value?.description,
+  ogImage,
 })
 </script>
 

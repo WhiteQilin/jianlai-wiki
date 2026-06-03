@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { getMediaUrl } from '~/constants/homeHeroVideos'
+
 const route = useRoute()
 const section = 'characters'
 const sectionTitle = 'Characters'
@@ -13,8 +15,20 @@ if (!page.value) {
 
 const { groups: relatedGroups } = await useRelatedEntries(route.path)
 
+const ogImageSrc = (page.value as any)?.banner || (page.value as any)?.image
+const ogImage = ogImageSrc
+  ? (() => {
+      const resolved = getMediaUrl(ogImageSrc)
+      return resolved.startsWith('/') ? new URL(resolved, 'https://jianlai.wiki').href : resolved
+    })()
+  : undefined
+
 useSeoMeta({
-  title: `${page.value?.title} | Jian Lai Wiki`
+  title: () => page.value?.title,
+  description: () => page.value?.description,
+  ogTitle: () => page.value?.title,
+  ogDescription: () => page.value?.description,
+  ogImage,
 })
 </script>
 
@@ -63,19 +77,6 @@ useSeoMeta({
                 { label: 'Realm', value: (page as any).realm || 'Unknown' }
               ]"
             />
-          </ScrollReveal>
-          
-          <ScrollReveal animation="reveal-fade-up" delay="stagger-3">
-            <div class="sticky-toc">
-              <h4>Contents</h4>
-              <ul>
-                <li><a href="#">Overview</a></li>
-                <li><a href="#">Cultivation</a></li>
-                <li><a href="#">Relationships</a></li>
-                <li><a href="#">Story</a></li>
-                <li><a href="#">Abilities</a></li>
-              </ul>
-            </div>
           </ScrollReveal>
         </aside>
 
@@ -141,46 +142,6 @@ useSeoMeta({
   gap: 2rem;
 }
 
-.sticky-toc {
-  position: sticky;
-  top: calc(var(--header-height) + 2rem);
-  background: var(--c-bg-soft);
-  border: 1px solid var(--c-border);
-  padding: 1.5rem;
-  border-radius: 4px;
-}
-
-.sticky-toc h4 {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin: 0 0 1rem 0;
-  color: var(--c-text-3);
-  border-bottom: 1px solid var(--c-divider);
-  padding-bottom: 0.5rem;
-}
-
-.sticky-toc ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-}
-
-.sticky-toc a {
-  text-decoration: none;
-  color: var(--c-text-2);
-  font-size: 0.9rem;
-  transition: color 0.3s ease;
-}
-
-.sticky-toc a:hover {
-  color: var(--c-seal-red);
-}
-
 .breadcrumb {
   font-family: var(--font-mono);
   font-size: 0.8rem;
@@ -215,10 +176,6 @@ useSeoMeta({
     width: 100%;
     flex-direction: row;
     align-items: flex-start;
-  }
-  .sticky-toc {
-    position: static;
-    flex-grow: 1;
   }
 }
 

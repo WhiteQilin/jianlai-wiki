@@ -1,6 +1,11 @@
 <script setup lang="ts">
 useSeoMeta({
-  title: 'About | Jian Lai Wiki'
+  title: 'About',
+  description:
+    'Jian Lai Wiki is an unofficial, fan-made compendium dedicated to the lore, characters, and history of the xianxia web novel Sword, Come! (剑来).',
+  ogTitle: 'About',
+  ogDescription:
+    'Jian Lai Wiki is an unofficial, fan-made compendium dedicated to the lore, characters, and history of the xianxia web novel Sword, Come! (剑来).',
 })
 </script>
 
