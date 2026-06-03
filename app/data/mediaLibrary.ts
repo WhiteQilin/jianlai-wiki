@@ -117,6 +117,28 @@ const SHOWCASE_VIDEOS: MediaLibEntry[] = [
   },
 ]
 
+/**
+ * Official character promo videos referenced by character content
+ * (`content/characters/*.md` → `video:` fields). R2-only paths; the binaries
+ * live on R2 and are not checked into the repo.
+ */
+const CHARACTER_PVS: MediaLibEntry[] = [
+  {
+    path: '/videos/ning-yao-pv.mp4',
+    type: 'video',
+    label: 'Ning Yao PV',
+    group: 'Character PV',
+    note: 'Official character promo. R2-only; credit when used.',
+  },
+  {
+    path: '/videos/qi-jingchun-pv.mp4',
+    type: 'video',
+    label: 'Qi Jingchun PV',
+    group: 'Character PV',
+    note: 'Official character promo. R2-only; credit when used.',
+  },
+]
+
 /** Fonts hosted on R2 (copy-only in the editor; never inserted into content). */
 const FONTS: MediaLibEntry[] = [
   {
@@ -166,6 +188,7 @@ export const MEDIA_LIBRARY: MediaLibEntry[] = [
   ...IMAGES,
   ...CURATED_VIDEOS,
   ...SHOWCASE_VIDEOS,
+  ...CHARACTER_PVS,
   ...FONTS,
 ]
 
