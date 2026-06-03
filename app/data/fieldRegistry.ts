@@ -296,3 +296,17 @@ export function groupsForSection(
     .filter((g) => g.fields.length > 0)
     .sort((a, b) => a.order - b.order)
 }
+
+/** Keys of required fields for a section (globals + section-specific). */
+export function requiredFieldKeys(section: string): string[] {
+  return fieldsForSection(section)
+    .filter((f) => f.required)
+    .map((f) => f.key)
+}
+
+/** Keys of recommended (non-required) fields for a section. */
+export function recommendedFieldKeys(section: string): string[] {
+  return fieldsForSection(section)
+    .filter((f) => f.recommended && !f.required)
+    .map((f) => f.key)
+}

@@ -13,7 +13,11 @@ import {
   groupsForSection,
   unknownFieldKeys,
   knownFieldKeys,
+  requiredFieldKeys,
+  recommendedFieldKeys,
+  allFieldDefs,
 } from '~/data/fieldRegistry'
+import type { ProductionCheck } from '~/components/admin/ProductionChecklist.vue'
 
 useSeoMeta({
   title: 'Local Editor | Jian Lai Wiki'
@@ -58,7 +62,7 @@ const { data: selectedEntry, pending: entryPending } = await useFetch<any>(() =>
 
 // --- Preview / UX polish state ---
 const previewNonce = ref(0)
-const rightActiveTab = ref<'card' | 'preview' | 'validation'>('card')
+const rightActiveTab = ref<'card' | 'preview' | 'validation' | 'checklist'>('card')
 const previewViewportMode = ref<'desktop' | 'tablet' | 'mobile'>('desktop')
 const isFullscreenPreview = ref(false)
 const importSuccess = ref<null | {
@@ -284,6 +288,24 @@ const importValidationErrors = computed(() => {
     if (!hasValidManualCategory) return true
     return err !== 'category is required' && !/^category ".+" is not valid for section/.test(err)
   })
+})
+
+const importQualityWarnings = computed<string[]>(() => {
+  const result = importParseResult.value
+  if (!result) return []
+  const fm = result.frontmatter || {}
+  const warns: string[] = []
+
+  if (fm.verificationStatus === 'verified' && !result.hasReferences) {
+    warns.push('verificationStatus is "verified" but the entry has no References section. Add references or lower the status.')
+  }
+
+  const sourceNotes = typeof fm.sourceNotes === 'string' ? fm.sourceNotes.trim() : ''
+  if (!sourceNotes) {
+    warns.push('sourceNotes is empty. Add volume/chapter references so the entry can be verified later.')
+  }
+
+  return warns
 })
 
 const canSaveImport = computed(() => {
@@ -806,6 +828,22 @@ function handleMediaSetField(payload: { key: string; path: string }) {
   updateField(payload.key, payload.path)
 }
 
+// --- Stage 12E: Save confirmation, edit summary, commit + checklist ---
+
+interface LastSaveInfo {
+  routePath: string
+  fileRelPath: string
+  backup: string
+  bytesWritten: number
+  summary: string
+  savedAt: string
+}
+
+const editSummary = ref('')
+const lastSave = ref<LastSaveInfo | null>(null)
+const saveError = ref('')
+const commitCopied = ref(false)
+
 async function saveEntry() {
   if (validationErrors.value.length > 0) {
     alert('Please fix validation errors before saving.')
@@ -813,9 +851,15 @@ async function saveEntry() {
   }
 
   isSaving.value = true
+  saveError.value = ''
 
   try {
-    const res = await $fetch('/api/editor/entry', {
+    const res = await $fetch<{
+      routePath: string
+      fileRelPath: string
+      backup: string
+      bytesWritten: number
+    }>('/api/editor/entry', {
       method: 'POST',
       body: {
         path: selectedEntryPath.value,
@@ -823,15 +867,223 @@ async function saveEntry() {
         body: editBody.value
       }
     })
-    alert('Saved successfully! Backup created at: ' + (res as any).backup)
     initialSnapshot.value = JSON.stringify({
       frontmatter: editForm.value,
       body: editBody.value,
     })
+    lastSave.value = {
+      routePath: res.routePath,
+      fileRelPath: res.fileRelPath,
+      backup: res.backup,
+      bytesWritten: res.bytesWritten,
+      summary: editSummary.value.trim(),
+      savedAt: new Date().toLocaleString(),
+    }
   } catch (e: any) {
-    alert('Save failed: ' + (e.data?.message || e.data?.statusMessage || e.message))
+    saveError.value = e.data?.message || e.data?.statusMessage || e.message || 'Save failed'
   } finally {
     isSaving.value = false
+  }
+}
+
+// Reset the edit summary + save card when switching entries.
+watch(selectedEntryPath, () => {
+  editSummary.value = ''
+  lastSave.value = null
+  saveError.value = ''
+  commitCopied.value = false
+})
+
+// --- Ghost relationship links (shared detection for checklist) ---
+const RELATIONSHIP_FIELD_KEYS = [
+  'related',
+  'affiliations',
+  'members',
+  'leader',
+  'headquarters',
+  'location',
+  'owners',
+  'users',
+  'practitioners',
+  'participants',
+  'relatedFactions',
+  'inhabitants',
+  'governingFaction',
+  'parentLocation',
+]
+
+const ghostLinks = computed<string[]>(() => {
+  const fm = editForm.value
+  const ghosts: string[] = []
+  const known = entries.value || []
+
+  function check(path: string) {
+    const p = `${path}`.trim()
+    if (!p || !p.startsWith('/')) return
+    if (p.split('/').filter(Boolean).length !== 2) return
+    if (!known.some((e: any) => e.routePath === p)) ghosts.push(p)
+  }
+
+  for (const key of RELATIONSHIP_FIELD_KEYS) {
+    const val = fm[key]
+    if (!val) continue
+    const paths = Array.isArray(val) ? val : [val]
+    for (const p of paths) {
+      if (typeof p === 'string') check(p)
+    }
+  }
+
+  if (Array.isArray(fm.relationships)) {
+    for (const row of fm.relationships) {
+      if (typeof row?.link === 'string') check(row.link)
+    }
+  }
+  if (Array.isArray(fm.entries)) {
+    for (const row of fm.entries) {
+      if (typeof row?.link === 'string') check(row.link)
+    }
+  }
+
+  return [...new Set(ghosts)]
+})
+
+// --- Media field validity (shared detection for checklist) ---
+const invalidMediaFields = computed<string[]>(() => {
+  const fm = editForm.value
+  const issues: string[] = []
+  const specs: Array<{ key: string; prefix: string; exts: Set<string> }> = [
+    { key: 'image', prefix: '/images/', exts: IMAGE_EXTS },
+    { key: 'banner', prefix: '/images/', exts: IMAGE_EXTS },
+    { key: 'video', prefix: '/videos/', exts: VIDEO_EXTS },
+  ]
+  for (const spec of specs) {
+    const val = typeof fm[spec.key] === 'string' ? fm[spec.key].trim() : ''
+    if (!val) continue
+    if (!val.startsWith(spec.prefix) || (fileExt(val) && !spec.exts.has(fileExt(val)))) {
+      issues.push(`${spec.key}: "${val}"`)
+    }
+  }
+  return issues
+})
+
+// --- Required / recommended field tracking (registry-driven) ---
+function fieldFilled(key: string): boolean {
+  const v = editForm.value[key]
+  if (Array.isArray(v)) return v.length > 0
+  return v != null && `${v}`.trim() !== ''
+}
+
+const missingRequiredKeys = computed(() =>
+  requiredFieldKeys(currentSection.value).filter((k) => !fieldFilled(k)),
+)
+
+const missingRecommendedKeys = computed(() =>
+  recommendedFieldKeys(currentSection.value).filter((k) => !fieldFilled(k)),
+)
+
+function labelFor(key: string): string {
+  return allFieldDefs()[key]?.label || key
+}
+
+// --- Production checklist (Stage 12E) ---
+const productionChecks = computed<ProductionCheck[]>(() => {
+  const fm = editForm.value
+  const checks: ProductionCheck[] = []
+
+  checks.push({
+    id: 'required',
+    label: 'Required fields complete',
+    status: missingRequiredKeys.value.length ? 'fail' : 'pass',
+    detail: missingRequiredKeys.value.length
+      ? `Missing: ${missingRequiredKeys.value.map(labelFor).join(', ')}`
+      : 'All required fields present.',
+  })
+
+  checks.push({
+    id: 'recommended',
+    label: 'Recommended fields present',
+    status: missingRecommendedKeys.value.length ? 'warn' : 'pass',
+    detail: missingRecommendedKeys.value.length
+      ? `Consider adding: ${missingRecommendedKeys.value.map(labelFor).join(', ')}`
+      : 'All recommended fields present.',
+  })
+
+  const verified = fm.verificationStatus === 'verified'
+  checks.push({
+    id: 'references',
+    label: 'References present if verified',
+    status: verified
+      ? (referencesStatus.value.hasReferences ? 'pass' : 'fail')
+      : 'na',
+    detail: verified
+      ? (referencesStatus.value.hasReferences
+        ? 'Verified entry has a References section.'
+        : 'Verified entries should include references.')
+      : 'Only required when verificationStatus is "verified".',
+  })
+
+  const hasTopTitle = editBody.value.trim().startsWith('# ')
+  checks.push({
+    id: 'body-title',
+    label: 'No top-level # title in body',
+    status: hasTopTitle ? 'fail' : 'pass',
+    detail: hasTopTitle
+      ? 'The layout already renders the title — remove the leading "# ".'
+      : 'Body does not duplicate the title.',
+  })
+
+  checks.push({
+    id: 'ghost-links',
+    label: 'No ghost relationship links',
+    status: ghostLinks.value.length ? 'warn' : 'pass',
+    detail: ghostLinks.value.length
+      ? `Unresolved: ${ghostLinks.value.join(', ')}`
+      : 'All relationship links resolve to existing entries.',
+  })
+
+  checks.push({
+    id: 'media',
+    label: 'Media fields valid',
+    status: invalidMediaFields.value.length ? 'warn' : 'pass',
+    detail: invalidMediaFields.value.length
+      ? `Check: ${invalidMediaFields.value.join('; ')}`
+      : 'Media paths use expected prefixes and extensions.',
+  })
+
+  const verificationOk = verificationHints.value.length === 0
+  checks.push({
+    id: 'verification',
+    label: 'verificationStatus appropriate',
+    status: verificationOk ? 'pass' : 'warn',
+    detail: verificationOk
+      ? `Status: ${fm.verificationStatus || '(unset)'}`
+      : verificationHints.value.join(' '),
+  })
+
+  return checks
+})
+
+// --- Ready-to-commit helper (copy-only; no git execution) ---
+const commitCommands = computed(() => {
+  const relPath = lastSave.value?.fileRelPath || (selectedEntry.value?.fileRelPath ?? '')
+  const file = relPath ? `content/${relPath}` : 'content/<section>/<slug>.md'
+  const summary = (editSummary.value.trim() || lastSave.value?.summary || '').replace(/"/g, '\\"')
+  const message = summary || `content: update ${lastSave.value?.routePath || selectedEntryPath.value}`
+  return [
+    `git add "${file}"`,
+    `git commit -m "${message}"`,
+  ].join('\n')
+})
+
+async function copyCommitCommands() {
+  if (import.meta.client && navigator.clipboard) {
+    try {
+      await navigator.clipboard.writeText(commitCommands.value)
+      commitCopied.value = true
+      setTimeout(() => { commitCopied.value = false }, 2000)
+    } catch {
+      commitCopied.value = false
+    }
   }
 }
 </script>
@@ -849,6 +1101,19 @@ async function saveEntry() {
         <strong>Import {{ importSuccess.action === 'created' ? 'created' : 'updated' }} successfully.</strong>
         <div>Route: <code>{{ importSuccess.routePath }}</code></div>
         <div>File: <code>content/{{ importSuccess.fileRelPath }}</code></div>
+
+        <div class="next-steps">
+          <h4>Next steps</h4>
+          <ol>
+            <li>Open the entry and review the registry-driven fields.</li>
+            <li>Confirm the taxonomy category mapped correctly.</li>
+            <li>Add or verify the References section before marking as verified.</li>
+            <li>Fill in <code>sourceNotes</code> with volume/chapter references.</li>
+            <li>Run the Production Checklist tab and resolve any fails.</li>
+            <li>Use the Ready-to-commit helper to commit the new Markdown.</li>
+          </ol>
+          <button class="create-btn" @click="editEntry(importSuccess.routePath)">Open entry now</button>
+        </div>
       </div>
 
       <div class="controls">
@@ -900,6 +1165,13 @@ async function saveEntry() {
           <span class="status-badge" :class="canSave ? 'ready' : 'invalid'">
             {{ canSave ? 'Ready to save' : 'Fix required fields' }}
           </span>
+          <input
+            v-model="editSummary"
+            type="text"
+            class="edit-summary-input"
+            placeholder="Edit summary (local-only, used for commit message)"
+            title="Local-only. Not written to Markdown."
+          />
           <button @click="openPublicPage" class="workspace-btn" :disabled="!previewRoute">Open Public Page</button>
           <button @click="refreshPreview" class="workspace-btn" :disabled="!previewRoute">Refresh Preview</button>
           <button @click="openMediaLibrary" class="workspace-btn assets-trigger">Media Library</button>
@@ -909,6 +1181,28 @@ async function saveEntry() {
           <button @click="closeEditor" class="workspace-btn cancel-trigger">Discard & Back</button>
         </div>
       </header>
+
+      <div v-if="saveError" class="save-status-card error">
+        <strong>Save failed.</strong> {{ saveError }}
+      </div>
+
+      <div v-if="lastSave" class="save-status-card success">
+        <div class="save-status-head">
+          <strong>✅ Saved</strong>
+          <span class="save-time">{{ lastSave.savedAt }}</span>
+        </div>
+        <div class="save-status-grid">
+          <div>Entry: <code>{{ lastSave.routePath }}</code></div>
+          <div>File: <code>content/{{ lastSave.fileRelPath }}</code></div>
+          <div>Backup: <code>{{ lastSave.backup }}</code></div>
+          <div>Bytes written: <code>{{ lastSave.bytesWritten }}</code></div>
+          <div v-if="lastSave.summary">Summary: <code>{{ lastSave.summary }}</code></div>
+        </div>
+        <p class="backup-note">
+          Backups are stored under <code>.editor-backups/</code> (timestamped, dev-only). To recover, copy a
+          <code>.bak</code> file back over the entry manually. No automatic restore is performed.
+        </p>
+      </div>
 
       <div v-if="entryPending" class="loading">Loading entry...</div>
 
@@ -1035,6 +1329,9 @@ async function saveEntry() {
                 <span v-if="validationErrors.length" class="tab-count danger">{{ validationErrors.length }}</span>
                 <span v-else-if="validationWarnings.length" class="tab-count warn">{{ validationWarnings.length }}</span>
               </button>
+              <button :class="{ active: rightActiveTab === 'checklist' }" @click="rightActiveTab = 'checklist'">
+                Checklist
+              </button>
             </div>
 
             <div v-if="rightActiveTab === 'preview'" class="emulator-controls-cluster">
@@ -1071,6 +1368,33 @@ async function saveEntry() {
               <div v-if="validationWarnings.length" class="audit-block warnings-container">
                 <h5>Warnings (Can Save)</h5>
                 <p v-for="w in validationWarnings" :key="w" class="audit-item">⚠️ {{ w }}</p>
+              </div>
+            </div>
+
+            <div v-if="rightActiveTab === 'checklist'" class="tab-pane-content checklist-pane">
+              <h4>Production Checklist</h4>
+              <AdminProductionChecklist :checks="productionChecks" />
+
+              <div class="commit-helper">
+                <h5>Ready to commit</h5>
+                <p class="commit-help-text">
+                  Copy these commands to commit this entry. This is a copyable helper only — the editor never runs git.
+                </p>
+                <pre class="commit-block">{{ commitCommands }}</pre>
+                <button type="button" class="workspace-btn" @click="copyCommitCommands">
+                  {{ commitCopied ? 'Copied!' : 'Copy commands' }}
+                </button>
+                <p class="commit-warning">
+                  ⚠️ Do NOT commit <code>public/videos</code> or <code>public/fonts</code>.
+                </p>
+              </div>
+
+              <div class="backup-helper">
+                <h5>Backups</h5>
+                <p class="backup-note">
+                  Every save writes a timestamped copy under <code>.editor-backups/</code> before overwriting.
+                  To recover, copy the relevant <code>.bak</code> file back over the entry manually (dev-only).
+                </p>
               </div>
             </div>
           </div>
@@ -1234,6 +1558,13 @@ async function saveEntry() {
               <h4>⚠️ Import Warnings</h4>
               <ul>
                 <li v-for="warn in importParseResult.warnings" :key="warn">{{ warn }}</li>
+              </ul>
+            </div>
+
+            <div v-if="importQualityWarnings.length" class="validation-panel warnings">
+              <h4>⚠️ Sourcing &amp; Verification</h4>
+              <ul>
+                <li v-for="warn in importQualityWarnings" :key="warn">{{ warn }}</li>
               </ul>
             </div>
 
@@ -2039,5 +2370,109 @@ async function saveEntry() {
   background: #e8f5e9;
   color: #1b5e20;
   border-radius: 4px;
+}
+
+/* --- Stage 12E: edit summary, save card, checklist, commit helper --- */
+.edit-summary-input {
+  min-width: 18rem;
+  flex: 1 1 14rem;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.8rem;
+}
+
+.save-status-card {
+  margin: 0.75rem 1.5rem 0;
+  padding: 0.7rem 0.9rem;
+  border-radius: 6px;
+  border: 1px solid var(--c-border);
+  font-size: 0.82rem;
+}
+
+.save-status-card.success {
+  background: rgba(46, 125, 50, 0.08);
+  border-color: rgba(46, 125, 50, 0.4);
+}
+
+.save-status-card.error {
+  background: rgba(176, 0, 32, 0.08);
+  border-color: rgba(176, 0, 32, 0.45);
+}
+
+.save-status-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.save-time {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  opacity: 0.85;
+}
+
+.save-status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 0.2rem 1rem;
+  margin-top: 0.4rem;
+}
+
+.save-status-grid code {
+  word-break: break-all;
+}
+
+.backup-note {
+  margin-top: 0.5rem;
+  font-size: 0.74rem;
+  opacity: 0.85;
+}
+
+.checklist-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 0.5rem;
+}
+
+.commit-helper,
+.backup-helper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-top: 1px solid var(--c-border);
+  padding-top: 1rem;
+}
+
+.commit-helper h5,
+.backup-helper h5 {
+  margin: 0;
+}
+
+.commit-help-text {
+  font-size: 0.76rem;
+  opacity: 0.85;
+  margin: 0;
+}
+
+.commit-block {
+  background: #111;
+  color: #ebc074;
+  padding: 0.6rem 0.75rem;
+  border-radius: 5px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.76rem;
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin: 0;
+}
+
+.commit-warning {
+  font-size: 0.76rem;
+  color: #b00020;
+  margin: 0;
 }
 </style>
