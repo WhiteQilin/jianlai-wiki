@@ -163,6 +163,7 @@ export const SECTION_FIELDS: Record<string, FieldDef[]> = {
   ],
   factions: [
     { key: 'factionType', label: 'Faction Type', type: 'text', group: 'section' },
+    { key: 'region', label: 'Region', type: 'text', group: 'section', placeholder: 'e.g. Eastern Aquarius Continent', help: 'General region text fallback for when no /world/... entry exists yet. Does not replace Headquarters.' },
     { key: 'headquarters', label: 'Headquarters', type: 'relationship', group: 'relationships' },
     { key: 'leader', label: 'Leader', type: 'relationship-multi', group: 'relationships' },
     { key: 'members', label: 'Members', type: 'relationship-multi', group: 'relationships' },
@@ -189,6 +190,8 @@ export const SECTION_FIELDS: Record<string, FieldDef[]> = {
     { key: 'tier', label: 'Tier', type: 'text', group: 'section' },
     { key: 'origin', label: 'Origin', type: 'text', group: 'section' },
     { key: 'owners', label: 'Owners', type: 'relationship-multi', group: 'relationships' },
+    { key: 'contains', label: 'Contains', type: 'relationship-multi', group: 'relationships', help: 'For vessel/storage artifacts: items held or nourished inside. Accepts relationship paths or free text; leave empty if unknown.' },
+    { key: 'storedItems', label: 'Stored Items', type: 'relationship-multi', group: 'relationships', help: 'Companion list to Contains for items kept in the vessel. Accepts paths or free text; optional.' },
   ],
   timeline: [
     { key: 'date', label: 'Date', type: 'text', group: 'section' },
@@ -215,6 +218,7 @@ export const SECTION_FIELDS: Record<string, FieldDef[]> = {
   glossary: [
     { key: 'termType', label: 'Term Type', type: 'text', group: 'section' },
     { key: 'relatedTerms', label: 'Related Terms', type: 'tags', group: 'section' },
+    { key: 'denominations', label: 'Denominations', type: 'tags', group: 'section', help: 'Optional currency sub-units (e.g. snowflake-coin). Keeps denominations out of the cross-link Related Terms field.' },
   ],
 }
 

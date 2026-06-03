@@ -149,3 +149,34 @@ Recommended scope:
 5. Keep the editor local-only and avoid auth/database/media-upload work until the content workflow is stable.
 
 Do **not** start public CMS/auth/database work yet.
+
+---
+
+## Stage 13B — Field Registry & Taxonomy Refinement (Complete)
+
+Refined the private editor registry based on the five real Jian Lai pilot entries
+(Cui Dongshan, Mud Bottle Alley, Sword-Nurturing Gourd, Fengxue Temple, Immortal
+Money) created in Stage 13A. No public editing, auth, database, or upload work added.
+
+**Changes:**
+
+1. Added optional artifact vessel fields `contains` and `storedItems` (relationship
+   paths where possible; free text and empty values allowed).
+2. Added optional faction text field `region` as a general-region fallback when no
+   routed `/world/...` entry exists yet — it does **not** replace `headquarters`.
+3. Reviewed glossary/currency structure: kept `relatedTerms`, added an optional
+   `denominations` string-array for currency sub-units. Did not overbuild.
+4. Documented a media placeholder convention: empty image/banner is acceptable for
+   early entries and treated as recommended/non-blocking in the checklist. No image
+   paths invented; nothing added to `public/videos` or `public/fonts`.
+5. Hardened editor QA with a retry/settle guard for transient `ECONNREFUSED` during
+   temp content create/delete, plus assertions verifying the new optional fields are
+   registered and round-trip through save without being stripped.
+
+All additions are optional/additive in `content.config.ts` and `fieldRegistry.ts`;
+existing content and frontmatter remain compatible. The editor stays dev-only,
+`/admin` is not prerendered, `/titles` remains internal, and the route count is
+unchanged.
+
+See `plans/entry-field-registry.md` (Stage 13B Addendum) for field details, the
+media placeholder convention, and remaining taxonomy questions.

@@ -133,6 +133,7 @@ Complete type vocabulary for every field in the schema. Types are: `string`, `nu
 |---|---|
 | `factionType` | string |
 | `headquarters` | path string |
+| `region` | string *(Stage 13B; general region text fallback when no routed `/world/...` entry exists yet — does NOT replace `headquarters`)* |
 | `leader` | path string \| path string[] |
 | `members` | path string[] |
 | `teachings` | string[] |
@@ -143,6 +144,8 @@ Complete type vocabulary for every field in the schema. Types are: `string`, `nu
 | `artifactType` | string |
 | `tier` | string |
 | `owners` | path string[] |
+| `contains` | path string[] \| string[] *(Stage 13B; vessel/storage contents — relationship paths where possible, free text allowed, empty OK)* |
+| `storedItems` | path string[] \| string[] *(Stage 13B; companion list to `contains`; optional)* |
 
 ### World / Location
 | Field | Type |
@@ -207,6 +210,7 @@ Complete type vocabulary for every field in the schema. Types are: `string`, `nu
 |---|---|
 | `termType` | string |
 | `relatedTerms` | path string[] |
+| `denominations` | string[] *(Stage 13B; optional currency sub-units, e.g. snowflake-coin — keeps denominations out of the cross-link `relatedTerms`)* |
 
 ---
 
@@ -698,6 +702,49 @@ These decisions are canonical as of Stage 7C and should be honored by all future
 8. **Relationship paths must point at routed sections.** Links to internal/non-existent targets are dropped from the graph without error.
 9. **`titleZh` is reserved** as a future alias for `chinese` and must not be used yet.
 10. **Search only sees** `title`, `chinese`, `pinyin`, `category`, `tags`, `description`. Body prose is not indexed.
+
+---
+
+## Stage 13B Addendum — Field Registry & Taxonomy Refinement
+
+Stage 13B refined the registry based on the five real Jian Lai pilot entries. All
+additions are **optional and additive** — existing content and frontmatter remain
+fully compatible, and no field was renamed or removed.
+
+### New optional fields
+
+| Field | Section | Type | Purpose |
+|---|---|---|---|
+| `contains` | artifacts | path string[] / string[] | Vessel/storage contents (e.g. swords nourished inside a Sword-Nurturing Gourd). Relationship paths where possible; free text and empty allowed. |
+| `storedItems` | artifacts | path string[] / string[] | Companion list to `contains` for items kept in the vessel. Optional. |
+| `region` | factions | string | General region text fallback when no routed `/world/...` entry exists yet. **Does not replace `headquarters`.** |
+| `denominations` | glossary | string[] | Optional currency sub-units (e.g. `snowflake-coin`). Keeps denominations out of the cross-link `relatedTerms` field, which stays as-is. |
+
+> `contains`/`storedItems` are **not** strict-path-validated in the editor, so they
+> accept both relationship paths and plain text. Routed-looking paths still receive a
+> non-blocking ghost-link hint in the checklist. `region` and `denominations` are
+> never treated as relationship paths.
+
+### Media Placeholder Convention
+
+Early entries routinely ship with empty media. This is **expected and non-blocking**:
+
+- An empty `image` or `banner` is **acceptable** for early/stub entries; cards fall
+  back to the seal-character placeholder.
+- The editor Production Checklist treats missing media as **recommended, not a
+  failure** — the `media` check stays `pass` for empty values and only `warn`s on a
+  malformed (wrong prefix/extension) path.
+- **Do not invent image paths.** Leave the field as `""` until real media exists.
+- **Do not add files** to `public/videos` or `public/fonts` to satisfy a placeholder.
+
+### Remaining taxonomy questions
+
+- Should `denominations` entries eventually become routed glossary sub-entries (one
+  route each) rather than inline strings?
+- Should `region` be promoted to a proper `/world` relationship once those location
+  entries exist, with a migration path from text → path?
+- Do `contains` and `storedItems` overlap enough to merge into a single field
+  long-term?
 
 ---
 

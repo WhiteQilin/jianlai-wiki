@@ -66,6 +66,9 @@ export default defineContentConfig({
         // --- Faction / Sect ---
         factionType: z.string().optional(),
         headquarters: z.string().optional(),
+        // General region text fallback when no routed `/world/...` entry exists
+        // yet. Additive; does NOT replace `headquarters`.
+        region: z.string().optional(),
         leader: z.union([z.string(), z.array(z.string())]).optional(),
         members: z.array(z.string()).optional(),
         teachings: z.array(z.string()).optional(),
@@ -74,6 +77,10 @@ export default defineContentConfig({
         artifactType: z.string().optional(),
         tier: z.string().optional(),
         owners: z.array(z.string()).optional(),
+        // Vessel/storage artifacts: items held or nourished inside. Entries may
+        // be relationship paths (`/section/slug`) or free text; empty allowed.
+        contains: z.array(z.string()).optional(),
+        storedItems: z.array(z.string()).optional(),
 
         // --- World / Location ---
         locationType: z.string().optional(),
@@ -129,6 +136,9 @@ export default defineContentConfig({
         // --- Glossary ---
         termType: z.string().optional(),
         relatedTerms: z.array(z.string()).optional(),
+        // Optional currency sub-units (e.g. snowflake-coin, grain-rain-coin).
+        // Plain strings; keeps denominations out of the cross-link `relatedTerms`.
+        denominations: z.array(z.string()).optional(),
       }),
     }),
   },

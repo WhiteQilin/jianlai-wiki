@@ -11,6 +11,43 @@ const TAXONOMY_TEMP_FILE = join(ROOT, 'content', 'world', 'haoran-heaven.md')
 
 const results = []
 
+const RETRY_ATTEMPTS = 5
+const RETRY_DELAY_MS = 400
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
+/** True for transient connection errors raised when the dev server restarts. */
+function isTransientNetworkError(error) {
+  const code = error?.cause?.code || error?.code || ''
+  const msg = `${error?.message || ''}`
+  return (
+    code === 'ECONNREFUSED' ||
+    code === 'ECONNRESET' ||
+    code === 'UND_ERR_SOCKET' ||
+    /ECONNREFUSED|ECONNRESET|fetch failed/i.test(msg)
+  )
+}
+
+/**
+ * Retry/settle guard: re-run a fetch-based action if the dev server is briefly
+ * unreachable (e.g. it restarts mid-run during temp content create/delete).
+ * Only transient connection errors are retried; assertion/HTTP errors bubble up.
+ */
+async function withRetry(fn, label = 'request') {
+  let lastError
+  for (let attempt = 1; attempt <= RETRY_ATTEMPTS; attempt += 1) {
+    try {
+      return await fn()
+    } catch (error) {
+      lastError = error
+      if (!isTransientNetworkError(error) || attempt === RETRY_ATTEMPTS) throw error
+      console.warn(`[editor-qa] transient ${label} error (attempt ${attempt}/${RETRY_ATTEMPTS}); retrying...`)
+      await sleep(RETRY_DELAY_MS * attempt)
+    }
+  }
+  throw lastError
+}
+
 function pass(name, details = '') {
   results.push({ name, status: 'PASS', details })
 }
@@ -25,11 +62,11 @@ function assert(name, condition, details = '') {
 }
 
 async function jsonFetch(path, options = {}) {
-  const res = await fetch(`${BASE_URL}${path}`, {
+  const res = await withRetry(() => fetch(`${BASE_URL}${path}`, {
     headers: options.body ? { 'Content-Type': 'application/json' } : undefined,
     ...options,
     body: options.body ? JSON.stringify(options.body) : undefined,
-  })
+  }), `${options.method || 'GET'} ${path}`)
 
   const text = await res.text()
   let data = null
@@ -49,7 +86,7 @@ async function jsonFetch(path, options = {}) {
 
 async function status(path) {
   try {
-    const res = await fetch(`${BASE_URL}${path}`)
+    const res = await withRetry(() => fetch(`${BASE_URL}${path}`), `GET ${path}`)
     return res.status
   } catch {
     return -1
@@ -88,6 +125,16 @@ async function main() {
     assert(`dev-only guard present in ${file.replace(`${ROOT}\\`, '').replaceAll('\\', '/')}`, raw.includes('import.meta.dev'))
   }
 
+  // Stage 13B: confirm the new optional fields are declared in the registry and schema.
+  const registrySource = await readFile(join(ROOT, 'app', 'data', 'fieldRegistry.ts'), 'utf-8')
+  for (const key of ['contains', 'storedItems', 'region', 'denominations']) {
+    assert(`Stage 13B field "${key}" registered in fieldRegistry.ts`, registrySource.includes(`key: '${key}'`))
+  }
+  const schemaSource = await readFile(join(ROOT, 'content.config.ts'), 'utf-8')
+  for (const key of ['contains', 'storedItems', 'region', 'denominations']) {
+    assert(`Stage 13B field "${key}" is optional in content.config.ts`, new RegExp(`${key}:[^\\n]*\\.optional\\(\\)`).test(schemaSource))
+  }
+
   const traversalStatus = await status('/api/editor/entry?path=/characters/../about')
   const sampleStatus = await status('/api/editor/entry?path=/characters/sample')
   const metaStatus = await status('/api/editor/entry?path=/_meta/characters')
@@ -124,6 +171,8 @@ async function main() {
   fm.related = ['/characters/chen-pingan']
   fm.relatedTerms = ['stage-8l']
   fm.termType = 'QA Term'
+  // Stage 13B: prove a new optional taxonomy field round-trips without stripping.
+  fm.denominations = ['stage-13b-snowflake-coin', 'stage-13b-grain-rain-coin']
 
   const saved = await jsonFetch('/api/editor/entry', {
     method: 'POST',
@@ -134,6 +183,16 @@ async function main() {
     },
   })
   assert('save creates backup before overwrite', Boolean(saved.backup && existsSync(join(ROOT, saved.backup))))
+
+  const reloaded = await jsonFetch(`/api/editor/entry?path=${encodeURIComponent(TEMP_ROUTE)}`)
+  const reloadedFm = reloaded.frontmatter || {}
+  assert(
+    'Stage 13B optional field (denominations) persists through save',
+    Array.isArray(reloadedFm.denominations) &&
+      reloadedFm.denominations.includes('stage-13b-snowflake-coin') &&
+      reloadedFm.denominations.includes('stage-13b-grain-rain-coin'),
+    `denominations=${JSON.stringify(reloadedFm.denominations)}`,
+  )
 
   const deleted = await jsonFetch('/api/editor/entry', { method: 'DELETE', body: { path: TEMP_ROUTE } })
   assert('delete creates backup before removal', Boolean(deleted.backup && existsSync(join(ROOT, deleted.backup))))

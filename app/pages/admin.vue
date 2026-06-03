@@ -1041,13 +1041,18 @@ const productionChecks = computed<ProductionCheck[]>(() => {
       : 'All relationship links resolve to existing entries.',
   })
 
+  const hasImage = typeof fm.image === 'string' && fm.image.trim() !== ''
+  const hasBanner = typeof fm.banner === 'string' && fm.banner.trim() !== ''
+  const emptyMediaNote = (!hasImage || !hasBanner)
+    ? ' Empty image/banner is acceptable for early entries (recommended, non-blocking) — add media later.'
+    : ''
   checks.push({
     id: 'media',
     label: 'Media fields valid',
     status: invalidMediaFields.value.length ? 'warn' : 'pass',
     detail: invalidMediaFields.value.length
       ? `Check: ${invalidMediaFields.value.join('; ')}`
-      : 'Media paths use expected prefixes and extensions.',
+      : `Media paths use expected prefixes and extensions.${emptyMediaNote}`,
   })
 
   const verificationOk = verificationHints.value.length === 0
