@@ -3,7 +3,7 @@ title: Manhuang Heaven
 chinese: 蛮荒天下
 pinyin: Man Huang Tian Xia
 section: world
-category: World
+category: Heaven
 status: published
 importance: primary
 verificationStatus: verified

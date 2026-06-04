@@ -13,7 +13,9 @@ export const SECTION_CANON_TYPE_FIELD: Record<string, string> = {
 
 export const TAXONOMY_ALIAS_MAP: Record<string, Record<string, string>> = {
   world: {
-    heaven: 'World',
+    // `Heaven` is now a canonical world category (section: world,
+    // category: Heaven, locationType: Heaven), so it is intentionally NOT
+    // aliased to `World` here.
     world: 'World',
     天下: 'World',
     'major world': 'World',

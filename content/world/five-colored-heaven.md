@@ -3,7 +3,7 @@ title: Five Colored Heaven
 chinese: 五彩天下
 pinyin: Wu Cai Tian Xia
 section: world
-category: World
+category: Heaven
 status: published
 importance: primary
 verificationStatus: verified

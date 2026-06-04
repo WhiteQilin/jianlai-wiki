@@ -90,6 +90,9 @@ export default defineContentConfig({
 
         // --- Cultivation ---
         realmLevel: z.number().optional(),
+        // Realm groups/ranges (e.g. "1–5", "6–10", "11–15"). String, not numeric:
+        // use this for tier groupings; keep `realmLevel` for single numeric realms.
+        realmRange: z.string().optional(),
         pathType: z.string().optional(),
         practitioners: z.array(z.string()).optional(),
 

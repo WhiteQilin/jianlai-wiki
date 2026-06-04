@@ -83,7 +83,7 @@ export const VERIFICATION_VALUES = ['verified', 'to-be-verified', 'disputed', 's
 
 export const CATEGORY_MAP: Record<string, string[]> = {
   characters: ['Character', 'Major', 'Minor', 'Gods'],
-  world: ['World', 'Continent', 'Grotto-Heaven', 'Blessed Land', 'City', 'Landmark', 'Sword-Qi-Great-Wall'],
+  world: ['World', 'Heaven', 'Continent', 'Grotto-Heaven', 'Blessed Land', 'City', 'Landmark', 'Sword-Qi-Great-Wall'],
   cultivation: ['Realm', 'Path', 'Method', 'Concept'],
   swordsmanship: ['Technique', 'Flying-Sword-Art', 'Ability', 'Sword-Style'],
   factions: ['Sect', 'Dynasty', 'Academy', 'Clan', 'Alliance'],
@@ -177,7 +177,8 @@ export const SECTION_FIELDS: Record<string, FieldDef[]> = {
   ],
   cultivation: [
     { key: 'pathType', label: 'Path Type', type: 'text', group: 'section' },
-    { key: 'realmLevel', label: 'Realm Level', type: 'number', group: 'section' },
+    { key: 'realmLevel', label: 'Realm Level', type: 'number', group: 'section', help: 'Single numeric realm (e.g. 9). For a tier/group spanning realms, leave blank and use Realm Range instead.' },
+    { key: 'realmRange', label: 'Realm Range', type: 'text', group: 'section', help: 'Realm group/range such as 1–5, 6–10, 11–15. Use for tier groupings; keep Realm Level for single numeric realms.' },
     { key: 'practitioners', label: 'Practitioners', type: 'relationship-multi', group: 'relationships' },
   ],
   swordsmanship: [

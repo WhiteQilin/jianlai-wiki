@@ -12,6 +12,7 @@ banner: ""
 seal: 境
 description: The collective term for the higher tier of cultivation realms in Jian Lai, marking the threshold of truly powerful and long-lived cultivators.
 pathType: Realm Grouping
+realmRange: "11–15"
 tags:
   - realm
   - cultivation

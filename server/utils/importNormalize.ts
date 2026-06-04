@@ -45,6 +45,7 @@ const STRING_OPTIONAL_FIELDS = new Set([
   'parentLocation',
   // Cultivation
   'pathType',
+  'realmRange',
   // Swordsmanship
   'abilityType',
   'lineage',
@@ -122,6 +123,68 @@ export interface ImportFieldNormalizationReview {
   normalizedNullFields: string[]
   normalizedRelationships: boolean
   relationshipsConvertedCount: number
+  movedRealmLevelToRange: boolean
+  droppedRealmLevel: boolean
+}
+
+/**
+ * Match a realm range like `6-10`, `6–10` (en dash), `6—10` (em dash），or `6 to 10`.
+ * Captures the two endpoints so we can normalize to an en-dash range string.
+ */
+const REALM_RANGE_RE = /^\s*(\d+)\s*(?:-|–|—|to)\s*(\d+)\s*$/i
+
+/**
+ * Coerce a NotebookLM `realmLevel` into schema-safe fields.
+ * - real number → keep as `realmLevel` (numeric).
+ * - range (`6-10`, `6–10`, `6 to 10`) → move to `realmRange` ("6–10"), drop `realmLevel`.
+ * - NaN / blank / non-numeric prose → drop `realmLevel` entirely.
+ * Never lets a non-numeric value reach `realmLevel` (which crashes SQLite as NaN).
+ */
+function normalizeRealmLevelField(frontmatter: Record<string, any>): {
+  movedToRange: boolean
+  dropped: boolean
+  warning: string | null
+} {
+  if (!('realmLevel' in frontmatter)) {
+    return { movedToRange: false, dropped: false, warning: null }
+  }
+
+  const raw = frontmatter.realmLevel
+
+  // Already a finite number: keep as-is.
+  if (typeof raw === 'number' && Number.isFinite(raw)) {
+    return { movedToRange: false, dropped: false, warning: null }
+  }
+
+  const text = `${raw ?? ''}`.trim()
+
+  // Pure integer expressed as string (e.g. "9"): coerce to number, keep.
+  if (/^\d+$/.test(text)) {
+    frontmatter.realmLevel = Number(text)
+    return { movedToRange: false, dropped: false, warning: null }
+  }
+
+  // Range like 6-10 / 6–10 / 6 to 10: move to realmRange (en-dash form).
+  const rangeMatch = text.match(REALM_RANGE_RE)
+  if (rangeMatch) {
+    const rangeValue = `${rangeMatch[1]}–${rangeMatch[2]}`
+    delete frontmatter.realmLevel
+    // Don't clobber an explicit realmRange if one was already provided.
+    if (!frontmatter.realmRange) frontmatter.realmRange = rangeValue
+    return {
+      movedToRange: true,
+      dropped: false,
+      warning: `Moved realmLevel range to realmRange ("${rangeValue}"); realmLevel must be a single number.`,
+    }
+  }
+
+  // NaN, blank, or non-numeric prose: omit realmLevel to avoid SQLite NaN crash.
+  delete frontmatter.realmLevel
+  return {
+    movedToRange: false,
+    dropped: true,
+    warning: `Omitted non-numeric realmLevel ("${text}"); realmLevel must be a single number. Use realmRange for groups/ranges.`,
+  }
 }
 
 /**
@@ -243,7 +306,10 @@ export function normalizeImportedFields(frontmatter: Record<string, any>): Impor
     }
   }
 
-  // 3. Build warnings.
+  // 3. Coerce realmLevel: keep real numbers, move ranges to realmRange, drop NaN/prose.
+  const realm = normalizeRealmLevelField(normalized)
+
+  // 4. Build warnings.
   if (nullFieldsCoerced.length > 0) {
     warnings.push(
       `Converted null optional fields to safe empties: ${nullFieldsCoerced.join(', ')} (string→"", array→[], number→omitted).`,
@@ -256,11 +322,17 @@ export function normalizeImportedFields(frontmatter: Record<string, any>): Impor
     )
   }
 
+  if (realm.warning) {
+    warnings.push(realm.warning)
+  }
+
   return {
     frontmatter: normalized,
     warnings,
     normalizedNullFields: nullFieldsCoerced,
     normalizedRelationships: relationshipsConverted,
     relationshipsConvertedCount,
+    movedRealmLevelToRange: realm.movedToRange,
+    droppedRealmLevel: realm.dropped,
   }
 }

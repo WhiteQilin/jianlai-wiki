@@ -240,15 +240,49 @@ async function main() {
     method: 'POST',
     body: { mode: 'parse', markdown: taxonomyMarkdown },
   })
-  assert('taxonomy temp maps Heaven to World', parsedTaxonomy.result.frontmatter.category === 'World')
+  // Heaven is now a canonical world category: it must be kept as-is (not
+  // aliased to World) and must NOT raise a taxonomy mapping warning/review.
+  assert('taxonomy temp keeps Heaven as canonical category', parsedTaxonomy.result.frontmatter.category === 'Heaven')
   assert('taxonomy temp preserves locationType', parsedTaxonomy.result.frontmatter.locationType === 'Heaven')
-  assert('taxonomy temp warning is returned', parsedTaxonomy.result.warnings.some((warning) => warning.includes('Mapped imported category "Heaven"')))
-  assert('taxonomy temp review payload is returned', parsedTaxonomy.result.taxonomyReview?.originalCategory === 'Heaven')
+  assert(
+    'taxonomy temp does NOT map Heaven to World',
+    !parsedTaxonomy.result.warnings.some((warning) => warning.includes('Mapped imported category "Heaven"')),
+  )
+  assert('taxonomy temp emits no Heaven taxonomy review', !parsedTaxonomy.result.taxonomyReview)
   assert(
     'taxonomy temp resolves to disposable QA route',
     parsedTaxonomy.result.routePath === TAXONOMY_TEMP_ROUTE,
     `routePath=${parsedTaxonomy.result.routePath}`,
   )
+
+  // Alias mechanism still works for non-canonical values (天下 -> World).
+  const aliasMarkdown = [
+    '---',
+    'title: Editor QA Temp Alias World',
+    'chinese: 别名测试天下',
+    'pinyin: Bie Ming',
+    'section: world',
+    'category: 天下',
+    'locationType: Heaven',
+    'description: Disposable alias QA world; safe to delete.',
+    'importance: minor',
+    'verificationStatus: to-be-verified',
+    '---',
+    '## Overview',
+    '',
+    'Body.',
+    '',
+  ].join('\n')
+  const parsedAlias = await jsonFetch('/api/editor/import-markdown', {
+    method: 'POST',
+    body: { mode: 'parse', markdown: aliasMarkdown },
+  })
+  assert('taxonomy alias maps 天下 to World', parsedAlias.result.frontmatter.category === 'World')
+  assert(
+    'taxonomy alias warning is returned',
+    parsedAlias.result.warnings.some((warning) => warning.includes('Mapped imported category "天下"')),
+  )
+  assert('taxonomy alias review payload is returned', parsedAlias.result.taxonomyReview?.originalCategory === '天下')
 
   // ---------------------------------------------------------------------------
   // Stage 13F: NotebookLM import coercion (parse-only; no file writes).
@@ -358,6 +392,95 @@ async function main() {
     'Stage 13F import review reports relationship conversion count',
     parsedRels.result.importReview?.normalizedRelationships === true &&
       parsedRels.result.importReview?.relationshipsConvertedCount === 2,
+  )
+
+  // ---------------------------------------------------------------------------
+  // Stage 16A: realmLevel range adapter (realmLevel "6-10" → realmRange "6–10").
+  // Preserves NotebookLM semantics while keeping realmLevel schema-safe (number).
+  // ---------------------------------------------------------------------------
+  const realmRangeMarkdown = [
+    '---',
+    'title: Stage 16A Realm Range',
+    'chinese: 境界范围测试',
+    'pinyin: Jing Jie',
+    'section: cultivation',
+    'category: Realm',
+    'description: NotebookLM emits realmLevel as a 6-10 range.',
+    'importance: minor',
+    'verificationStatus: to-be-verified',
+    'realmLevel: 6-10',
+    '---',
+    '## Overview',
+    '',
+    'Body.',
+    '',
+  ].join('\n')
+  const parsedRealmRange = await jsonFetch('/api/editor/import-markdown', {
+    method: 'POST',
+    body: { mode: 'parse', markdown: realmRangeMarkdown },
+  })
+  const realmFm = parsedRealmRange.result.frontmatter
+  assert('Stage 16A realmLevel range moved to realmRange "6–10"', realmFm.realmRange === '6–10', `realmRange=${JSON.stringify(realmFm.realmRange)}`)
+  assert('Stage 16A realmLevel omitted after range move', !('realmLevel' in realmFm), `realmLevel=${JSON.stringify(realmFm.realmLevel)}`)
+  assert(
+    'Stage 16A realmLevel-range warning is surfaced',
+    parsedRealmRange.result.warnings.some((w) => w.includes('Moved realmLevel range to realmRange')),
+    `warnings=${JSON.stringify(parsedRealmRange.result.warnings)}`,
+  )
+  assert('Stage 16A import review reports realmLevel moved to range', parsedRealmRange.result.importReview?.movedRealmLevelToRange === true)
+
+  // Real numeric realmLevel is preserved untouched.
+  const realmNumberMarkdown = [
+    '---',
+    'title: Stage 16A Realm Number',
+    'chinese: 单一境界测试',
+    'pinyin: Dan Yi',
+    'section: cultivation',
+    'category: Realm',
+    'description: A single numeric realmLevel must be preserved.',
+    'importance: minor',
+    'verificationStatus: to-be-verified',
+    'realmLevel: 9',
+    '---',
+    '## Overview',
+    '',
+    'Body.',
+    '',
+  ].join('\n')
+  const parsedRealmNumber = await jsonFetch('/api/editor/import-markdown', {
+    method: 'POST',
+    body: { mode: 'parse', markdown: realmNumberMarkdown },
+  })
+  assert('Stage 16A numeric realmLevel preserved', parsedRealmNumber.result.frontmatter.realmLevel === 9)
+  assert('Stage 16A numeric realmLevel sets no realmRange', !parsedRealmNumber.result.frontmatter.realmRange)
+
+  // Non-numeric prose realmLevel is dropped (no SQLite NaN crash) with a warning.
+  const realmProseMarkdown = [
+    '---',
+    'title: Stage 16A Realm Prose',
+    'chinese: 非数字测试',
+    'pinyin: Fei Shu Zi',
+    'section: cultivation',
+    'category: Realm',
+    'description: NotebookLM emits non-numeric prose for realmLevel.',
+    'importance: minor',
+    'verificationStatus: to-be-verified',
+    'realmLevel: high tier',
+    '---',
+    '## Overview',
+    '',
+    'Body.',
+    '',
+  ].join('\n')
+  const parsedRealmProse = await jsonFetch('/api/editor/import-markdown', {
+    method: 'POST',
+    body: { mode: 'parse', markdown: realmProseMarkdown },
+  })
+  assert('Stage 16A non-numeric realmLevel dropped', !('realmLevel' in parsedRealmProse.result.frontmatter))
+  assert('Stage 16A non-numeric realmLevel review flag set', parsedRealmProse.result.importReview?.droppedRealmLevel === true)
+  assert(
+    'Stage 16A non-numeric realmLevel warning is surfaced',
+    parsedRealmProse.result.warnings.some((w) => w.includes('Omitted non-numeric realmLevel')),
   )
 
   await jsonFetch('/api/editor/import-markdown', {

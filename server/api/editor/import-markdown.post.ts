@@ -31,6 +31,8 @@ interface ImportFieldReview {
   normalizedNullFields: string[]
   normalizedRelationships: boolean
   relationshipsConvertedCount: number
+  movedRealmLevelToRange: boolean
+  droppedRealmLevel: boolean
 }
 
 interface ImportResult {
@@ -196,6 +198,8 @@ async function buildParseResult(frontmatter: Record<string, any>, body: string):
       normalizedNullFields: fieldReview.normalizedNullFields,
       normalizedRelationships: fieldReview.normalizedRelationships,
       relationshipsConvertedCount: fieldReview.relationshipsConvertedCount,
+      movedRealmLevelToRange: fieldReview.movedRealmLevelToRange,
+      droppedRealmLevel: fieldReview.droppedRealmLevel,
     },
   }
 }
