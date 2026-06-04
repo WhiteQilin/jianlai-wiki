@@ -7,8 +7,11 @@ const BASE_URL = process.env.EDITOR_QA_BASE_URL || 'http://localhost:3000'
 const ROOT = process.cwd()
 const TEMP_ROUTE = '/glossary/stage-8l-qa-temp-entry'
 const TEMP_FILE = join(ROOT, 'content', 'glossary', 'stage-8l-qa-temp-entry.md')
-const TAXONOMY_TEMP_ROUTE = '/world/haoran-heaven'
-const TAXONOMY_TEMP_FILE = join(ROOT, 'content', 'world', 'haoran-heaven.md')
+// Disposable QA-only world slug. Must never match a real content entry so that
+// editor:qa can freely create/delete it without clobbering authored lore
+// (e.g. a real /world/haoran-heaven entry).
+const TAXONOMY_TEMP_ROUTE = '/world/editor-qa-temp-world'
+const TAXONOMY_TEMP_FILE = join(ROOT, 'content', 'world', 'editor-qa-temp-world.md')
 
 const results = []
 
@@ -201,9 +204,9 @@ async function main() {
 
   const taxonomyMarkdown = [
     '---',
-    'title: Haoran Heaven',
-    'chinese: 浩然天下',
-    'pinyin: Hao Ran Tian Xia',
+    'title: Editor QA Temp World',
+    'chinese: 编辑器QA临时天下',
+    'pinyin: Bian Ji Qi QA Lin Shi',
     'section: world',
     'category: Heaven',
     'locationType: Heaven',
@@ -213,10 +216,10 @@ async function main() {
     'image: ""',
     'banner: ""',
     'video: ""',
-    'seal: 浩',
-    'description: One of the primary worlds in the universe.',
+    'seal: QA',
+    'description: Disposable editor QA world; safe to delete.',
     'tags:',
-    '  - haoran-heaven',
+    '  - editor-qa-temp-world',
     'related:',
     '  - /world/sword-qi-great-wall',
     'sourceNotes: Test taxonomy normalization.',
@@ -237,10 +240,15 @@ async function main() {
     method: 'POST',
     body: { mode: 'parse', markdown: taxonomyMarkdown },
   })
-  assert('Haoran taxonomy maps Heaven to World', parsedTaxonomy.result.frontmatter.category === 'World')
-  assert('Haoran taxonomy preserves locationType', parsedTaxonomy.result.frontmatter.locationType === 'Heaven')
-  assert('Haoran taxonomy warning is returned', parsedTaxonomy.result.warnings.some((warning) => warning.includes('Mapped imported category "Heaven"')))
-  assert('Haoran taxonomy review payload is returned', parsedTaxonomy.result.taxonomyReview?.originalCategory === 'Heaven')
+  assert('taxonomy temp maps Heaven to World', parsedTaxonomy.result.frontmatter.category === 'World')
+  assert('taxonomy temp preserves locationType', parsedTaxonomy.result.frontmatter.locationType === 'Heaven')
+  assert('taxonomy temp warning is returned', parsedTaxonomy.result.warnings.some((warning) => warning.includes('Mapped imported category "Heaven"')))
+  assert('taxonomy temp review payload is returned', parsedTaxonomy.result.taxonomyReview?.originalCategory === 'Heaven')
+  assert(
+    'taxonomy temp resolves to disposable QA route',
+    parsedTaxonomy.result.routePath === TAXONOMY_TEMP_ROUTE,
+    `routePath=${parsedTaxonomy.result.routePath}`,
+  )
 
   // ---------------------------------------------------------------------------
   // Stage 13F: NotebookLM import coercion (parse-only; no file writes).
