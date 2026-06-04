@@ -6,6 +6,7 @@ section: world
 description: Explore the vast realms, continents, and secret realms of Jian Lai.
 categories:
   - World
+  - Heaven
   - Continent
   - Grotto-Heaven
   - Blessed Land
@@ -18,4 +19,4 @@ sourceNotes: "Sample scaffold pending detailed verification."
 ---
 
 Section metadata for World. Non-routed `_meta/` partial. Defines intro copy and
-valid `category` values (World, Continent, Grotto-Heaven, Blessed Land, etc.) for Stage 4 filter tabs.
+valid `category` values (World, Heaven, Continent, Grotto-Heaven, Blessed Land, etc.) for Stage 4 filter tabs.

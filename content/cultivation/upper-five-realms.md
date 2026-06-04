@@ -3,15 +3,15 @@ title: Upper Five Realms
 chinese: 上五境
 pinyin: Shàng Wǔ Jìng
 section: cultivation
-category: Concept
+category: Realm
 subcategory: Realm Grouping
-status: Unknown
+status: published
 importance: major
 image: ""
 banner: ""
 seal: 境
 description: The collective term for the higher tier of cultivation realms in Jian Lai, marking the threshold of truly powerful and long-lived cultivators.
-pathType: Realm Grouping
+pathType: Qi Refining
 realmRange: "11–15"
 tags:
   - realm

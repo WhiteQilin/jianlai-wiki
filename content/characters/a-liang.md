@@ -23,6 +23,7 @@ related:
   - /characters/lu-zhi
   - /factions/sub-sage-lineage
   - /world/sword-qi-great-wall
+  - /cultivation/sword-cultivator
 origin: /world/haoran-heaven
 realm: 14th Realm (combat power / peak)
 affiliations:

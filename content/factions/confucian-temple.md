@@ -24,7 +24,8 @@ related:
   - /factions/shanya-academy
   - /factions/guanhu-academy
 factionType: Academy
-headquarters: /world/middle-earth-divine-continent
+region: Middle Earth Divine Continent
+headquarters: ""
 leader:
   - /characters/most-holy-teacher
   - /characters/li-sheng
@@ -34,7 +35,8 @@ members:
   - /characters/lu-xi
   - /characters/dao-lin
   - /characters/xi-ping
-teachings: /teachings/confucianism
+teachings:
+  - /teachings/confucianism
 sourceNotes: |
   Governance over Haoran Heaven and academies verified in Volumes 9, 29, and 30. Counter-offensive strategy against Manhuang Heaven verified in Volume 30, Chapter 1. Key figures such as Lu Xi and Dao Lin verified in Volume 9, Chapter 6 and Volume 44, Chapter 8.
 firstAppearance: ""
