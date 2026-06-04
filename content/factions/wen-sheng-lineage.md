@@ -4,7 +4,7 @@ chinese: 文圣一脉
 pinyin: Wen Sheng Yi Mai
 section: factions
 category: Lineage
-subcategory: Super-Faction
+subcategory: Teaching
 factionType: Confucian lineage
 status: published
 importance: primary
@@ -23,7 +23,6 @@ related:
   - /characters/cui-chan
   - /characters/zuo-you
   - /characters/qi-jingchun
-  - /characters/liu-shiliu
   - /characters/chen-pingan
   - /factions/confucian-temple
   - /factions/shanya-academy
@@ -34,12 +33,7 @@ members:
   - /characters/cui-chan
   - /characters/zuo-you
   - /characters/qi-jingchun
-  - /characters/liu-shiliu
   - /characters/chen-pingan
-  - /characters/mao-xiaodong
-  - /characters/cao-qinglang
-teachings:
-  - /teachings/confucianism
 sourceNotes: |
   The core philosophy of "Merit and Action" (事功) and "Human Nature is inherently evil" (性本恶) verified in Volume 27, Chapter 3. The Three-Four Dispute (三四之争) and loss of statues in the Confucian Temple verified in Volume 3, Chapter 10. The disciple hierarchy (Cui Chan, Zuo You, Qi Jingchun, Liu Shiliu) verified in Volume 25, Chapter 8. Chen Ping'an as the closed-door disciple verified in Volume 29, Chapter 6. Mao Xiaodong's transfer to the Li Sheng lineage verified in Volume 29, Chapter 7. Restoration of the Wen Sheng statues in the Confucian Temple verified in Volume 29, Chapter 7.
 firstAppearance: ""
@@ -89,4 +83,4 @@ Following the war, public and scholarly opinion shifted drastically. Scholars ac
 - **剑来27：风雪夜归人, 第三章 — 春风得意:** Supports the core philosophy of "Merit and Action" (事功学问) being proposed by Cui Chan and the "Human Nature is Evil" (性本恶) doctrine being championed by the Old Scholar.
 - **剑来29：左中皆好剑, 第六章 — 议事:** Supports Chen Ping'an's status as the closed-door disciple, meeting his senior brothers Zuo You and Jun Qian (Liu Shiliu) together in the Merit Forest.
 - **剑来29：左中皆好剑, 第七章 — 无话可说:** Supports Mao Xiaodong transferring from the Wen Sheng lineage to the Li Sheng lineage, and the official Confucian Temple decree restoring the Wen Sheng's statues and his rightful divine position.
-- **剑来30：一剑破万法, 第四章 — 酒中又过风波:** Supports the detail that the Sub-Sage's doctrine relies on "Human Nature is Good" (性本善) and the "Four Hearts," sharply contrasting the Wen Sheng lineage.```
+- **剑来30：一剑破万法, 第四章 — 酒中又过风波:** Supports the detail that the Sub-Sage's doctrine relies on "Human Nature is Good" (性本善) and the "Four Hearts," sharply contrasting the Wen Sheng lineage.
