@@ -22,7 +22,14 @@ export const TAXONOMY_ALIAS_MAP: Record<string, Record<string, string>> = {
     realm: 'World',
     macrocosm: 'World',
   },
-  factions: {},
+  factions: {
+    // `Lineage` is a canonical faction category (organized teaching lineages
+    // like Wen Sheng Lineage / Sub-Sage Lineage). Map common synonyms; the
+    // canonical value passes through unchanged.
+    'teaching lineage': 'Lineage',
+    'scholarly lineage': 'Lineage',
+    'confucian lineage': 'Lineage',
+  },
   artifacts: {},
   cultivation: {},
   swordsmanship: {},

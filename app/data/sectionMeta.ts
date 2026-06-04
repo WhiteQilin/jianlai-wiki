@@ -48,7 +48,7 @@ export const SECTION_META: Record<string, RawSectionMeta> = {
     title: 'Factions',
     chinese: '宗门势力',
     description: 'The sects, dynasties, academies, and clans that shape the mortal and immortal worlds.',
-    categories: ['Sect', 'Dynasty', 'Academy', 'Clan', 'Alliance'],
+    categories: ['Sect', 'Dynasty', 'Academy', 'Clan', 'Alliance', 'Lineage'],
   },
   artifacts: {
     title: 'Artifacts',

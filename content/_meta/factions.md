@@ -10,6 +10,7 @@ categories:
   - Academy
   - Clan
   - Alliance
+  - Lineage
 status: Draft
 verificationStatus: to-be-verified
 sourceNotes: "Sample scaffold pending detailed verification."

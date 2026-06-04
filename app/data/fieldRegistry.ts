@@ -86,7 +86,7 @@ export const CATEGORY_MAP: Record<string, string[]> = {
   world: ['World', 'Heaven', 'Continent', 'Grotto-Heaven', 'Blessed Land', 'City', 'Landmark', 'Sword-Qi-Great-Wall'],
   cultivation: ['Realm', 'Path', 'Method', 'Concept'],
   swordsmanship: ['Technique', 'Flying-Sword-Art', 'Ability', 'Sword-Style'],
-  factions: ['Sect', 'Dynasty', 'Academy', 'Clan', 'Alliance'],
+  factions: ['Sect', 'Dynasty', 'Academy', 'Clan', 'Alliance', 'Lineage'],
   artifacts: ['Weapon', 'Flying-Sword', 'Sword-Nurturing-Gourd', 'Treasure', 'Material', 'Talisman'],
   timeline: ['Era', 'Event', 'Arc'],
   rankings: ['Tier-List', 'Realm-Ladder', 'Named-List'],
