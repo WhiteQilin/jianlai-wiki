@@ -22,10 +22,12 @@ related:
   - /characters/a-liang
   - /characters/ritual-sage
   - /factions/confucian-temple
+  - /factions/sub-sage-lineage
 origin: /world/haoran-heaven
 realm: 14th Realm (合道 / Merged Dao)
 affiliations:
   - /factions/confucian-temple
+  - /factions/sub-sage-lineage
 titles:
   - Sub-Sage (亚圣)
 abilities:

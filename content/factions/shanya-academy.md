@@ -22,16 +22,20 @@ related:
   - /world/haoran-heaven
   - /factions/confucian-temple
   - /factions/wen-sheng-lineage
+  - /factions/guanhu-academy
   - /characters/qi-jingchun
   - /characters/cui-chan
+  - /characters/mao-xiaodong
 factionType: Academy
 region: Great Sui Dynasty / Donghua Mountain
 leader:
   - /characters/cui-chan
   - /characters/qi-jingchun
+  - /characters/mao-xiaodong
 members:
   - /characters/li-baoping
-teachings: []
+teachings:
+  - /teachings/confucianism
 sourceNotes: |
   Historical status and early principle of "action" verified in Volume 11, Chapter 4. Relocation to Donghua Mountain in Great Sui verified in Volume 11, Chapters 6 and 8. Qi Jingchun's struggles and recommendation letters verified in Volume 11, Chapter 5. Cui Chan's plotting against the academy verified in Volume 2, Chapter 6. Cui Chan's later role as Mountain Chief and its push to return to the 72 Academies verified in Volume 22, Chapter 3 and Volume 26, Chapter 6.
 firstAppearance: ""

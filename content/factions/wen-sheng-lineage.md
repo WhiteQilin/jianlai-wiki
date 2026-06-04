@@ -23,9 +23,13 @@ related:
   - /characters/cui-chan
   - /characters/zuo-you
   - /characters/qi-jingchun
+  - /characters/liu-shiliu
   - /characters/chen-pingan
+  - /characters/mao-xiaodong
+  - /characters/cao-qinglang
   - /factions/confucian-temple
   - /factions/shanya-academy
+  - /teachings/confucianism
 headquarters: /world/haoran-heaven
 leader:
   - /characters/old-scholar
@@ -33,7 +37,12 @@ members:
   - /characters/cui-chan
   - /characters/zuo-you
   - /characters/qi-jingchun
+  - /characters/liu-shiliu
   - /characters/chen-pingan
+  - /characters/mao-xiaodong
+  - /characters/cao-qinglang
+teachings:
+  - /teachings/confucianism
 sourceNotes: |
   The core philosophy of "Merit and Action" (事功) and "Human Nature is inherently evil" (性本恶) verified in Volume 27, Chapter 3. The Three-Four Dispute (三四之争) and loss of statues in the Confucian Temple verified in Volume 3, Chapter 10. The disciple hierarchy (Cui Chan, Zuo You, Qi Jingchun, Liu Shiliu) verified in Volume 25, Chapter 8. Chen Ping'an as the closed-door disciple verified in Volume 29, Chapter 6. Mao Xiaodong's transfer to the Li Sheng lineage verified in Volume 29, Chapter 7. Restoration of the Wen Sheng statues in the Confucian Temple verified in Volume 29, Chapter 7.
 firstAppearance: ""

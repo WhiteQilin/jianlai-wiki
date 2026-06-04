@@ -21,6 +21,8 @@ related:
   - /characters/cui-chan
   - /characters/zuo-you
   - /characters/qi-jingchun
+  - /characters/liu-shiliu
+  - /characters/mao-xiaodong
   - /factions/confucian-temple
   - /factions/wen-sheng-lineage
 origin: /world/haoran-heaven
@@ -49,7 +51,7 @@ relationships:
     link: /characters/qi-jingchun
   - name: Liu Shiliu
     relation: ""
-    link: ""
+    link: /characters/liu-shiliu
   - name: Chen Chunan
     relation: ""
     link: ""
