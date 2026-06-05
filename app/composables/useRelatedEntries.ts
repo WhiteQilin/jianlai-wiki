@@ -1,3 +1,4 @@
+import { MEDIA_LIBRARY } from '~/data/mediaLibrary'
 import {
   RELATIONSHIP_FIELDS,
   extractPaths,
@@ -41,6 +42,34 @@ export interface RelatedGroup {
   entries: RelatedEntry[]
 }
 
+const PUBLIC_IMAGE_PATHS = new Set(
+  MEDIA_LIBRARY
+    .filter((item) => item.type === 'image')
+    .map((item) => item.path),
+)
+
+function publicImagePath(record: Record<string, any>): string | undefined {
+  const image = typeof record.image === 'string' ? record.image.trim() : ''
+  if (!image) return undefined
+  return PUBLIC_IMAGE_PATHS.has(image) ? image : undefined
+}
+
+function publicStatusLabel(record: Record<string, any>): string {
+  const status = typeof record.status === 'string' ? record.status.trim() : ''
+  const verification = typeof record.verificationStatus === 'string' ? record.verificationStatus.trim() : ''
+
+  if (status && !['published', 'draft'].includes(status.toLowerCase())) return status
+
+  const verificationLabels: Record<string, string> = {
+    verified: 'Verified',
+    'to-be-verified': 'To Be Verified',
+    disputed: 'Disputed',
+    speculative: 'Speculative',
+  }
+
+  return verificationLabels[verification] || 'To Be Verified'
+}
+
 function toRelatedEntry(record: Record<string, any>): RelatedEntry | null {
   const path = record.path
   if (!isRoutedPath(path)) return null
@@ -50,8 +79,8 @@ function toRelatedEntry(record: Record<string, any>): RelatedEntry | null {
     chinese: record.chinese || '',
     description: record.description || 'Entry pending detailed documentation.',
     category: record.category || 'Entry',
-    status: record.status || 'To be verified',
-    image: record.image,
+    status: publicStatusLabel(record),
+    image: publicImagePath(record),
   }
 }
 
