@@ -79,28 +79,34 @@ const titleText = computed(() => {
 }
 
 .route-display-link.is-ghost {
-  color: var(--c-text-2);
+  color: var(--c-text-3);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: color-mix(in srgb, var(--c-border) 80%, transparent);
+  text-underline-offset: 0.2em;
 }
 
 .route-display-link.is-missing-route,
 .route-display-link.is-internal-only {
-  cursor: default;
+  cursor: help;
 }
 
 .route-display-link.is-ghost.is-chip {
   border-style: dashed;
-  background: color-mix(in srgb, var(--c-bg-soft) 80%, transparent);
+  background: color-mix(in srgb, var(--c-bg-soft) 40%, transparent);
+  text-decoration: none;
 }
 
 .route-display-link.is-missing-route.is-chip::after,
 .route-display-link.is-internal-only.is-chip::after {
   content: 'pending';
-  margin-left: 0.15rem;
+  margin-left: 0.25rem;
   color: var(--c-text-3);
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: 0.58rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  opacity: 0.7;
 }
 
 .route-display-link.is-internal-only.is-chip::after {

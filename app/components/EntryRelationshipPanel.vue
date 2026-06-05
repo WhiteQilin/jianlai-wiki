@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, computed } from 'vue'
 import type { RelatedGroup } from '~/composables/useRelatedEntries'
 import { createEntryResolver, type EntryRecordLike } from '~/utils/entryLinkResolver'
 
@@ -29,6 +30,16 @@ const structuredRelationships = computed(() => {
 
 const relatedGroups = computed(() => props.groups || [])
 const hasContent = computed(() => structuredRelationships.value.length > 0 || relatedGroups.value.length > 0)
+
+const isExpanded = ref(false)
+const INITIAL_LIMIT = 8
+
+const visibleRelationships = computed(() => {
+  if (isExpanded.value) return structuredRelationships.value
+  return structuredRelationships.value.slice(0, INITIAL_LIMIT)
+})
+
+const hasMoreRelationships = computed(() => structuredRelationships.value.length > INITIAL_LIMIT)
 </script>
 
 <template>
@@ -43,7 +54,7 @@ const hasContent = computed(() => structuredRelationships.value.length > 0 || re
 
     <div v-if="structuredRelationships.length" class="structured-relationships">
       <article
-        v-for="relationship in structuredRelationships"
+        v-for="relationship in visibleRelationships"
         :key="`${relationship.name}-${relationship.relation}`"
         class="relationship-card"
       >
@@ -55,6 +66,12 @@ const hasContent = computed(() => structuredRelationships.value.length > 0 || re
         <span v-else class="relationship-name">{{ relationship.name }}</span>
         <span v-if="relationship.relation" class="relationship-label">{{ relationship.relation }}</span>
       </article>
+    </div>
+
+    <div v-if="hasMoreRelationships" class="expand-action">
+      <button class="expand-button" @click="isExpanded = !isExpanded">
+        {{ isExpanded ? 'Show Less' : `Show All ${structuredRelationships.length} Relationships` }}
+      </button>
     </div>
 
     <RelatedEntries v-if="relatedGroups.length" :groups="relatedGroups" class="related-card-groups" />
@@ -141,6 +158,32 @@ const hasContent = computed(() => structuredRelationships.value.length > 0 || re
   color: var(--c-text-3);
   font-size: 0.88rem;
   line-height: 1.45;
+}
+
+.expand-action {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.expand-button {
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--c-border) 70%, transparent);
+  color: var(--c-text-2);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  border-radius: 2px;
+}
+
+.expand-button:hover {
+  color: var(--c-seal-red);
+  border-color: var(--c-seal-red-soft);
+  background: color-mix(in srgb, var(--c-seal-red) 5%, transparent);
 }
 
 .related-card-groups {

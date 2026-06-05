@@ -127,15 +127,36 @@ const navItems = computed<NavItem[]>(() => {
 }
 
 @media (max-width: 760px) {
+  .entry-section-nav {
+    position: relative;
+  }
+
+  .entry-section-nav::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 2.5rem;
+    background: linear-gradient(to right, transparent, var(--c-bg));
+    pointer-events: none;
+  }
+
   .contents-list {
     flex-wrap: nowrap;
     overflow-x: auto;
-    padding-bottom: 0.2rem;
-    scrollbar-width: thin;
+    padding-bottom: 0.5rem;
+    padding-right: 2.5rem;
+    scrollbar-width: none; /* Firefox */
+  }
+  
+  .contents-list::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
   }
 
   .contents-link {
     white-space: nowrap;
+    flex-shrink: 0;
   }
 }
 </style>

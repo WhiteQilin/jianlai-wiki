@@ -350,10 +350,15 @@ const hasContent = computed(() => Boolean(resolvedImage.value) || mainFields.val
 }
 
 .placeholder-char {
-  color: color-mix(in srgb, var(--c-ink) 18%, transparent);
+  color: color-mix(in srgb, var(--c-seal-red) 65%, transparent);
   font-family: var(--font-heading);
   font-size: clamp(3.25rem, 11vw, 6rem);
   line-height: 1;
+  border: 0.08em solid color-mix(in srgb, var(--c-seal-red) 45%, transparent);
+  padding: 0.15em 0.25em;
+  border-radius: 0.1em;
+  transform: rotate(-3deg);
+  background: color-mix(in srgb, var(--c-paper) 40%, transparent);
 }
 
 .image-overlay {
