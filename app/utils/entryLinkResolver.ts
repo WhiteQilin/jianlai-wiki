@@ -114,6 +114,24 @@ export function createEntryResolver(entries: EntryRecordLike[] = []) {
     }
   }
 
+  function resolveDisplayAlias(raw: string): EntryRecordLike | undefined {
+    const normalized = normalizeLookupKey(raw)
+    const direct = byDisplayName.get(normalized)
+    if (direct) return direct
+
+    const parts = raw
+      .split(/\s*(?:\/|／|\||、|,|，|;|；)\s*/g)
+      .map((part) => part.trim())
+      .filter(Boolean)
+
+    for (const part of parts) {
+      const record = byDisplayName.get(normalizeLookupKey(part))
+      if (record) return record
+    }
+
+    return undefined
+  }
+
   function resolveEntryLink(value: unknown): ResolvedEntryLink | null {
     if (typeof value !== 'string') return null
     const raw = value.trim()
@@ -139,7 +157,7 @@ export function createEntryResolver(entries: EntryRecordLike[] = []) {
       }
     }
 
-    const record = byDisplayName.get(normalizeLookupKey(raw))
+    const record = resolveDisplayAlias(raw)
     if (record) return fromRecord(raw, record, false)
 
     return {

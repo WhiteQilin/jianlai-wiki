@@ -86,7 +86,7 @@ export const ENTRY_INFOBOX_PROFILES: Record<PublicSection, EntryInfoboxProfile> 
       { key: 'leader', label: 'Leadership', kind: 'list', maxItems: 6 },
       { key: 'inhabitants', label: 'Inhabitants', kind: 'list', maxItems: 8 },
       { key: 'contains', label: 'Contains', kind: 'list', maxItems: 8 },
-      { key: 'related', label: 'Related Locations', kind: 'list', maxItems: 6 },
+      { key: 'related', label: 'Related Entries', kind: 'list', maxItems: 6 },
     ],
     footerFields: SOURCE_FOOTER,
   },

@@ -9,6 +9,7 @@
  */
 import type { RelatedGroup } from '~/composables/useRelatedEntries'
 import type { EntryRecordLike } from '~/utils/entryLinkResolver'
+import { resolvePublicImage } from '~/utils/publicMedia'
 
 const props = defineProps<{
   page: any
@@ -23,8 +24,16 @@ const { data: allEntries } = await useAsyncData('entry-detail-link-graph', () =>
 
 const entries = computed<EntryRecordLike[]>(() => (allEntries.value || []) as EntryRecordLike[])
 const groups = computed<RelatedGroup[]>(() => props.relatedGroups ?? [])
+const resolvedHeroPoster = computed(() => resolvePublicImage(props.page?.image))
+const resolvedBanner = computed(() => resolvePublicImage(props.page?.banner))
 const showVideoHero = computed(() => props.section === 'characters' && Boolean(props.page?.video))
-const showBanner = computed(() => Boolean(props.page?.banner) && !showVideoHero.value)
+const showBanner = computed(() => Boolean(resolvedBanner.value) && !showVideoHero.value)
+const hasReferenceContent = computed(() => Boolean(
+  props.page?.sourceNotes ||
+  props.page?.verificationStatus ||
+  props.page?.firstAppearance ||
+  props.page?.lastUpdated,
+))
 
 const importanceLabel = computed(() => {
   const value = props.page?.importance
@@ -43,7 +52,7 @@ const importanceLabel = computed(() => {
     <CharacterHero
       v-if="showVideoHero"
       :video="page.video"
-      :poster="page?.image"
+      :poster="resolvedHeroPoster || undefined"
       :titleEn="page?.title"
       :titleZh="page?.chinese"
       :pinyin="page?.pinyin"
@@ -53,7 +62,7 @@ const importanceLabel = computed(() => {
 
     <MediaBanner
       v-else-if="showBanner"
-      :image="page.banner"
+      :image="resolvedBanner"
       :alt="page?.title"
       :is-official="true"
     />
@@ -121,10 +130,12 @@ const importanceLabel = computed(() => {
             </ScrollReveal>
           </template>
 
-          <OrnamentalDivider motif="diamond" />
-          <ScrollReveal animation="reveal-fade-up">
-            <EntryReferenceBlock :page="page" />
-          </ScrollReveal>
+          <template v-if="hasReferenceContent">
+            <OrnamentalDivider motif="diamond" />
+            <ScrollReveal animation="reveal-fade-up">
+              <EntryReferenceBlock :page="page" />
+            </ScrollReveal>
+          </template>
         </main>
       </div>
     </div>

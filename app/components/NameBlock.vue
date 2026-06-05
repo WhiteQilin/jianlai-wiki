@@ -33,15 +33,18 @@ defineProps<{
   display: flex;
   align-items: center;
   gap: 1.5rem;
+  min-width: 0;
 }
 
 .name-en {
+  min-width: 0;
   font-family: var(--font-heading);
-  font-size: 4.5rem;
+  font-size: clamp(2.8rem, 8vw, 4.5rem);
   color: var(--c-ink);
   margin: 0;
   line-height: 1.1;
   letter-spacing: 0.02em;
+  overflow-wrap: anywhere;
 }
 
 .name-seal {
@@ -86,10 +89,10 @@ defineProps<{
   .name-block {
     margin-bottom: 1.5rem;
   }
-  .name-en { font-size: 3.2rem; }
+  .name-en { font-size: clamp(2.35rem, 13vw, 3.2rem); }
   .name-zh { font-size: 2.2rem; letter-spacing: 0.1em; }
-  .name-primary { gap: 1rem; }
+  .name-primary { gap: 0.8rem; flex-wrap: wrap; }
   .name-seal { font-size: 1.2rem; padding: 4px 6px; }
-  .name-secondary { gap: 1rem; flex-wrap: wrap; }
+  .name-secondary { gap: 1rem; flex-wrap: wrap; min-width: 0; }
 }
 </style>

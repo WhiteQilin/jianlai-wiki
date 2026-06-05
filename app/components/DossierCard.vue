@@ -1,5 +1,7 @@
 <script setup lang="ts">
-defineProps<{
+import { resolvePublicImage } from '~/utils/publicMedia'
+
+const props = defineProps<{
   link: string
   nameEn: string
   nameZh: string
@@ -8,13 +10,15 @@ defineProps<{
   status: string
   image?: string
 }>()
+
+const resolvedImage = computed(() => resolvePublicImage(props.image))
 </script>
 
 <template>
   <NuxtLink :to="link" class="dossier-card">
     <div class="card-texture"></div>
-    <div v-if="image" class="card-image-wrap">
-      <img :src="image" :alt="nameEn" class="card-image" loading="lazy" />
+    <div v-if="resolvedImage" class="card-image-wrap">
+      <img :src="resolvedImage" :alt="nameEn" class="card-image" loading="lazy" />
       <div class="card-image-overlay"></div>
     </div>
     <div v-else class="card-image-placeholder">

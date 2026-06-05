@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { profileForSection, type InfoboxFieldProfile } from '~/data/entryInfoboxProfiles'
 import { createEntryResolver, humanizePlainValue, type EntryRecordLike, type ResolvedEntryLink } from '~/utils/entryLinkResolver'
+import { resolvePublicImage } from '~/utils/publicMedia'
 
 interface DisplayField {
   key: string
@@ -29,6 +30,7 @@ const fallbackChar = computed(() => {
 })
 
 const heroMode = computed(() => profile.value.imageMode)
+const resolvedImage = computed(() => resolvePublicImage(props.page?.image))
 
 const PUBLIC_VALUE_LABELS: Record<string, Record<string, string>> = {
   verificationStatus: {
@@ -170,7 +172,7 @@ function buildField(field: InfoboxFieldProfile): DisplayField | null {
 
 const mainFields = computed(() => profile.value.fields.map(buildField).filter((field): field is DisplayField => Boolean(field)))
 const footerFields = computed(() => (profile.value.footerFields || []).map(buildField).filter((field): field is DisplayField => Boolean(field)))
-const hasContent = computed(() => Boolean(props.page?.image) || mainFields.value.length > 0 || footerFields.value.length > 0)
+const hasContent = computed(() => Boolean(resolvedImage.value) || mainFields.value.length > 0 || footerFields.value.length > 0)
 </script>
 
 <template>
@@ -184,7 +186,7 @@ const hasContent = computed(() => Boolean(props.page?.image) || mainFields.value
     </div>
 
     <div class="infobox-image-wrapper" :class="`image-${heroMode}`">
-      <img v-if="page?.image" :src="page.image" :alt="page?.title || 'Entry image'" class="infobox-image" />
+      <img v-if="resolvedImage" :src="resolvedImage" :alt="page?.title || 'Entry image'" class="infobox-image" />
       <div v-else class="infobox-placeholder" aria-hidden="true">
         <span class="placeholder-char">{{ fallbackChar }}</span>
       </div>
