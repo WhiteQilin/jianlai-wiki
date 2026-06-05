@@ -21,6 +21,7 @@ related:
   - /characters/ritual-sage
   - /characters/sub-sage
   - /characters/old-scholar
+  - /characters/dao-ancestor
   - /characters/chen-pingan
   - /factions/confucian-temple
 origin: /world/haoran-heaven

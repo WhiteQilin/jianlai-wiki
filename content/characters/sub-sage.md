@@ -23,6 +23,7 @@ related:
   - /characters/ritual-sage
   - /factions/confucian-temple
   - /factions/sub-sage-lineage
+  - /world/middle-earth-divine-continent
 origin: /world/haoran-heaven
 realm: 14th Realm (合道 / Merged Dao)
 affiliations:

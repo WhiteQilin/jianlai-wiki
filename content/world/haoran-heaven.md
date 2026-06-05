@@ -29,6 +29,8 @@ leader:
   - /characters/li-sheng
 governingFaction: /factions/confucian-temple
 parentLocation: ""
+contains:
+  - /world/middle-earth-divine-continent
 inhabitants:
   - /characters/chen-pingan
   - /characters/cui-chan

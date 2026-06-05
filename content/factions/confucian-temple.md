@@ -25,7 +25,7 @@ related:
   - /factions/guanhu-academy
 factionType: Academy
 region: Middle Earth Divine Continent
-headquarters: ""
+headquarters: /world/middle-earth-divine-continent
 leader:
   - /characters/most-holy-teacher
   - /characters/li-sheng

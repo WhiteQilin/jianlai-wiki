@@ -23,6 +23,7 @@ related:
   - /characters/a-liang
   - /factions/confucian-temple
   - /factions/wen-sheng-lineage
+  - /world/middle-earth-divine-continent
 headquarters: /world/haoran-heaven
 leader:
   - /characters/sub-sage
