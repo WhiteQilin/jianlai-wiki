@@ -81,4 +81,3 @@ According to Feng Yi, had Qi Jingchun chosen to abandon the town and protect his
 - **剑来32：登高拖虚舟，第六章 — 十四:** Confirms his true identity as the Medicine Buddha and his role as the Lord of the Eastern Pure Lapis Lazuli World. It also notes Feng Yi's revelation regarding his ultimate intent to protect the town had Qi Jingchun not intervened.
 - **剑来39：借取万重山，第二章 — 推陈出新:** Mentions his origins in the Western Buddhist Kingdom and his role in addressing the three-thousand-year tribulation of the town.
 - **剑来47：饮者折镆干，第三章 — 将进酒:** Mentions his role at the Baoxi Kiln and his relationship with Liu Xianyang and Chen Ping'an as apprentices.
-```

@@ -336,3 +336,120 @@ export function normalizeImportedFields(frontmatter: Record<string, any>): Impor
     droppedRealmLevel: realm.dropped,
   }
 }
+
+/**
+ * Stage 21B — NotebookLM pasted-markdown body hardening.
+ *
+ * Operates on the RAW pasted markdown (before the frontmatter `---` split) so it
+ * can strip an outer fenced block that wraps the WHOLE file, then re-detect the
+ * frontmatter. Warn-only for content issues: never invents or rewrites citations,
+ * never strips a valid `剑来<number>` reference.
+ */
+export interface ImportBodyNormalizationReview {
+  markdown: string
+  warnings: string[]
+  removedOuterFence: boolean
+  removedTrailingFence: boolean
+  placeholderTokensFound: boolean
+  unformattedReferences: boolean
+}
+
+/**
+ * Literal placeholder `剑来X` — the char after `剑来` is a LITERAL ASCII `X`/`x`,
+ * never a digit. Valid numbered citations (`剑来25`) are deliberately not matched.
+ */
+const LITERAL_JIANLAI_PLACEHOLDER_RE = /剑来[Xx](?![0-9])/
+
+/**
+ * Placeholder reference tokens NotebookLM sometimes leaves behind.
+ */
+const PLACEHOLDER_TOKENS = [
+  '[Volume Title]',
+  '[Chapter Number]',
+  '[specific claim]',
+  'Volume X',
+]
+
+export function normalizeImportedBody(rawMarkdown: string): ImportBodyNormalizationReview {
+  const warnings: string[] = []
+  let markdown = rawMarkdown ?? ''
+  let removedOuterFence = false
+  let removedTrailingFence = false
+
+  // 1. Outer wrapping fence around the WHOLE file: opening ``` (optionally
+  //    ```markdown / ```md) on the first non-empty line + closing ``` on the
+  //    last non-empty line. Strip both so the frontmatter `---` can be parsed.
+  {
+    const trimmed = markdown.replace(/^\s+/, '').replace(/\s+$/, '')
+    const openMatch = trimmed.match(/^`{3,}[ \t]*(markdown|md)?[ \t]*\r?\n/i)
+    if (openMatch && /\r?\n`{3,}[ \t]*$/.test(trimmed)) {
+      const withoutOpen = trimmed.slice(openMatch[0].length)
+      const inner = withoutOpen.replace(/\r?\n`{3,}[ \t]*$/, '')
+      markdown = inner
+      removedOuterFence = true
+      warnings.push('Removed outer Markdown code fence from pasted NotebookLM output.')
+    }
+  }
+
+  // 2. Trailing accidental fence at the very end (after the body), even when the
+  //    whole file wasn't fence-wrapped.
+  if (!removedOuterFence) {
+    const stripped = markdown.replace(/\r?\n`{3,}[ \t]*\s*$/, '\n')
+    if (stripped !== markdown) {
+      markdown = stripped
+      removedTrailingFence = true
+      warnings.push('Removed trailing Markdown code fence from pasted NotebookLM output.')
+    }
+  }
+
+  // 3. Literal placeholder `剑来X` and bracketed placeholder tokens (warn only).
+  const hasLiteralJianlai = LITERAL_JIANLAI_PLACEHOLDER_RE.test(markdown)
+  const hasToken = PLACEHOLDER_TOKENS.some((t) => markdown.includes(t))
+  const placeholderTokensFound = hasLiteralJianlai || hasToken
+  if (placeholderTokensFound) {
+    warnings.push('Reference placeholders found; verify before saving.')
+  }
+
+  // 4. Unformatted References detection (warn only; never auto-rewrite):
+  //    a) a bare `References` line that isn't a `##` heading, or
+  //    b) non-bullet, non-empty lines inside a `## References` block.
+  let unformattedReferences = false
+  const lines = markdown.split(/\r?\n/)
+
+  for (const line of lines) {
+    if (line.trim().toLowerCase() === 'references') {
+      unformattedReferences = true
+      break
+    }
+  }
+
+  if (!unformattedReferences) {
+    const refIdx = lines.findIndex((l) => /^##\s+References\s*$/i.test(l))
+    if (refIdx !== -1) {
+      for (let i = refIdx + 1; i < lines.length; i += 1) {
+        const line = lines[i] ?? ''
+        if (/^#{1,6}\s+/.test(line)) break // next section heading ends the block
+        const t = line.trim()
+        if (!t) continue
+        // A properly formatted reference line is a `-`/`*` bullet.
+        if (!/^[-*]\s+/.test(t)) {
+          unformattedReferences = true
+          break
+        }
+      }
+    }
+  }
+
+  if (unformattedReferences) {
+    warnings.push('Possible unformatted References section detected.')
+  }
+
+  return {
+    markdown,
+    warnings,
+    removedOuterFence,
+    removedTrailingFence,
+    placeholderTokensFound,
+    unformattedReferences,
+  }
+}

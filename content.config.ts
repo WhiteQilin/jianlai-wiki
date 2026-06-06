@@ -18,7 +18,14 @@ export default defineContentConfig({
   collections: {
     content: defineCollection({
       type: 'page',
-      source: '**',
+      // Stage 21B: exclude sample scaffolds from the public collection so they
+      // never enter queryCollection results (no section-grid cards, no crawled
+      // routes, no sitemap/search). The editor reads scaffolds from disk directly
+      // (server/api/editor/*), so the template/sample workflow is unaffected.
+      source: {
+        include: '**',
+        exclude: ['**/sample.md', '**/_sample.md'],
+      },
       schema: z.object({
         // --- Existing active fields (keep using these) ---
         chinese: z.string().optional(),

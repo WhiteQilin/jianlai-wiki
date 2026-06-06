@@ -483,6 +483,194 @@ async function main() {
     parsedRealmProse.result.warnings.some((w) => w.includes('Omitted non-numeric realmLevel')),
   )
 
+  // ---------------------------------------------------------------------------
+  // Stage 21B: NotebookLM body hardening (parse-only; no file writes).
+  // Outer/trailing code fences stripped, placeholders flagged, unformatted
+  // References flagged, and valid 剑来<number> citations preserved untouched.
+  // ---------------------------------------------------------------------------
+
+  // Fixture A: whole file wrapped in an outer ```markdown fence.
+  const innerDoc = [
+    '---',
+    'title: Stage 21B Outer Fence',
+    'chinese: 外层代码块测试',
+    'pinyin: Wai Ceng',
+    'section: characters',
+    'category: Character',
+    'description: NotebookLM wrapped the whole file in a code fence.',
+    'importance: minor',
+    'verificationStatus: to-be-verified',
+    '---',
+    '## Overview',
+    '',
+    'Body.',
+    '',
+    '## References',
+    '',
+    '- **剑来25：天地皆同力，第九章 — 不是剑客心难契:** A valid numbered citation that must be preserved.',
+    '',
+  ].join('\n')
+  const outerFenceMarkdown = '```markdown\n' + innerDoc + '\n```'
+
+  const parsedOuterFence = await jsonFetch('/api/editor/import-markdown', {
+    method: 'POST',
+    body: { mode: 'parse', markdown: outerFenceMarkdown },
+  })
+  assert(
+    'Stage 21B outer fence removed (frontmatter still parses)',
+    parsedOuterFence.result.frontmatter.title === 'Stage 21B Outer Fence',
+    `title=${JSON.stringify(parsedOuterFence.result.frontmatter.title)}`,
+  )
+  assert(
+    'Stage 21B outer-fence warning surfaced',
+    parsedOuterFence.result.warnings.some((w) => w.includes('Removed outer Markdown code fence')),
+    `warnings=${JSON.stringify(parsedOuterFence.result.warnings)}`,
+  )
+  assert(
+    'Stage 21B valid 剑来<number> citation preserved through outer-fence strip',
+    parsedOuterFence.result.body.includes('剑来25'),
+  )
+  assert(
+    'Stage 21B body has no residual code fence after outer-fence strip',
+    !parsedOuterFence.result.body.includes('```'),
+  )
+
+  // Fixture B: trailing accidental fence at the end of the body.
+  const trailingFenceMarkdown = [
+    '---',
+    'title: Stage 21B Trailing Fence',
+    'chinese: 尾部代码块测试',
+    'pinyin: Wei Bu',
+    'section: characters',
+    'category: Character',
+    'description: NotebookLM left a trailing code fence at the end.',
+    'importance: minor',
+    'verificationStatus: to-be-verified',
+    '---',
+    '## Overview',
+    '',
+    'Body.',
+    '',
+    '## References',
+    '',
+    '- **剑来2：忽为远行客，第四章 — 天亮:** Valid citation.',
+    '```',
+  ].join('\n')
+  const parsedTrailingFence = await jsonFetch('/api/editor/import-markdown', {
+    method: 'POST',
+    body: { mode: 'parse', markdown: trailingFenceMarkdown },
+  })
+  assert(
+    'Stage 21B trailing-fence warning surfaced',
+    parsedTrailingFence.result.warnings.some((w) => w.includes('Removed trailing Markdown code fence')),
+    `warnings=${JSON.stringify(parsedTrailingFence.result.warnings)}`,
+  )
+  assert(
+    'Stage 21B trailing fence removed from body',
+    !parsedTrailingFence.result.body.includes('```'),
+  )
+  assert(
+    'Stage 21B valid citation preserved after trailing-fence strip',
+    parsedTrailingFence.result.body.includes('剑来2'),
+  )
+
+  // Fixture C: placeholder tokens (剑来X literal + [Volume Title] + [specific claim]).
+  const placeholderMarkdown = [
+    '---',
+    'title: Stage 21B Placeholders',
+    'chinese: 占位符测试',
+    'pinyin: Zhan Wei Fu',
+    'section: characters',
+    'category: Character',
+    'description: NotebookLM left placeholder reference tokens.',
+    'importance: minor',
+    'verificationStatus: to-be-verified',
+    '---',
+    '## Overview',
+    '',
+    'Body.',
+    '',
+    '## References',
+    '',
+    '- **剑来X：[Volume Title]，[Chapter Number]:** [specific claim] placeholder reference.',
+    '',
+  ].join('\n')
+  const parsedPlaceholders = await jsonFetch('/api/editor/import-markdown', {
+    method: 'POST',
+    body: { mode: 'parse', markdown: placeholderMarkdown },
+  })
+  assert(
+    'Stage 21B placeholder warning surfaced',
+    parsedPlaceholders.result.warnings.some((w) => w.includes('Reference placeholders found')),
+    `warnings=${JSON.stringify(parsedPlaceholders.result.warnings)}`,
+  )
+
+  // Fixture D: valid numbered citation must NOT trigger the placeholder warning.
+  const validCitationMarkdown = [
+    '---',
+    'title: Stage 21B Valid Citation',
+    'chinese: 有效引用测试',
+    'pinyin: You Xiao',
+    'section: characters',
+    'category: Character',
+    'description: A valid numbered citation must not be flagged as a placeholder.',
+    'importance: minor',
+    'verificationStatus: to-be-verified',
+    '---',
+    '## Overview',
+    '',
+    'Body.',
+    '',
+    '## References',
+    '',
+    '- **剑来25：天地皆同力，第九章 — 不是剑客心难契:** Valid, properly formatted citation.',
+    '',
+  ].join('\n')
+  const parsedValidCitation = await jsonFetch('/api/editor/import-markdown', {
+    method: 'POST',
+    body: { mode: 'parse', markdown: validCitationMarkdown },
+  })
+  assert(
+    'Stage 21B valid 剑来<number> citation NOT flagged as placeholder',
+    !parsedValidCitation.result.warnings.some((w) => w.includes('Reference placeholders found')),
+    `warnings=${JSON.stringify(parsedValidCitation.result.warnings)}`,
+  )
+  assert(
+    'Stage 21B well-formatted References NOT flagged as unformatted',
+    !parsedValidCitation.result.warnings.some((w) => w.includes('unformatted References')),
+  )
+
+  // Fixture E: unformatted References (plain non-bullet line under ## References).
+  const unformattedRefsMarkdown = [
+    '---',
+    'title: Stage 21B Unformatted Refs',
+    'chinese: 未格式化引用测试',
+    'pinyin: Wei Ge Shi Hua',
+    'section: characters',
+    'category: Character',
+    'description: References section uses plain unbulleted lines.',
+    'importance: minor',
+    'verificationStatus: to-be-verified',
+    '---',
+    '## Overview',
+    '',
+    'Body.',
+    '',
+    '## References',
+    '',
+    '剑来2：忽为远行客 — plain unbulleted reference line.',
+    '',
+  ].join('\n')
+  const parsedUnformatted = await jsonFetch('/api/editor/import-markdown', {
+    method: 'POST',
+    body: { mode: 'parse', markdown: unformattedRefsMarkdown },
+  })
+  assert(
+    'Stage 21B unformatted References warning surfaced',
+    parsedUnformatted.result.warnings.some((w) => w.includes('unformatted References')),
+    `warnings=${JSON.stringify(parsedUnformatted.result.warnings)}`,
+  )
+
   await jsonFetch('/api/editor/import-markdown', {
     method: 'POST',
     body: {

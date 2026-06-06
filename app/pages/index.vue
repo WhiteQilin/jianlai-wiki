@@ -62,7 +62,7 @@ const spotlightItems = [
     desc: 'The Vast and Mighty World, where Confucianism holds sway and scholars guide the mortal dynasties.',
     category: 'World',
     status: 'Continent',
-    link: '/world/sample'
+    link: '/world/haoran-heaven'
   }
 ]
 </script>

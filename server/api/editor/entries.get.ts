@@ -57,8 +57,8 @@ export default defineEventHandler(async () => {
 
       if (!file.isFile() || extname(file.name) !== '.md') continue
 
-      // Ignore sample.md
-      if (file.name === 'sample.md') continue
+      // Ignore sample.md and any underscore-prefixed partial (e.g. _sample.md).
+      if (file.name === 'sample.md' || file.name.startsWith('_')) continue
 
       const relPath = relative(contentDir, fullPath).replace(/\\/g, '/')
       const routePath = '/' + relPath.replace(/\.md$/, '')

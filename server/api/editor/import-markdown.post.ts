@@ -15,7 +15,7 @@ import {
   validateEditorRelationshipPath,
 } from '../../utils/editor'
 import { normalizeImportedTaxonomy, type TaxonomyNormalizationReview } from '../../utils/taxonomy'
-import { normalizeImportedFields } from '../../utils/importNormalize'
+import { normalizeImportedFields, normalizeImportedBody } from '../../utils/importNormalize'
 
 type Mode = 'parse' | 'save'
 
@@ -224,7 +224,10 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 400, statusMessage: 'Bad Request', message: 'markdown is required' })
     }
 
-    const split = splitMarkdown(markdown)
+    // Stage 21B: strip outer/trailing NotebookLM code fences and collect
+    // body-level warnings (placeholders, unformatted references) before parsing.
+    const bodyNormalization = normalizeImportedBody(markdown)
+    const split = splitMarkdown(bodyNormalization.markdown)
     if ('error' in split) {
       throw createError({ statusCode: 422, statusMessage: 'Invalid Markdown', message: split.error })
     }
@@ -245,6 +248,9 @@ export default defineEventHandler(async (event) => {
     }
 
     const result = await buildParseResult(frontmatter, split.body)
+    if (bodyNormalization.warnings.length) {
+      result.warnings = [...bodyNormalization.warnings, ...result.warnings]
+    }
     return { success: true, result }
   }
 

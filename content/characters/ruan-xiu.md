@@ -113,4 +113,3 @@ Ruan Xiu's strength defies conventional cultivation boundaries, stemming directl
 * **剑来13：陇上花又开，第十章 — 水火之争让个道:** Mentions her status as the innate Fire God and the inevitable Water-Fire Dispute with Li Liu.
 * **剑来25：天地皆同力，第九章 — 不是剑客心难契:** Confirms that the ancient Water-Fire Dispute ended with Ruan Xiu's victory and Li Liu's defeat.
 * **剑来33：城头刻新字，第六章 — 一只笼中雀:** Notes Zhou Mi's ascension to the ancient Heavenly Court and the Fire God taking her supreme throne.
-```
