@@ -370,6 +370,12 @@ const spotlightItems = [
   .featured-wide {
     grid-column: span 1;
   }
+  .stats-inner {
+    padding: 1.5rem 1rem;
+  }
+  .stat-num {
+    font-size: 2rem;
+  }
 }
 
 .wip-notice {

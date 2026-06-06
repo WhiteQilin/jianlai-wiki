@@ -75,4 +75,12 @@ defineEmits<{
   font-weight: 500;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
+
+@media (max-width: 640px) {
+  .category-tabs {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}
 </style>

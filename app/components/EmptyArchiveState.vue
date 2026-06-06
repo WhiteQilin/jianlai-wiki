@@ -19,6 +19,9 @@ defineProps<{
     <p class="empty-text">
       {{ text || 'The archive table is set, the ink is drying, and these records will be entered after verification.' }}
     </p>
+    <div class="empty-cta">
+      <NuxtLink to="/contribute" class="contribute-link">Help expand the archive &rarr;</NuxtLink>
+    </div>
   </section>
 </template>
 
@@ -163,6 +166,31 @@ defineProps<{
   line-height: 1.75;
   margin: 0;
   max-width: 560px;
+}
+
+.empty-cta {
+  margin-top: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.contribute-link {
+  display: inline-block;
+  padding: 0.5rem 1.25rem;
+  border: 1px solid var(--c-seal-red);
+  color: var(--c-seal-red);
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.contribute-link:hover {
+  background: var(--c-seal-red);
+  color: white;
 }
 
 .dark .empty-archive-state {

@@ -305,5 +305,9 @@ const importanceLabel = computed(() => {
   .entry-lead {
     font-size: 1.04rem;
   }
+  .entry-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+  }
 }
 </style>

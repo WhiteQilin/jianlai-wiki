@@ -19,6 +19,12 @@ useSeoMeta({
       
       <h3>Status</h3>
       <p>The wiki is currently <strong>Under Construction</strong>. Information marked as "To be verified" is pending confirmation against the text.</p>
+      
+      <h3>Help Expand the Archive</h3>
+      <p>Notice a missing entry, incorrect lore, or a typo? We welcome contributions from the community.</p>
+      <p>
+        <NuxtLink to="/contribute" class="contribute-link">Learn how to contribute &rarr;</NuxtLink>
+      </p>
     </div>
   </div>
 </template>
@@ -33,5 +39,17 @@ useSeoMeta({
   font-size: 0.6em;
   color: var(--c-text-3);
   margin-left: 0.5rem;
+}
+.contribute-link {
+  display: inline-block;
+  margin-top: 1rem;
+  color: var(--c-seal-red);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+.contribute-link:hover {
+  color: var(--c-seal-red-dark);
+  text-decoration: underline;
 }
 </style>

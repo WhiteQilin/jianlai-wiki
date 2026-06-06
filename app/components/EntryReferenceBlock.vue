@@ -51,6 +51,10 @@ const hasContent = computed(() => Boolean(props.page?.sourceNotes || props.page?
           <dd>{{ page.lastUpdated }}</dd>
         </div>
       </dl>
+      <div class="reference-cta">
+        <p>Notice an error or have more details to add?</p>
+        <NuxtLink to="/contribute" class="contribute-link">Suggest an Edit &rarr;</NuxtLink>
+      </div>
     </div>
   </section>
 </template>
@@ -123,5 +127,29 @@ const hasContent = computed(() => Boolean(props.page?.sourceNotes || props.page?
   margin: 0;
   color: var(--c-ink);
   font-size: 0.85rem;
+}
+
+.reference-cta {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--c-divider);
+  font-size: 0.85rem;
+  color: var(--c-text-3);
+}
+
+.reference-cta p {
+  margin: 0 0 0.5rem 0;
+}
+
+.contribute-link {
+  color: var(--c-seal-red);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.contribute-link:hover {
+  color: var(--c-seal-red-dark);
+  text-decoration: underline;
 }
 </style>

@@ -34,7 +34,8 @@
           <div class="link-group">
             <h4>Meta</h4>
             <NuxtLink to="/about">About Wiki</NuxtLink>
-            <a href="https://github.com/WhiteQilin/jianlai-wiki" target="_blank" rel="noopener noreferrer">Contribute on GitHub</a>
+            <NuxtLink to="/contribute">Contribute</NuxtLink>
+            <a href="https://github.com/WhiteQilin/jianlai-wiki" target="_blank" rel="noopener noreferrer">GitHub</a>
           </div>
         </div>
       </div>
