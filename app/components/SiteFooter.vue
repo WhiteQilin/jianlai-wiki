@@ -1,5 +1,13 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+const isTimeline = computed(() => route.path === '/timeline' || route.path.startsWith('/timeline/'))
+</script>
+
 <template>
-  <footer class="site-footer">
+  <footer class="site-footer" :class="{ 'is-timeline': isTimeline }">
     <div class="footer-container">
       <div class="footer-top">
         <div class="footer-brand">
@@ -57,6 +65,23 @@
   margin-top: auto;
   position: relative;
   overflow: hidden;
+  transition: background-color 0.5s ease, border-color 0.5s ease;
+}
+
+/* Timeline Dark Footer Variant */
+.site-footer.is-timeline {
+  background-color: #0a0a0a;
+  border-top: 1px solid rgba(212, 175, 55, 0.2);
+  --c-charcoal: #d4af37;
+  --c-text-2: rgba(255, 255, 255, 0.7);
+  --c-text-3: rgba(255, 255, 255, 0.5);
+  --c-border: rgba(212, 175, 55, 0.15);
+  --c-divider: rgba(212, 175, 55, 0.1);
+  --c-seal-red-soft: rgba(186, 38, 38, 0.15);
+}
+
+.site-footer.is-timeline .link-group a:hover {
+  color: var(--c-gold, #d4af37);
 }
 
 .footer-container {

@@ -10,6 +10,8 @@ const route = useRoute()
 
 const { open: openSearch, toggle: toggleSearch, close: closeSearch, isOpen: isSearchOpen } = useSearchState()
 
+const isTimelineRoute = computed(() => route.path === '/timeline' || route.path.startsWith('/timeline/'))
+
 // Secondary sections surfaced via the "More" dropdown (titles intentionally excluded).
 const moreLinks = [
   { to: '/rankings', zh: '榜单', en: 'Rankings' },
@@ -90,7 +92,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <header class="site-header" :class="{ 'is-scrolled': isScrolled }">
+  <header class="site-header" :class="{ 'is-scrolled': isScrolled, 'is-timeline': isTimelineRoute }">
     <div class="header-bg-texture"></div>
     <div class="header-container">
       <NuxtLink to="/" class="site-logo">
@@ -250,6 +252,59 @@ onUnmounted(() => {
 
 .dark .site-header.is-scrolled {
   background-color: rgba(15, 16, 17, 0.85);
+}
+
+/* --- Timeline Header Variant --- */
+.site-header.is-timeline {
+  --c-ink: #ffffff;
+  --c-text-2: rgba(255, 255, 255, 0.8);
+  --c-text-3: rgba(255, 255, 255, 0.6);
+  --c-border: rgba(212, 175, 55, 0.2);
+  --c-bg-soft: rgba(0, 0, 0, 0.4);
+  --c-bg-alt: rgba(212, 175, 55, 0.1);
+  --c-charcoal: #ffffff; /* For hamburger */
+}
+
+.site-header.is-timeline .header-bg-texture {
+  /* Hide the bright default texture */
+  opacity: 0 !important;
+}
+
+.site-header.is-timeline.is-scrolled {
+  background-color: rgba(5, 5, 5, 0.85);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+}
+
+.site-header.is-timeline .nav-zh,
+.site-header.is-timeline .logo-en {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.site-header.is-timeline .site-nav a::after,
+.site-header.is-timeline .nav-more-trigger::after {
+  background: var(--c-gold, #d4af37);
+}
+
+.site-header.is-timeline .site-nav a:hover .nav-zh,
+.site-header.is-timeline .site-nav a.router-link-active .nav-zh,
+.site-header.is-timeline .nav-more:hover .nav-more-trigger .nav-zh,
+.site-header.is-timeline .nav-more-trigger.is-active .nav-zh {
+  color: var(--c-gold, #d4af37);
+}
+
+.site-header.is-timeline .nav-more-panel {
+  background: rgba(10, 10, 10, 0.95);
+  border-color: rgba(212, 175, 55, 0.15);
+}
+
+.site-header.is-timeline .nav-more-item:hover {
+  background: rgba(212, 175, 55, 0.1);
+}
+
+.site-header.is-timeline .nav-more-item:hover .more-zh,
+.site-header.is-timeline .nav-more-item.router-link-active .more-zh {
+  color: var(--c-gold, #d4af37);
 }
 
 .header-container {

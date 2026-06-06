@@ -3,11 +3,16 @@ defineProps<{
   title?: string
   text?: string
   icon?: string
+  variant?: 'default' | 'dark-chronicle'
 }>()
 </script>
 
 <template>
-  <section class="empty-archive-state" aria-live="polite">
+  <section
+    class="empty-archive-state"
+    :class="{ 'empty-archive-state--dark-chronicle': variant === 'dark-chronicle' }"
+    aria-live="polite"
+  >
     <div class="corner corner-tl" aria-hidden="true"></div>
     <div class="corner corner-br" aria-hidden="true"></div>
     <div class="watermark" aria-hidden="true">{{ icon || '卷' }}</div>
@@ -202,5 +207,52 @@ defineProps<{
 
 .dark .empty-archive-state::before {
   opacity: 0.04;
+}
+
+/* Dark Chronicle Variant (Timeline Redesign) */
+.empty-archive-state--dark-chronicle {
+  background: #0a0a0a;
+  border: 1px solid rgba(212, 175, 55, 0.2); /* Muted gold border */
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.empty-archive-state--dark-chronicle::before {
+  opacity: 0.05;
+  background-image: none; /* Remove bright ink wash */
+}
+
+.empty-archive-state--dark-chronicle::after {
+  border-color: rgba(212, 175, 55, 0.1);
+}
+
+.empty-archive-state--dark-chronicle .corner {
+  color: rgba(212, 175, 55, 0.3);
+}
+
+.empty-archive-state--dark-chronicle .watermark {
+  color: #fff;
+  opacity: 0.02;
+}
+
+.empty-archive-state--dark-chronicle .empty-title {
+  color: #ffffff;
+  font-family: var(--font-zh-display, "FZWeibei-S03S", serif);
+  letter-spacing: 0.1em;
+}
+
+.empty-archive-state--dark-chronicle .empty-text {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.empty-archive-state--dark-chronicle .contribute-link {
+  border-color: rgba(212, 175, 55, 0.5);
+  color: var(--c-gold, #d4af37);
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.empty-archive-state--dark-chronicle .contribute-link:hover {
+  background: rgba(212, 175, 55, 0.15);
+  color: #fff;
+  border-color: var(--c-gold, #d4af37);
 }
 </style>

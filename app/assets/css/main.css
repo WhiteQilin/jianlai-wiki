@@ -128,6 +128,19 @@ body::after {
   transform: scale(0.98);
 }
 
+/* Timeline Route Transition */
+.timeline-transition-enter-active,
+.timeline-transition-leave-active {
+  transition: opacity 0.8s ease, filter 0.8s ease, background-color 0.8s ease;
+  background-color: #050505;
+}
+.timeline-transition-enter-from,
+.timeline-transition-leave-to {
+  opacity: 0;
+  filter: blur(10px) grayscale(100%);
+  background-color: var(--c-paper);
+}
+
 /* Layout Containers */
 .page-container {
   width: 100%;
