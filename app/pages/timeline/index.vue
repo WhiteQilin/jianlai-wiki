@@ -8,7 +8,7 @@ const meta = useSectionMeta('timeline')
 const { data: items } = await useAsyncData('timeline-list', () => {
   return queryCollection('content')
     .where('path', 'LIKE', '/timeline/%')
-    .order('title', 'ASC')
+    .order('eraOrder', 'ASC')
     .all()
 })
 
