@@ -20,7 +20,7 @@ tags:
   - piyun-mountain
   - upper-five-realms
 affiliations:
-  - /factions/dali-empire
+  - /factions/great-li-dynasty
   - /factions/luopo-mountain
 related:
   - /characters/chen-pingan
@@ -33,13 +33,13 @@ relationships:
     link: /characters/chen-pingan
   - name: Dali Empire
     relation: governing court
-    link: /factions/dali-empire
+    link: /factions/great-li-dynasty
   - name: Zheng Dafeng
     relation: friend / neighbor
-    link: /characters/zheng-dafeng
+    link: ""
   - name: Chen Lingjun
     relation: friend
-    link: /characters/chen-lingjun
+    link: ""
   - name: Xu Ruo
     relation: acquaintance / guide to Piyun Mountain
     link: ""

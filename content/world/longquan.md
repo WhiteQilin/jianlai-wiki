@@ -20,23 +20,23 @@ tags:
   - baoping-continent
   - lizhu-grotto-heaven
   - hometown
-governingFaction: /factions/dali-empire
+governingFaction: /factions/great-li-dynasty
 parentLocation: /world/baoping-continent
 related:
   - /world/lizhu-grotto-heaven
   - /factions/luopo-mountain
   - /factions/dragon-springs-sword-sect
-  - /factions/dali-empire
+  - /factions/great-li-dynasty
 relationships:
   - name: Dali Empire
     relation: governing empire
-    link: /factions/dali-empire
+    link: /factions/great-li-dynasty
   - name: Lizhu Grotto-Heaven
     relation: predecessor state / origin
     link: /world/lizhu-grotto-heaven
   - name: Wu Yuan
     relation: first magistrate / governor
-    link: /characters/wu-yuan
+    link: ""
   - name: Wei Bo
     relation: Northern Peak Mountain God (Piyun Mountain)
     link: /characters/wei-bo

@@ -35,10 +35,10 @@ relationships:
     link: /characters/chen-pingan
   - name: Wang Zhu
     relation: Former maidservant (Zhi Gui)
-    link: /characters/wang-zhu
+    link: ""
   - name: Song He
     relation: Brother / Emperor of Great Li
-    link: /characters/song-he
+    link: ""
 sourceNotes: |
   Origins and departure from Lizhu Grotto-Heaven verified in Volumes 2 and 6.  Identity as Prince of Luo Song Mu verified in Volume 12.  Details of Qi Jingchun's six books and his relationship with Zhi Gui verified in Volume 28, Chapter 7.  Political maneuvers during the war and travel to the capital verified in Volumes 32 and 34.
 firstAppearance: ""

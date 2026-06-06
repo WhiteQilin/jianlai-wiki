@@ -30,9 +30,8 @@ members:
   - /characters/xu-xiaoqiao
   - /characters/xie-ling
 relatedFactions:
-  - /factions/dali-empire
+  - /factions/great-li-dynasty
   - /factions/wind-and-snow-temple
-  - /factions/zhengyang-mountain
   - /factions/luopo-mountain
 relationships:
   - name: Ruan Qiong
@@ -43,7 +42,7 @@ relationships:
     link: /characters/liu-xianyang
   - name: Dali Empire
     relation: backer / governing authority
-    link: /factions/dali-empire
+    link: /factions/great-li-dynasty
   - name: Wind and Snow Temple
     relation: mother sect / ally
     link: /factions/wind-and-snow-temple
@@ -52,7 +51,7 @@ relationships:
     link: /factions/luopo-mountain
   - name: Zhengyang Mountain
     relation: rival / enemy
-    link: /factions/zhengyang-mountain
+    link: ""
 firstAppearance: ""
 lastUpdated: 2026-06-05
 ---

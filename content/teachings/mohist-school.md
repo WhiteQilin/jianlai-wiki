@@ -26,7 +26,7 @@ affiliations: []
 relationships:
   - name: Xu Ruo
     relation: ranger / sword cultivator
-    link: /characters/xu-ruo
+    link: ""
   - name: Luan Changye
     relation: former member
     link: ""

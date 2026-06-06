@@ -27,14 +27,12 @@ members:
   - /characters/ruan-qiong
   - /characters/xu-xiaoqiao
 relatedFactions:
-  - /factions/zhenwu-mountain
   - /factions/dragon-springs-sword-sect
-  - /factions/zhengyang-mountain
   - /factions/fenglei-garden
 relationships:
   - name: Zhenwu Mountain
     relation: peer / rival Military School ancestral mountain
-    link: /factions/zhenwu-mountain
+    link: ""
   - name: Dragon Springs Sword Sect
     relation: friendly offshoot / ally
     link: /factions/dragon-springs-sword-sect

@@ -35,10 +35,10 @@ relationships:
     link: /characters/chen-pingan
   - name: Jiang Shangzhen
     relation: acquaintance
-    link: /characters/jiang-shangzhen
+    link: ""
   - name: Zhou Mi
     relation: superior (Mr. Zhou)
-    link: /characters/zhou-mi
+    link: ""
 sourceNotes: Major claims regarding her identity as a moon entity, her innate abilities, her battles at the Sword Qi Great Wall, and her romantic relationship with Liu Xianyang are fully supported by the text. Verification of exact chapter references across all volumes is pending.
 firstAppearance: ""
 lastUpdated: 2026-06-06

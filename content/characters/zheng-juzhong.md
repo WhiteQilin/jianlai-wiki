@@ -36,19 +36,19 @@ abilities:
 relationships:
   - name: Chen Qingliu
     relation: ""
-    link: /characters/chen-qingliu
+    link: ""
   - name: Fu Jin
     relation: ""
-    link: /characters/fu-jin
+    link: ""
   - name: Gu Can
     relation: ""
     link: /characters/gu-can
   - name: Han Qiaose
     relation: ""
-    link: /characters/han-qiaose
+    link: ""
   - name: Liu Chicheng
     relation: ""
-    link: /characters/liu-chicheng
+    link: ""
 sourceNotes: |
   Identity as a 14th-realm cultivator and actions in Manhuang Heaven verified in Volume 30, Chapter 4 and Volume 39, Chapter 9. Master-disciple relationship with Chen Qingliu verified in Volume 32, Chapter 4 (also referenced near Vol 41). His Three-Talent Array manifestation verified in Volume 42, Chapter 4. His banner and spar with Yu Dou verified in Volume 48, Chapter 5.
 firstAppearance: ""

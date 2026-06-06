@@ -30,10 +30,10 @@ affiliations:
 relationships:
   - name: Li Er
     relation: father
-    link: /characters/li-er
+    link: ""
   - name: Li Huai
     relation: younger brother
-    link: /characters/li-huai
+    link: ""
   - name: Han Chengjiang
     relation: husband
     link: ""
@@ -42,10 +42,10 @@ relationships:
     link: /characters/ruan-xiu
   - name: Yang Laotou
     relation: orchestrator of her reincarnation
-    link: /characters/yang-laotou
+    link: ""
   - name: Cao Xi
     relation: nominal master / protector
-    link: /characters/cao-xi
+    link: ""
   - name: Shen Lin
     relation: subordinate
     link: ""

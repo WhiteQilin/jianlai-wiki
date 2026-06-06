@@ -34,7 +34,7 @@ affiliations:
 relationships:
   - name: He Xiaoliang
     relation: unrequited love interest
-    link: /characters/he-xiaoliang
+    link: ""
   - name: A Liang
     relation: senior / guide
     link: /characters/a-liang
@@ -49,7 +49,7 @@ relationships:
     link: ""
   - name: Cao Jun
     relation: acquaintance / fellow sword cultivator
-    link: /characters/cao-jun
+    link: ""
   - name: Yu Huiting
     relation: martial niece
     link: ""
