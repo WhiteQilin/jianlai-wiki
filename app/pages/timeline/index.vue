@@ -29,16 +29,51 @@ definePageMeta({
     mode: 'out-in'
   }
 })
-// Map content entries to the required rail format
-const timelineEvents = computed(() => {
-  return filteredItems.value.map((item: any) => ({
-    title: item.title || 'Unknown Event',
-    era: item.era || item.category || 'Unknown Era',
-    summary: item.description || 'Event details pending.',
-    characters: item.participants || item.related || [],
-    link: item.path,
-    image: item.image
-  }))
+// Group entries by era to form Macro (era/arc) and Micro (events) structure
+const eraGroups = computed(() => {
+  const groups = new Map<string, any[]>()
+  
+  // Create an array sorted by eraOrder to preserve chronological order
+  const sortedItems = [...(filteredItems.value || [])].sort((a: any, b: any) => {
+    return (a.eraOrder || 0) - (b.eraOrder || 0)
+  })
+  
+  sortedItems.forEach((item: any) => {
+    const eraName = item.era || item.category || 'Unknown Era'
+    if (!groups.has(eraName)) {
+      groups.set(eraName, [])
+    }
+    groups.get(eraName)!.push({
+      title: item.title || 'Unknown Event',
+      chinese: item.chinese || '',
+      era: eraName,
+      summary: item.description || 'Event details pending.',
+      characters: item.participants || item.related || [],
+      link: item.path,
+      image: item.image,
+      category: item.category,
+      status: item.status,
+      eraOrder: item.eraOrder
+    })
+  })
+
+  // Create macro nodes mapping from the groups
+  return Array.from(groups.entries()).map(([era, events]) => {
+    // Determine the macro entry for this era. Prefer 'Arc' or 'Era' category, otherwise use the first chronologically.
+    const macroEntry = events.find(e => e.category === 'Arc' || e.category === 'Era') || events[0]
+    
+    // Filter out the macro entry itself from the micro-events ledger
+    const microEvents = events.filter(e => e.link !== macroEntry.link && e.category !== 'Arc' && e.category !== 'Era')
+    
+    return {
+      era,
+      title: macroEntry.title,
+      summary: macroEntry.summary,
+      link: macroEntry.link,
+      characters: macroEntry.characters,
+      events: microEvents // only the actual micro-events
+    }
+  })
 })
 </script>
 
@@ -49,7 +84,7 @@ const timelineEvents = computed(() => {
       titleZh="年表"
       desc="The chronological history of Jian Lai, from the ancient era to the present day. Witness the unfolding of the Great Dao."
     >
-      <TimelineChronicleRail v-if="timelineEvents.length > 0" :events="timelineEvents" />
+      <TimelineChronicleRail v-if="eraGroups.length > 0" :eraGroups="eraGroups" />
       <div v-else class="empty-timeline-hero">
         <p class="empty-hero-text">Chronicle awaiting inscription</p>
       </div>
@@ -66,24 +101,35 @@ const timelineEvents = computed(() => {
             />
           </ScrollReveal>
 
-          <DossierGrid v-if="filteredItems.length > 0">
-            <ScrollReveal
-              v-for="(item, index) in filteredItems"
-              :key="item.path"
-              animation="reveal-fade-up"
-              :delay="(`stagger-${(index % 5) + 1}` as any)"
-            >
-              <DossierCard
-                :link="item.path"
-                :nameEn="item.title || 'Unknown'"
-                :nameZh="(item as any).chinese || ''"
-                :desc="item.description || 'Entry pending detailed documentation.'"
-                :category="(item as any).category || 'Timeline'"
-                :status="(item as any).status || 'To be verified'"
-                :image="(item as any).image"
-              />
-            </ScrollReveal>
-          </DossierGrid>
+          <template v-if="eraGroups.length > 0">
+            <div v-for="(group, groupIndex) in eraGroups" :key="group.era" class="era-archive-group">
+              <ScrollReveal animation="reveal-fade-up">
+                <div class="era-group-header">
+                  <h2 class="era-group-title">{{ group.era }}</h2>
+                  <div class="era-group-divider"></div>
+                </div>
+              </ScrollReveal>
+              
+              <DossierGrid>
+                <ScrollReveal
+                  v-for="(item, index) in group.events"
+                  :key="item.link"
+                  animation="reveal-fade-up"
+                  :delay="(`stagger-${(index % 5) + 1}` as any)"
+                >
+                  <DossierCard
+                    :link="item.link"
+                    :nameEn="item.title"
+                    :nameZh="item.chinese"
+                    :desc="item.summary"
+                    :category="item.category || 'Timeline'"
+                    :status="item.status || 'To be verified'"
+                    :image="item.image"
+                  />
+                </ScrollReveal>
+              </DossierGrid>
+            </div>
+          </template>
 
           <ScrollReveal v-else animation="reveal-fade-up">
             <EmptyArchiveState
@@ -208,6 +254,33 @@ const timelineEvents = computed(() => {
   right: 0;
   height: 1px;
   background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.3), transparent);
+}
+
+.era-archive-group {
+  margin-bottom: 5rem;
+}
+
+.era-group-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.era-group-title {
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  color: var(--c-gold, #d4af37);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.era-group-divider {
+  flex-grow: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.3), transparent);
 }
 
 .timeline-end-mark {

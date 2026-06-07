@@ -2,57 +2,82 @@
 import { ref, computed } from 'vue'
 
 const props = defineProps<{
-  events: Array<{
-    title: string
+  eraGroups: Array<{
     era: string
+    title: string
     summary: string
     characters?: string[]
     link?: string
-    image?: string
+    events: Array<{
+      title: string
+      chinese?: string
+      summary: string
+      link?: string
+      eraOrder: number
+    }>
   }>
 }>()
 
 const activeIndex = ref(0)
-const activeEvent = computed(() => props.events[activeIndex.value] || null)
+const activeGroup = computed(() => props.eraGroups[activeIndex.value] || null)
 
-function selectEvent(index: number) {
+function selectGroup(index: number) {
   activeIndex.value = index
 }
 </script>
 
 <template>
   <div class="chronicle-rail-container">
-    <!-- Active Event Preview -->
-    <div class="event-preview-area" v-if="activeEvent">
+    <!-- Active Event Preview (Macro/Arc view + Micro events list) -->
+    <div class="event-preview-area" v-if="activeGroup">
       <div class="preview-content">
-        <span class="preview-era">{{ activeEvent.era }}</span>
-        <h3 class="preview-title">{{ activeEvent.title }}</h3>
-        <p class="preview-summary">{{ activeEvent.summary }}</p>
-        <div class="preview-characters" v-if="activeEvent.characters && activeEvent.characters.length">
-          <span class="char-tag" v-for="char in activeEvent.characters" :key="char">{{ char }}</span>
+        <span class="preview-era">{{ activeGroup.era }}</span>
+        <h3 class="preview-title">{{ activeGroup.title }}</h3>
+        <p class="preview-summary">{{ activeGroup.summary }}</p>
+        <div class="preview-characters" v-if="activeGroup.characters && activeGroup.characters.length">
+          <span class="char-tag" v-for="char in activeGroup.characters" :key="char">{{ char }}</span>
         </div>
-        <NuxtLink v-if="activeEvent.link" :to="activeEvent.link" class="preview-link">
-          Explore Record <span class="arrow">→</span>
+        <NuxtLink v-if="activeGroup.link" :to="activeGroup.link" class="preview-link">
+          Explore Era Record <span class="arrow">→</span>
         </NuxtLink>
+      </div>
+
+      <!-- Micro-chronicle sub-rail/ledger for the active macro arc -->
+      <div class="micro-events-ledger" v-if="activeGroup.events.length > 1">
+        <h4 class="ledger-title">Arc Records</h4>
+        <div class="ledger-list">
+          <NuxtLink 
+            v-for="event in activeGroup.events" 
+            :key="event.link" 
+            :to="event.link" 
+            class="ledger-item"
+          >
+            <span class="ledger-marker"></span>
+            <div class="ledger-details">
+              <span class="ledger-event-title">{{ event.title }}</span>
+              <span class="ledger-event-chinese" v-if="event.chinese">{{ event.chinese }}</span>
+            </div>
+          </NuxtLink>
+        </div>
       </div>
     </div>
 
-    <!-- Horizontal Rail -->
+    <!-- Horizontal Macro Rail -->
     <div class="rail-wrapper">
       <div class="rail-track"></div>
       <div class="rail-nodes">
         <button 
-          v-for="(event, index) in events" 
+          v-for="(group, index) in eraGroups" 
           :key="index"
           class="rail-node"
           :class="{ 'is-active': activeIndex === index }"
-          @click="selectEvent(index)"
-          @mouseenter="selectEvent(index)"
-          :aria-label="`View event: ${event.title}`"
+          @click="selectGroup(index)"
+          @mouseenter="selectGroup(index)"
+          :aria-label="`View era: ${group.era}`"
           :aria-current="activeIndex === index ? 'step' : undefined"
         >
           <span class="node-dot"></span>
-          <span class="node-label">{{ event.era }}</span>
+          <span class="node-label">{{ group.era }}</span>
         </button>
       </div>
     </div>
@@ -76,12 +101,102 @@ function selectEvent(index: number) {
   min-height: 200px;
   display: flex;
   align-items: flex-end;
+  justify-content: space-between;
+  gap: 4rem;
   padding: 0 2rem;
 }
 
 .preview-content {
+  flex: 1;
   max-width: 600px;
   animation: fadeIn 0.4s ease-out;
+}
+
+/* Micro Ledger */
+.micro-events-ledger {
+  flex: 0 0 350px;
+  background: linear-gradient(180deg, rgba(10,10,10,0.8) 0%, rgba(5,5,5,0.6) 100%);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  border-left: 2px solid rgba(212, 175, 55, 0.5);
+  padding: 1.5rem;
+  animation: fadeIn 0.5s ease-out;
+  max-height: 280px;
+  overflow-y: auto;
+  
+  /* Scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212, 175, 55, 0.3) transparent;
+}
+
+.micro-events-ledger::-webkit-scrollbar {
+  width: 4px;
+}
+.micro-events-ledger::-webkit-scrollbar-track {
+  background: transparent;
+}
+.micro-events-ledger::-webkit-scrollbar-thumb {
+  background-color: rgba(212, 175, 55, 0.3);
+}
+
+.ledger-title {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin: 0 0 1.5rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 0.5rem;
+}
+
+.ledger-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ledger-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  text-decoration: none;
+  group: ledger-hover;
+}
+
+.ledger-marker {
+  width: 6px;
+  height: 6px;
+  margin-top: 6px;
+  background: rgba(212, 175, 55, 0.3);
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.ledger-item:hover .ledger-marker {
+  background: #d4af37;
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+}
+
+.ledger-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.ledger-event-title {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
+  transition: color 0.3s ease;
+}
+
+.ledger-item:hover .ledger-event-title {
+  color: #fff;
+}
+
+.ledger-event-chinese {
+  color: rgba(212, 175, 55, 0.6);
+  font-size: 0.8rem;
 }
 
 .preview-era {
@@ -186,8 +301,6 @@ function selectEvent(index: number) {
   pointer-events: none;
 }
 
-/* Glowing segment connecting active nodes could be added via JS, but we'll use a pseudo-element on the active node for now */
-
 .rail-nodes {
   display: flex;
   justify-content: space-between;
@@ -282,6 +395,14 @@ function selectEvent(index: number) {
 }
 
 @media (max-width: 768px) {
+  .event-preview-area {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .micro-events-ledger {
+    flex: none;
+    width: 100%;
+  }
   .preview-title {
     font-size: 2rem;
   }
