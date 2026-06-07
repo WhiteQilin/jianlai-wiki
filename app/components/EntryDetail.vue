@@ -11,11 +11,26 @@ import type { RelatedGroup } from '~/composables/useRelatedEntries'
 import type { EntryRecordLike } from '~/utils/entryLinkResolver'
 import { resolvePublicImage } from '~/utils/publicMedia'
 
+interface TimelineNavigationRecord {
+  path: string
+  title: string
+  era?: string
+  eraOrder?: number
+}
+
+interface TimelineNavigation {
+  era?: string
+  eraHref?: string
+  previous?: TimelineNavigationRecord | null
+  next?: TimelineNavigationRecord | null
+}
+
 const props = defineProps<{
   page: any
   section: string
   sectionTitle: string
   relatedGroups?: RelatedGroup[]
+  timelineNavigation?: TimelineNavigation
 }>()
 
 const { data: allEntries } = await useAsyncData('entry-detail-link-graph', () =>
@@ -28,6 +43,19 @@ const resolvedHeroPoster = computed(() => resolvePublicImage(props.page?.image))
 const resolvedBanner = computed(() => resolvePublicImage(props.page?.banner))
 const showVideoHero = computed(() => props.section === 'characters' && Boolean(props.page?.video))
 const showBanner = computed(() => Boolean(resolvedBanner.value) && !showVideoHero.value)
+const isTimelineDetail = computed(() => props.section === 'timeline')
+const timelineDetailNavigation = computed<TimelineNavigation | null>(() => {
+  if (!isTimelineDetail.value) return null
+
+  return props.timelineNavigation ?? {
+    era: props.page?.era,
+    eraHref: '/timeline',
+    previous: null,
+    next: null,
+  }
+})
+const timelineEraLabel = computed(() => timelineDetailNavigation.value?.era || 'Timeline Record')
+const timelineEraHref = computed(() => timelineDetailNavigation.value?.eraHref || '/timeline')
 const hasReferenceContent = computed(() => Boolean(
   props.page?.sourceNotes ||
   props.page?.verificationStatus ||
@@ -45,6 +73,14 @@ const importanceLabel = computed(() => {
   }
   return value ? labels[value] || value : ''
 })
+
+function timelineRecordMeta(record?: TimelineNavigationRecord | null) {
+  const meta = []
+  if (record?.era) meta.push(record.era)
+  if (typeof record?.eraOrder === 'number') meta.push(`Order ${record.eraOrder}`)
+
+  return meta.join(' / ')
+}
 </script>
 
 <template>
@@ -74,6 +110,25 @@ const importanceLabel = computed(() => {
           <NuxtLink :to="`/${section}`">{{ sectionTitle }}</NuxtLink> <span>/</span>
           <span class="current">{{ page?.title }}</span>
         </div>
+      </ScrollReveal>
+
+      <ScrollReveal v-if="isTimelineDetail" animation="reveal-fade-up" delay="stagger-1">
+        <nav class="timeline-context-bar" aria-label="Timeline context navigation">
+          <div class="timeline-context-copy">
+            <span class="timeline-context-kicker">Arc Record</span>
+            <NuxtLink
+              v-if="timelineDetailNavigation?.era"
+              :to="timelineEraHref"
+              class="timeline-era-link"
+            >
+              {{ timelineEraLabel }}
+            </NuxtLink>
+            <span v-else class="timeline-era-link is-static">{{ timelineEraLabel }}</span>
+          </div>
+          <NuxtLink class="timeline-return-link" :to="timelineEraHref">
+            Return to Timeline
+          </NuxtLink>
+        </nav>
       </ScrollReveal>
 
       <ScrollReveal animation="reveal-fade-up" delay="stagger-1">
@@ -134,6 +189,47 @@ const importanceLabel = computed(() => {
             <OrnamentalDivider motif="diamond" />
             <ScrollReveal animation="reveal-fade-up">
               <EntryReferenceBlock :page="page" />
+            </ScrollReveal>
+          </template>
+
+          <template v-if="isTimelineDetail">
+            <OrnamentalDivider motif="jade" />
+            <ScrollReveal animation="reveal-fade-up">
+              <nav class="timeline-reader-nav" aria-label="Timeline reader navigation">
+                <NuxtLink
+                  v-if="timelineDetailNavigation?.previous"
+                  :to="timelineDetailNavigation.previous.path"
+                  class="timeline-reader-card is-previous"
+                >
+                  <span class="timeline-reader-label">Previous Record</span>
+                  <span class="timeline-reader-title">{{ timelineDetailNavigation.previous.title }}</span>
+                  <span
+                    v-if="timelineRecordMeta(timelineDetailNavigation.previous)"
+                    class="timeline-reader-meta"
+                  >
+                    {{ timelineRecordMeta(timelineDetailNavigation.previous) }}
+                  </span>
+                </NuxtLink>
+
+                <NuxtLink class="timeline-reader-return" :to="timelineEraHref">
+                  Return to Timeline
+                </NuxtLink>
+
+                <NuxtLink
+                  v-if="timelineDetailNavigation?.next"
+                  :to="timelineDetailNavigation.next.path"
+                  class="timeline-reader-card is-next"
+                >
+                  <span class="timeline-reader-label">Next Record</span>
+                  <span class="timeline-reader-title">{{ timelineDetailNavigation.next.title }}</span>
+                  <span
+                    v-if="timelineRecordMeta(timelineDetailNavigation.next)"
+                    class="timeline-reader-meta"
+                  >
+                    {{ timelineRecordMeta(timelineDetailNavigation.next) }}
+                  </span>
+                </NuxtLink>
+              </nav>
             </ScrollReveal>
           </template>
         </main>
@@ -304,7 +400,7 @@ const importanceLabel = computed(() => {
 }
 
 .section-timeline .breadcrumb {
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.15rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid rgba(212, 175, 55, 0.14);
 }
@@ -315,6 +411,100 @@ const importanceLabel = computed(() => {
 
 .section-timeline .current {
   color: rgba(240, 210, 122, 0.86);
+}
+
+.section-timeline .timeline-context-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(18, 15, 9, 0.82), rgba(7, 7, 7, 0.86)),
+    radial-gradient(circle at 0% 0%, rgba(212, 175, 55, 0.09), transparent 16rem);
+  box-shadow: inset 0 1px 0 rgba(255, 244, 194, 0.06);
+}
+
+.section-timeline .timeline-context-copy {
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.85rem;
+}
+
+.section-timeline .timeline-context-kicker,
+.section-timeline .timeline-return-link,
+.section-timeline .timeline-reader-label,
+.section-timeline .timeline-reader-meta,
+.section-timeline .timeline-reader-return {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.section-timeline .timeline-context-kicker {
+  color: rgba(212, 175, 55, 0.56);
+}
+
+.section-timeline .timeline-era-link,
+.section-timeline .timeline-return-link,
+.section-timeline .timeline-reader-card,
+.section-timeline .timeline-reader-return {
+  text-decoration: none;
+  transition:
+    border-color 0.24s ease,
+    background-color 0.24s ease,
+    color 0.24s ease,
+    transform 0.24s ease,
+    box-shadow 0.24s ease;
+}
+
+.section-timeline .timeline-era-link {
+  min-width: 0;
+  color: #fff4d6;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.28);
+  font-family: var(--font-heading);
+  font-size: 1.02rem;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.section-timeline .timeline-era-link:not(.is-static):hover,
+.section-timeline .timeline-era-link:not(.is-static):focus-visible {
+  color: #f0d27a;
+  border-bottom-color: rgba(240, 210, 122, 0.72);
+  outline: none;
+}
+
+.section-timeline .timeline-return-link,
+.section-timeline .timeline-reader-return {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.45rem;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid rgba(212, 175, 55, 0.24);
+  border-radius: 6px;
+  color: rgba(240, 210, 122, 0.88);
+  background: rgba(212, 175, 55, 0.06);
+  white-space: nowrap;
+}
+
+.section-timeline .timeline-return-link:hover,
+.section-timeline .timeline-return-link:focus-visible,
+.section-timeline .timeline-reader-return:hover,
+.section-timeline .timeline-reader-return:focus-visible {
+  color: #fff8e4;
+  border-color: rgba(240, 210, 122, 0.58);
+  background: rgba(212, 175, 55, 0.12);
+  box-shadow: 0 0 18px rgba(212, 175, 55, 0.1);
+  outline: none;
 }
 
 .section-timeline .entry-header {
@@ -349,6 +539,11 @@ const importanceLabel = computed(() => {
 }
 
 .section-timeline :deep(.name-en) {
+  font-size: clamp(2.55rem, 6vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
   color: #fff8e4;
   text-shadow: 0 0 28px rgba(212, 175, 55, 0.12);
 }
@@ -503,6 +698,88 @@ const importanceLabel = computed(() => {
   color: #f0d27a;
 }
 
+.section-timeline .timeline-reader-nav {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: stretch;
+  gap: 1rem;
+  margin-top: clamp(1rem, 2vw, 1.5rem);
+}
+
+.section-timeline .timeline-reader-card,
+.section-timeline .timeline-reader-return {
+  min-width: 0;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, rgba(18, 15, 9, 0.88), rgba(7, 7, 7, 0.9)),
+    radial-gradient(circle at 0% 0%, rgba(212, 175, 55, 0.1), transparent 14rem);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 244, 194, 0.06),
+    0 16px 36px rgba(0, 0, 0, 0.18);
+}
+
+.section-timeline .timeline-reader-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 8rem;
+  padding: 1rem;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.section-timeline .timeline-reader-card.is-previous {
+  grid-column: 1;
+}
+
+.section-timeline .timeline-reader-card.is-next {
+  grid-column: 3;
+  text-align: right;
+}
+
+.section-timeline .timeline-reader-label {
+  color: rgba(212, 175, 55, 0.66);
+}
+
+.section-timeline .timeline-reader-title {
+  color: #fff4d6;
+  font-family: var(--font-heading);
+  font-size: clamp(1.1rem, 1.5vw, 1.35rem);
+  line-height: 1.18;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+.section-timeline .timeline-reader-meta {
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.section-timeline .timeline-reader-card:hover,
+.section-timeline .timeline-reader-card:focus-visible {
+  color: #fff8e4;
+  border-color: rgba(240, 210, 122, 0.6);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 244, 194, 0.1),
+    0 18px 42px rgba(0, 0, 0, 0.24),
+    0 0 20px rgba(212, 175, 55, 0.1);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.section-timeline .timeline-reader-card:hover .timeline-reader-title,
+.section-timeline .timeline-reader-card:focus-visible .timeline-reader-title {
+  color: #f0d27a;
+}
+
+.section-timeline .timeline-reader-return {
+  grid-column: 2;
+  align-self: stretch;
+  min-width: 10rem;
+  padding-inline: 1rem;
+  text-align: center;
+}
+
 @media (max-width: 1024px) {
   .entry-header {
     grid-template-columns: 1fr;
@@ -528,15 +805,81 @@ const importanceLabel = computed(() => {
     max-height: none;
     overflow: visible;
   }
+
+  .section-timeline .article-layout {
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 760px) {
+  .section-timeline .timeline-context-bar,
+  .section-timeline .timeline-reader-nav {
+    grid-template-columns: 1fr;
+  }
+
+  .section-timeline .timeline-context-bar {
+    align-items: stretch;
+    flex-direction: column;
+    margin-bottom: 2rem;
+  }
+
+  .section-timeline .timeline-return-link,
+  .section-timeline .timeline-reader-return {
+    width: 100%;
+    white-space: normal;
+  }
+
+  .section-timeline .timeline-reader-card,
+  .section-timeline .timeline-reader-card.is-next {
+    grid-column: auto;
+    min-height: 0;
+    text-align: left;
+  }
+
+  .section-timeline .timeline-reader-return {
+    grid-column: auto;
+  }
 }
 
 @media (max-width: 640px) {
+  .section-timeline .mdc-content {
+    padding-top: calc(var(--header-height) + 1.5rem);
+  }
+
+  .section-timeline :deep(.name-en) {
+    font-size: clamp(2.05rem, 11vw, 3rem);
+    line-height: 1.08;
+  }
+
   .entry-lead {
     font-size: 1.04rem;
   }
   .entry-header {
     margin-bottom: 2rem;
     padding-bottom: 1.5rem;
+  }
+
+  .section-timeline .article-layout {
+    gap: 1.65rem;
+  }
+
+  .section-timeline .timeline-context-bar,
+  .section-timeline .timeline-reader-card {
+    padding: 0.85rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-timeline .timeline-era-link,
+  .section-timeline .timeline-return-link,
+  .section-timeline .timeline-reader-card,
+  .section-timeline .timeline-reader-return {
+    transition: none;
+  }
+
+  .section-timeline .timeline-reader-card:hover,
+  .section-timeline .timeline-reader-card:focus-visible {
+    transform: none;
   }
 }
 </style>

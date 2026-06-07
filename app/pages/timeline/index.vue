@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { timelineArcAnchorId } from '~/utils/timelineAnchors'
 
 const activeCategory = ref('All')
 
@@ -141,7 +142,12 @@ const timelineRouteLinks = computed(() => {
           </ScrollReveal>
 
           <template v-if="eraGroups.length > 0">
-            <div v-for="(group, groupIndex) in eraGroups" :key="group.era" class="era-archive-group">
+            <div
+              v-for="(group, groupIndex) in eraGroups"
+              :id="timelineArcAnchorId(group.era)"
+              :key="group.era"
+              class="era-archive-group"
+            >
               <ScrollReveal animation="reveal-fade-up">
                 <div class="era-group-header">
                   <div class="era-title-block">
@@ -374,6 +380,7 @@ const timelineRouteLinks = computed(() => {
 .era-archive-group {
   position: relative;
   margin-bottom: clamp(4.5rem, 8vw, 7rem);
+  scroll-margin-top: calc(var(--header-height) + 1.5rem);
 }
 
 .era-archive-group::before {
