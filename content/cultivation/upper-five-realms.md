@@ -10,7 +10,7 @@ importance: major
 image: ""
 banner: ""
 seal: 境
-description: The collective term for the higher tier of cultivation realms in Jian Lai, marking the threshold of truly powerful and long-lived cultivators.
+description: The 11th to 15th realm grouping of the Qi Refiner ladder, marking the threshold of truly powerful and long-lived spiritual cultivators.
 pathType: Qi Refining
 realmRange: "11–15"
 tags:
@@ -21,7 +21,6 @@ practitioners: []
 related:
   - /cultivation/qi-refiner
   - /cultivation/sword-cultivator
-  - /cultivation/pure-martial-artist
   - /glossary/natal-porcelain
 verificationStatus: to-be-verified
 sourceNotes: >
@@ -36,11 +35,11 @@ lastUpdated: 2026-06-03
 
 ## Overview
 
-The **Upper Five Realms** (上五境) is the collective term for the higher tier of the cultivation realm system in the world of Jian Lai. Reaching the Upper Five Realms marks the threshold at which a cultivator becomes genuinely powerful and long-lived, standing far above the practitioners of the lower realms.
+The **Upper Five Realms** (上五境) is the collective term for the higher tier of the Qi Refiner cultivation realm system in the world of Jian Lai. Reaching the Upper Five Realms marks the threshold at which a spiritual cultivator becomes genuinely powerful and long-lived, standing far above the practitioners of the lower realms.
 
 ## Context
 
-Cultivators across paths — whether [Qi Refiners](/cultivation/qi-refiner), [Sword Cultivators](/cultivation/sword-cultivator), or [Pure Martial Artists](/cultivation/pure-martial-artist) — measure their progress against this division. Figures who ascend into the Upper Five Realms, such as peerless Sword Immortals and Heavenly Lords, are referenced in the broader lore of the series, including in the high-stakes consequences surrounding artifacts like [Natal Porcelain](/glossary/natal-porcelain).
+Within this database, this grouping should be read as part of the [Qi Refiner](/cultivation/qi-refiner) ladder. It applies to Qi Refiners and to [Sword Cultivators](/cultivation/sword-cultivator) where the source treats sword cultivation as a specialized Qi Refiner path; it does not classify Pure Martial Artist progression. Figures who ascend into the Upper Five Realms, such as peerless Sword Immortals and Heavenly Lords, are referenced in the broader lore of the series, including in the high-stakes consequences surrounding artifacts like [Natal Porcelain](/glossary/natal-porcelain).
 
 ## Notes
 

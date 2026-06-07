@@ -4,6 +4,7 @@ chinese: 下五境
 pinyin: Xia Wu Jing
 section: cultivation
 category: Realm
+subcategory: Realm Grouping
 status: published
 importance: major
 verificationStatus: to-be-verified

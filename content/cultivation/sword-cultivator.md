@@ -5,6 +5,7 @@ pinyin: Jiànxiū
 description: The most lethal and revered path of Qi Refiners, known for their natal flying swords, pure sword hearts, and unparalleled offensive power.
 section: cultivation
 category: Path
+pathType: Qi Refining - Sword Cultivation
 importance: primary
 verificationStatus: verified
 tags:

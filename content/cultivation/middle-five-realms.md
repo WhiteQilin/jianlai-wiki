@@ -4,6 +4,7 @@ chinese: 中五境
 pinyin: Zhong Wu Jing
 section: cultivation
 category: Realm
+subcategory: Realm Grouping
 status: published
 importance: primary
 verificationStatus: verified
