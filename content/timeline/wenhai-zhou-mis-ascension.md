@@ -14,8 +14,8 @@ video: ""
 seal: ""
 description: The mastermind of the Wild World invasion physically ascends to the ancient heavenly ruins, shifting the cosmological balance before facing an apocalyptic interception.
 date: Unknown
-era: Counter-Offensive & New Heaven Arc
-eraOrder: 700
+era: Wild World Invasion Arc
+eraOrder: 550
 participants: []
 location: ""
 tags:

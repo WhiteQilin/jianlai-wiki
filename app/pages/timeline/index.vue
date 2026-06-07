@@ -293,6 +293,7 @@ const timelineRouteLinks = computed(() => {
 .era-group-header {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 1.5rem;
   margin-bottom: 2.5rem;
 }
@@ -303,13 +304,16 @@ const timelineRouteLinks = computed(() => {
   color: var(--c-gold, #d4af37);
   text-transform: uppercase;
   letter-spacing: 0.1em;
+  line-height: 1.35;
   margin: 0;
-  white-space: nowrap;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .era-group-divider {
-  flex-grow: 1;
+  flex: 1 1 80px;
   height: 1px;
+  min-width: 80px;
   background: linear-gradient(90deg, rgba(212, 175, 55, 0.3), transparent);
 }
 
