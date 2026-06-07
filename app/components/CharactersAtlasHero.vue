@@ -96,8 +96,8 @@ const primaryCount = computed(() => props.prominenceGroups?.find((group) => grou
   z-index: -3;
   background-size: cover;
   background-position: center;
-  opacity: 0.22;
-  filter: saturate(0.78) contrast(0.92);
+  opacity: 0.32;
+  filter: saturate(0.9) contrast(1.03);
   transform: scale(1.03);
 }
 
@@ -106,12 +106,12 @@ const primaryCount = computed(() => props.prominenceGroups?.find((group) => grou
   inset: 0;
   z-index: -2;
   background:
-    linear-gradient(90deg, var(--c-bg) 0%, color-mix(in srgb, var(--c-bg) 78%, transparent) 46%, transparent 100%),
+    linear-gradient(90deg, var(--c-bg) 0%, color-mix(in srgb, var(--c-bg) 74%, transparent) 46%, transparent 100%),
     linear-gradient(180deg, transparent 0%, var(--c-bg) 100%),
     url('/images/textures/ink-wash-01.webp');
   background-size: auto, auto, cover;
   background-blend-mode: normal, normal, multiply;
-  opacity: 0.94;
+  opacity: 0.88;
 }
 
 .hero-inner {
