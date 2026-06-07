@@ -68,13 +68,26 @@ const eraGroups = computed(() => {
     return {
       era,
       title: macroEntry.title,
+      chinese: macroEntry.chinese,
       summary: macroEntry.summary,
       link: macroEntry.link,
       characters: macroEntry.characters,
+      category: macroEntry.category,
+      status: macroEntry.status,
+      image: macroEntry.image,
+      eraOrder: macroEntry.eraOrder,
       events: microEvents // only the actual micro-events
     }
   })
 })
+
+function archiveOrder(index: number) {
+  return String(index + 1).padStart(2, '0')
+}
+
+function recordCountLabel(count: number) {
+  return `${count} ${count === 1 ? 'record' : 'records'}`
+}
 
 const timelineRouteLinks = computed(() => {
   const seen = new Set<string>()
@@ -131,29 +144,55 @@ const timelineRouteLinks = computed(() => {
             <div v-for="(group, groupIndex) in eraGroups" :key="group.era" class="era-archive-group">
               <ScrollReveal animation="reveal-fade-up">
                 <div class="era-group-header">
-                  <h2 class="era-group-title">{{ group.era }}</h2>
+                  <div class="era-title-block">
+                    <span class="era-group-index">Archive {{ archiveOrder(groupIndex) }}</span>
+                    <h2 class="era-group-title">{{ group.era }}</h2>
+                  </div>
                   <div class="era-group-divider"></div>
+                  <span class="era-group-count">{{ recordCountLabel(group.events.length) }}</span>
                 </div>
               </ScrollReveal>
-              
-              <DossierGrid>
-                <ScrollReveal
-                  v-for="(item, index) in group.events"
-                  :key="item.link"
-                  animation="reveal-fade-up"
-                  :delay="(`stagger-${(index % 5) + 1}` as any)"
-                >
-                  <DossierCard
-                    :link="item.link"
-                    :nameEn="item.title"
-                    :nameZh="item.chinese"
-                    :desc="item.summary"
-                    :category="item.category || 'Timeline'"
-                    :status="item.status || 'To be verified'"
-                    :image="item.image"
-                  />
+
+              <div class="era-archive-layout">
+                <ScrollReveal animation="reveal-fade-up" delay="stagger-1">
+                  <NuxtLink :to="group.link" class="era-parent-card">
+                    <div class="parent-card-rule" aria-hidden="true"></div>
+                    <div class="parent-card-copy">
+                      <div class="parent-card-meta">
+                        <span>{{ group.category || 'Arc' }}</span>
+                        <span v-if="group.eraOrder">Order {{ group.eraOrder }}</span>
+                      </div>
+                      <h3>{{ group.title }}</h3>
+                      <p v-if="group.chinese" class="parent-card-chinese">{{ group.chinese }}</p>
+                      <p class="parent-card-summary">{{ group.summary }}</p>
+                    </div>
+                    <div class="parent-card-stat">
+                      <span class="stat-value">{{ group.events.length }}</span>
+                      <span class="stat-label">records</span>
+                    </div>
+                  </NuxtLink>
                 </ScrollReveal>
-              </DossierGrid>
+
+                <DossierGrid v-if="group.events.length" class="timeline-event-grid">
+                  <ScrollReveal
+                    v-for="(item, index) in group.events"
+                    :key="item.link"
+                    class="timeline-event-card-frame"
+                    animation="reveal-fade-up"
+                    :delay="(`stagger-${(index % 5) + 1}` as any)"
+                  >
+                    <DossierCard
+                      :link="item.link"
+                      :nameEn="item.title"
+                      :nameZh="item.chinese"
+                      :desc="item.summary"
+                      :category="item.category || 'Event'"
+                      :status="item.status || 'To be verified'"
+                      :image="item.image"
+                    />
+                  </ScrollReveal>
+                </DossierGrid>
+              </div>
             </div>
           </template>
 
@@ -195,7 +234,6 @@ const timelineRouteLinks = computed(() => {
 }
 
 :deep(.category-tabs) {
-  /* Ensure the tabs look good on dark background */
   background-color: transparent;
   border-color: rgba(212, 175, 55, 0.2);
 }
@@ -224,15 +262,21 @@ const timelineRouteLinks = computed(() => {
 }
 
 :deep(.dossier-card) {
-  background: rgba(10, 10, 10, 0.8);
+  background:
+    linear-gradient(180deg, rgba(15, 13, 9, 0.92), rgba(7, 7, 7, 0.92)),
+    url('/images/textures/ink-wash-02.webp');
+  background-size: cover;
+  background-blend-mode: normal, screen;
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(212, 175, 55, 0.15);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(212, 175, 55, 0.16);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(255, 244, 194, 0.04);
+  transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
 }
 
 :deep(.dossier-card:hover) {
   border-color: var(--c-gold, #d4af37);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(212, 175, 55, 0.1);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.5), 0 0 22px rgba(212, 175, 55, 0.1);
   transform: translateY(-4px);
 }
 
@@ -243,6 +287,45 @@ const timelineRouteLinks = computed(() => {
 
 :deep(.dossier-card .card-desc) {
   color: rgba(255, 255, 255, 0.7);
+}
+
+:deep(.dossier-card .card-image-wrap),
+:deep(.dossier-card .card-image-placeholder) {
+  height: 160px;
+  border-bottom-color: rgba(212, 175, 55, 0.14);
+}
+
+:deep(.dossier-card .card-content) {
+  padding: 1.15rem;
+}
+
+:deep(.dossier-card .card-meta) {
+  align-items: flex-start;
+  gap: 0.8rem;
+}
+
+:deep(.dossier-card .category) {
+  color: rgba(212, 175, 55, 0.68);
+}
+
+:deep(.dossier-card .status) {
+  color: rgba(255, 234, 169, 0.78);
+  border-color: rgba(212, 175, 55, 0.24);
+  background: rgba(212, 175, 55, 0.06);
+}
+
+:deep(.dossier-card .card-name) {
+  font-size: 1.18rem;
+  line-height: 1.2;
+}
+
+:deep(.dossier-card:hover .card-name) {
+  color: #f0d27a;
+}
+
+:deep(.dossier-card .zh-name) {
+  color: rgba(212, 175, 55, 0.62);
+  font-size: 0.95rem;
 }
 
 .timeline-prerender-links {
@@ -265,14 +348,16 @@ const timelineRouteLinks = computed(() => {
 }
 
 .timeline-archive-section {
-  padding-top: 4rem;
+  padding-top: clamp(3rem, 6vw, 5rem);
+  padding-bottom: 1rem;
   background-color: #050505;
   background-image:
-    linear-gradient(to bottom, transparent, rgba(10, 10, 10, 0.8) 100%),
+    radial-gradient(circle at 18% 0%, rgba(212, 175, 55, 0.08), transparent 25rem),
+    linear-gradient(to bottom, rgba(5, 5, 5, 0.2), rgba(10, 10, 10, 0.88) 100%),
     url('/images/textures/ink-wash-01.webp'); /* Faint texture for body */
-  background-size: 100% 100%, cover;
-  background-position: center, center;
-  background-blend-mode: normal, multiply;
+  background-size: 100% 100%, 100% 100%, cover;
+  background-position: center, center, center;
+  background-blend-mode: normal, normal, multiply;
   position: relative;
 }
 
@@ -287,34 +372,214 @@ const timelineRouteLinks = computed(() => {
 }
 
 .era-archive-group {
-  margin-bottom: 5rem;
+  position: relative;
+  margin-bottom: clamp(4.5rem, 8vw, 7rem);
+}
+
+.era-archive-group::before {
+  content: '';
+  position: absolute;
+  top: 4.25rem;
+  bottom: -2.5rem;
+  left: 0.38rem;
+  width: 1px;
+  background: linear-gradient(to bottom, rgba(212, 175, 55, 0.38), rgba(212, 175, 55, 0.08), transparent);
+  pointer-events: none;
 }
 
 .era-group-header {
   display: flex;
-  align-items: center;
+  align-items: end;
   flex-wrap: wrap;
-  gap: 1.5rem;
-  margin-bottom: 2.5rem;
+  gap: 1rem 1.5rem;
+  margin-bottom: 1.35rem;
+  padding-left: 1.5rem;
+}
+
+.era-title-block {
+  min-width: min(100%, 22rem);
+}
+
+.era-group-index,
+.era-group-count {
+  color: rgba(255, 255, 255, 0.42);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.era-group-index {
+  display: block;
+  margin-bottom: 0.4rem;
 }
 
 .era-group-title {
   font-family: var(--font-mono);
-  font-size: 1.25rem;
-  color: var(--c-gold, #d4af37);
+  font-size: clamp(1.25rem, 2vw, 1.75rem);
+  color: #e4c96f;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   line-height: 1.35;
   margin: 0;
   max-width: 100%;
   overflow-wrap: anywhere;
+  text-shadow: 0 0 18px rgba(212, 175, 55, 0.18);
 }
 
 .era-group-divider {
   flex: 1 1 80px;
+  height: 2px;
+  min-width: 120px;
+  margin-bottom: 0.35rem;
+  background:
+    linear-gradient(90deg, rgba(212, 175, 55, 0.62), rgba(212, 175, 55, 0.08), transparent),
+    linear-gradient(90deg, rgba(255, 244, 194, 0.34), transparent);
+  box-shadow: 0 0 16px rgba(212, 175, 55, 0.14);
+}
+
+.era-group-count {
+  margin-bottom: 0.2rem;
+  color: rgba(212, 175, 55, 0.62);
+}
+
+.era-archive-layout {
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.era-parent-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  align-items: center;
+  margin-bottom: 1.3rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  color: inherit;
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(24, 18, 9, 0.9), rgba(7, 7, 7, 0.92) 68%),
+    radial-gradient(circle at 8% 0%, rgba(212, 175, 55, 0.14), transparent 16rem);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 244, 194, 0.08),
+    0 22px 54px rgba(0, 0, 0, 0.26);
+  overflow: hidden;
+  text-decoration: none;
+  transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+}
+
+.era-parent-card::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
   height: 1px;
-  min-width: 80px;
-  background: linear-gradient(90deg, rgba(212, 175, 55, 0.3), transparent);
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.54), transparent);
+}
+
+.era-parent-card:hover,
+.era-parent-card:focus-visible {
+  border-color: rgba(240, 210, 122, 0.62);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 244, 194, 0.12),
+    0 24px 58px rgba(0, 0, 0, 0.34),
+    0 0 24px rgba(212, 175, 55, 0.12);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.parent-card-rule {
+  position: absolute;
+  top: 1.25rem;
+  bottom: 1.25rem;
+  left: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, transparent, #d4af37, rgba(184, 42, 42, 0.52), transparent);
+  box-shadow: 0 0 18px rgba(212, 175, 55, 0.28);
+}
+
+.parent-card-copy {
+  min-width: 0;
+}
+
+.parent-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem 1rem;
+  margin-bottom: 0.75rem;
+  color: rgba(212, 175, 55, 0.66);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.parent-card-copy h3 {
+  margin: 0;
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: clamp(1.55rem, 2.5vw, 2.35rem);
+  font-weight: 500;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+.parent-card-chinese {
+  margin: 0.35rem 0 0;
+  color: rgba(212, 175, 55, 0.62);
+  font-family: var(--font-heading);
+  font-size: 1rem;
+}
+
+.parent-card-summary {
+  max-width: 74ch;
+  margin: 0.9rem 0 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.98rem;
+  line-height: 1.7;
+  text-wrap: pretty;
+}
+
+.parent-card-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 6.75rem;
+  min-height: 6.75rem;
+  border: 1px solid rgba(212, 175, 55, 0.24);
+  border-radius: 8px;
+  background: rgba(5, 5, 5, 0.4);
+  box-shadow: inset 0 0 24px rgba(212, 175, 55, 0.06);
+}
+
+.stat-value {
+  color: #f0d27a;
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-label {
+  margin-top: 0.35rem;
+  color: rgba(255, 255, 255, 0.48);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+:deep(.timeline-event-grid.dossier-grid) {
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.1rem;
+  margin: 1.1rem 0 0;
+}
+
+:deep(.timeline-event-card-frame .dossier-card) {
+  min-height: 100%;
 }
 
 .timeline-end-mark {
@@ -339,5 +604,57 @@ const timelineRouteLinks = computed(() => {
   background: var(--c-seal-red, #ba2626);
   border-radius: 50%;
   transform: rotate(45deg);
+}
+
+@media (max-width: 760px) {
+  .timeline-archive-section {
+    padding-top: 2.5rem;
+  }
+
+  .era-archive-group::before {
+    left: 0;
+  }
+
+  .era-group-header,
+  .era-archive-layout {
+    padding-left: 0.85rem;
+  }
+
+  .era-group-divider {
+    flex-basis: 100%;
+    min-width: 100%;
+  }
+
+  .era-parent-card {
+    grid-template-columns: 1fr;
+  }
+
+  .parent-card-stat {
+    align-items: flex-start;
+    min-width: 0;
+    min-height: auto;
+    padding: 0.8rem;
+  }
+
+  .stat-value {
+    font-size: 1.45rem;
+  }
+
+  :deep(.timeline-event-grid.dossier-grid) {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .era-parent-card,
+  :deep(.dossier-card) {
+    transition: none;
+  }
+
+  .era-parent-card:hover,
+  .era-parent-card:focus-visible,
+  :deep(.dossier-card:hover) {
+    transform: none;
+  }
 }
 </style>

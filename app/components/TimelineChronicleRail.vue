@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 const props = defineProps<{
   eraGroups: Array<{
@@ -21,63 +21,94 @@ const props = defineProps<{
 const activeIndex = ref(0)
 const activeGroup = computed(() => props.eraGroups[activeIndex.value] || null)
 
+const RAIL_LABELS: Record<string, string> = {
+  'Ancient Era': 'Ancient Era',
+  'Middle Era': 'Middle Era',
+  'Lizhu Grotto-Heaven Arc': 'Lizhu Arc',
+  'Sword Qi Great Wall Defense Arc': 'Sword Qi Wall',
+  'Sword Qi Great Wall Arc': 'Sword Qi Wall',
+  'Wild World Invasion Arc': 'Wild Invasion',
+  'Counter-Offensive & New Heaven Arc': 'Counter-Offensive',
+  'Counter-Offensive and New Heaven Arc': 'Counter-Offensive',
+}
+
+function railLabel(era: string) {
+  return RAIL_LABELS[era] || era.replace(/\s+Arc$/i, '')
+}
+
+function recordOrder(index: number) {
+  return String(index + 1).padStart(2, '0')
+}
+
 function selectGroup(index: number) {
+  if (index < 0 || index >= props.eraGroups.length) return
   activeIndex.value = index
 }
+
+watch(() => props.eraGroups.length, (length) => {
+  if (activeIndex.value >= length) {
+    activeIndex.value = Math.max(0, length - 1)
+  }
+})
 </script>
 
 <template>
   <div class="chronicle-rail-container">
-    <!-- Active Event Preview (Macro/Arc view + Micro events list) -->
-    <div class="event-preview-area" v-if="activeGroup">
+    <div v-if="activeGroup" class="event-preview-area">
       <div class="preview-content">
         <span class="preview-era">{{ activeGroup.era }}</span>
         <h3 class="preview-title">{{ activeGroup.title }}</h3>
         <p class="preview-summary">{{ activeGroup.summary }}</p>
-        <div class="preview-characters" v-if="activeGroup.characters && activeGroup.characters.length">
-          <span class="char-tag" v-for="char in activeGroup.characters" :key="char">{{ char }}</span>
+        <div v-if="activeGroup.characters && activeGroup.characters.length" class="preview-characters">
+          <span v-for="char in activeGroup.characters" :key="char" class="char-tag">{{ char }}</span>
         </div>
         <NuxtLink v-if="activeGroup.link" :to="activeGroup.link" class="preview-link">
-          Explore Era Record <span class="arrow">→</span>
+          Explore Era Record <span class="arrow">&rarr;</span>
         </NuxtLink>
       </div>
 
-      <!-- Micro-chronicle sub-rail/ledger for the active macro arc -->
-      <div class="micro-events-ledger" v-if="activeGroup.events.length > 1">
-        <h4 class="ledger-title">Arc Records</h4>
-        <div class="ledger-list">
-          <NuxtLink 
-            v-for="event in activeGroup.events" 
-            :key="event.link" 
-            :to="event.link" 
+      <div v-if="activeGroup.events.length" class="micro-events-ledger">
+        <div class="ledger-heading">
+          <h4 class="ledger-title">Arc Records</h4>
+          <span class="ledger-count">{{ activeGroup.events.length }} entries</span>
+        </div>
+        <div class="ledger-list" :aria-label="`${activeGroup.era} event records`">
+          <NuxtLink
+            v-for="(event, eventIndex) in activeGroup.events"
+            :key="event.link || event.title"
+            :to="event.link"
             class="ledger-item"
+            :title="event.title"
           >
-            <span class="ledger-marker"></span>
+            <span class="ledger-index">{{ recordOrder(eventIndex) }}</span>
             <div class="ledger-details">
               <span class="ledger-event-title">{{ event.title }}</span>
-              <span class="ledger-event-chinese" v-if="event.chinese">{{ event.chinese }}</span>
+              <span v-if="event.chinese" class="ledger-event-chinese">{{ event.chinese }}</span>
             </div>
           </NuxtLink>
         </div>
       </div>
     </div>
 
-    <!-- Horizontal Macro Rail -->
     <div class="rail-wrapper">
       <div class="rail-track"></div>
-      <div class="rail-nodes">
-        <button 
-          v-for="(group, index) in eraGroups" 
-          :key="index"
+      <div class="rail-nodes" role="tablist" aria-label="Timeline macro arcs">
+        <button
+          v-for="(group, index) in eraGroups"
+          :key="group.era"
           class="rail-node"
           :class="{ 'is-active': activeIndex === index }"
-          @click="selectGroup(index)"
-          @mouseenter="selectGroup(index)"
           :aria-label="`View era: ${group.era}`"
           :aria-current="activeIndex === index ? 'step' : undefined"
+          :aria-selected="activeIndex === index"
+          :title="group.era"
+          role="tab"
+          type="button"
+          @click="selectGroup(index)"
+          @mouseenter="selectGroup(index)"
         >
           <span class="node-dot"></span>
-          <span class="node-label">{{ group.era }}</span>
+          <span class="node-label">{{ railLabel(group.era) }}</span>
         </button>
       </div>
     </div>
@@ -86,187 +117,414 @@ function selectGroup(index: number) {
 
 <style scoped>
 .chronicle-rail-container {
+  --rail-gold: #d4af37;
+  --rail-gold-soft: rgba(212, 175, 55, 0.18);
   width: 100%;
-  max-width: 1200px;
+  min-width: 0;
+  max-width: 1280px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 4rem;
+  gap: clamp(1.75rem, 4vh, 3.25rem);
   position: relative;
-  z-index: 10; /* Above ambient layers */
+  z-index: 10;
 }
 
-/* Preview Area */
 .event-preview-area {
-  min-height: 200px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 4rem;
-  padding: 0 2rem;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 410px);
+  align-items: end;
+  gap: clamp(2rem, 5vw, 4.5rem);
+  padding: 0 clamp(0.75rem, 2vw, 2rem);
 }
 
 .preview-content {
-  flex: 1;
-  max-width: 600px;
+  min-width: 0;
+  max-width: 660px;
   animation: fadeIn 0.4s ease-out;
 }
 
-/* Micro Ledger */
-.micro-events-ledger {
-  flex: 0 0 350px;
-  background: linear-gradient(180deg, rgba(10,10,10,0.8) 0%, rgba(5,5,5,0.6) 100%);
-  border: 1px solid rgba(212, 175, 55, 0.15);
-  border-left: 2px solid rgba(212, 175, 55, 0.5);
-  padding: 1.5rem;
-  animation: fadeIn 0.5s ease-out;
-  max-height: 280px;
-  overflow-y: auto;
-  
-  /* Scrollbar styling */
-  scrollbar-width: thin;
-  scrollbar-color: rgba(212, 175, 55, 0.3) transparent;
-}
-
-.micro-events-ledger::-webkit-scrollbar {
-  width: 4px;
-}
-.micro-events-ledger::-webkit-scrollbar-track {
-  background: transparent;
-}
-.micro-events-ledger::-webkit-scrollbar-thumb {
-  background-color: rgba(212, 175, 55, 0.3);
-}
-
-.ledger-title {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.5);
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  margin: 0 0 1.5rem 0;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  padding-bottom: 0.5rem;
-}
-
-.ledger-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.ledger-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  text-decoration: none;
-  group: ledger-hover;
-}
-
-.ledger-marker {
-  width: 6px;
-  height: 6px;
-  margin-top: 6px;
-  background: rgba(212, 175, 55, 0.3);
-  border-radius: 50%;
-  flex-shrink: 0;
-  transition: all 0.3s ease;
-}
-
-.ledger-item:hover .ledger-marker {
-  background: #d4af37;
-  box-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
-}
-
-.ledger-details {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.ledger-event-title {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.95rem;
-  transition: color 0.3s ease;
-}
-
-.ledger-item:hover .ledger-event-title {
-  color: #fff;
-}
-
-.ledger-event-chinese {
-  color: rgba(212, 175, 55, 0.6);
-  font-size: 0.8rem;
-}
-
 .preview-era {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: var(--c-gold, #d4af37);
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
   display: block;
-  margin-bottom: 0.75rem;
-  opacity: 0.9;
+  margin-bottom: 0.7rem;
+  color: var(--rail-gold);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
 
 .preview-title {
+  margin: 0 0 0.9rem;
+  color: #fff;
   font-family: var(--font-heading);
-  font-size: 2.5rem;
-  color: #ffffff; /* Explicit white for dark cinematic background */
-  margin: 0 0 1rem 0;
-  line-height: 1.1;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  font-size: clamp(2rem, 3vw, 2.85rem);
+  line-height: 1.08;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.72);
+  text-wrap: balance;
 }
 
 .preview-summary {
-  font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.8);
-  line-height: 1.6;
-  margin: 0 0 1.5rem 0;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  max-width: 62ch;
+  margin: 0 0 1.35rem;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: clamp(0.98rem, 1vw, 1.08rem);
+  line-height: 1.68;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.72);
+  text-wrap: pretty;
 }
 
 .preview-characters {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  gap: 0.45rem;
+  margin-bottom: 1.35rem;
 }
 
 .char-tag {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 4px 12px;
-  border-radius: 20px;
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(4px);
+  padding: 0.26rem 0.65rem;
+  color: rgba(255, 255, 255, 0.74);
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  background: rgba(5, 5, 5, 0.46);
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
+  font-size: 0.73rem;
 }
 
 .preview-link {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  color: var(--c-seal-red, #ba2626);
+  gap: 0.55rem;
+  color: #e0c46d;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.32);
   font-family: var(--font-mono);
-  font-size: 0.85rem;
-  text-transform: uppercase;
+  font-size: 0.78rem;
   letter-spacing: 0.1em;
   text-decoration: none;
-  transition: all 0.3s ease;
+  text-transform: uppercase;
+  transition: color 0.24s ease, border-color 0.24s ease;
 }
 
-.preview-link:hover {
-  color: #ff4d4d;
+.preview-link:hover,
+.preview-link:focus-visible {
+  color: #fff1b3;
+  border-color: rgba(255, 241, 179, 0.7);
 }
 
 .preview-link .arrow {
-  transition: transform 0.3s ease;
+  transition: transform 0.24s ease;
 }
 
-.preview-link:hover .arrow {
+.preview-link:hover .arrow,
+.preview-link:focus-visible .arrow {
   transform: translateX(4px);
+}
+
+.micro-events-ledger {
+  position: relative;
+  overflow-y: auto;
+  max-height: min(300px, 34dvh);
+  padding: 1rem;
+  border: 1px solid rgba(212, 175, 55, 0.24);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(22, 18, 10, 0.86), rgba(5, 5, 5, 0.74)),
+    radial-gradient(circle at 18% 0%, rgba(212, 175, 55, 0.12), transparent 15rem);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 242, 184, 0.08),
+    inset 0 0 36px rgba(212, 175, 55, 0.06),
+    0 16px 42px rgba(0, 0, 0, 0.36);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212, 175, 55, 0.42) rgba(255, 255, 255, 0.04);
+  animation: fadeIn 0.5s ease-out;
+}
+
+.micro-events-ledger::before {
+  content: '';
+  position: sticky;
+  top: -1rem;
+  display: block;
+  height: 1px;
+  margin: -1rem -1rem 0.8rem;
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.62), transparent);
+}
+
+.micro-events-ledger::-webkit-scrollbar {
+  width: 5px;
+}
+
+.micro-events-ledger::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.micro-events-ledger::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.42);
+  border-radius: 999px;
+}
+
+.ledger-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.ledger-title,
+.ledger-count {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+}
+
+.ledger-title {
+  margin: 0;
+  color: rgba(255, 241, 179, 0.88);
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+}
+
+.ledger-count {
+  color: rgba(255, 255, 255, 0.46);
+  font-size: 0.64rem;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.ledger-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.38rem;
+}
+
+.ledger-item {
+  display: grid;
+  grid-template-columns: 2.4rem minmax(0, 1fr);
+  gap: 0.85rem;
+  align-items: start;
+  min-height: 3.1rem;
+  padding: 0.62rem 0.68rem;
+  color: inherit;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background 0.22s ease, border-color 0.22s ease, transform 0.22s ease;
+}
+
+.ledger-item:hover,
+.ledger-item:focus-visible {
+  border-color: rgba(212, 175, 55, 0.28);
+  background: rgba(212, 175, 55, 0.09);
+  transform: translateX(2px);
+  outline: none;
+}
+
+.ledger-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.5rem;
+  color: rgba(212, 175, 55, 0.72);
+  border-right: 1px solid rgba(212, 175, 55, 0.22);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+}
+
+.ledger-details {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.16rem;
+}
+
+.ledger-event-title {
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 0.9rem;
+  line-height: 1.32;
+  transition: color 0.22s ease;
+}
+
+.ledger-item:hover .ledger-event-title,
+.ledger-item:focus-visible .ledger-event-title {
+  color: #fff;
+}
+
+.ledger-event-chinese {
+  color: rgba(212, 175, 55, 0.64);
+  font-family: var(--font-heading);
+  font-size: 0.78rem;
+  line-height: 1.25;
+}
+
+.rail-wrapper {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  padding: 0.35rem 0 1rem;
+  mask-image: linear-gradient(to right, transparent, black 3.5rem, black calc(100% - 3.5rem), transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 3.5rem, black calc(100% - 3.5rem), transparent);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.rail-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.rail-track {
+  position: absolute;
+  top: 0.83rem;
+  left: 3.75rem;
+  right: 3.75rem;
+  height: 14px;
+  pointer-events: none;
+  border-radius: 999px;
+  background:
+    linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.22) 6%, rgba(212, 175, 55, 0.42) 50%, rgba(212, 175, 55, 0.22) 94%, transparent),
+    linear-gradient(180deg, transparent 0 39%, rgba(255, 238, 166, 0.74) 40% 58%, transparent 59% 100%);
+  filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.18));
+}
+
+.rail-track::before,
+.rail-track::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+.rail-track::before {
+  top: 6px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 244, 194, 0.52), rgba(212, 175, 55, 0.86), rgba(255, 244, 194, 0.52), transparent);
+}
+
+.rail-track::after {
+  top: 0;
+  bottom: 0;
+  background-image: repeating-linear-gradient(90deg, transparent 0 5.9rem, rgba(212, 175, 55, 0.26) 5.9rem 5.96rem);
+  opacity: 0.5;
+}
+
+.rail-nodes {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  min-width: max-content;
+  padding: 0 3.25rem;
+  gap: clamp(1.5rem, 4.8vw, 4.5rem);
+}
+
+.rail-node {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: clamp(6.5rem, 8vw, 8.75rem);
+  padding: 0;
+  color: inherit;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transition: transform 0.24s ease;
+}
+
+.rail-node::before {
+  content: '';
+  position: absolute;
+  top: 0.06rem;
+  left: 50%;
+  z-index: -1;
+  width: 1px;
+  height: 1.65rem;
+  background: linear-gradient(to bottom, transparent, rgba(212, 175, 55, 0.32), transparent);
+  transform: translateX(-50%);
+  transition: height 0.24s ease, background 0.24s ease;
+}
+
+.rail-node:hover,
+.rail-node:focus-visible {
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.rail-node:focus-visible .node-label {
+  outline: 1px solid rgba(212, 175, 55, 0.58);
+  outline-offset: 0.35rem;
+}
+
+.rail-node:hover::before,
+.rail-node:focus-visible::before {
+  height: 2.2rem;
+  background: linear-gradient(to bottom, transparent, rgba(255, 235, 163, 0.72), transparent);
+}
+
+.rail-node.is-active::before {
+  height: 2.55rem;
+  background: linear-gradient(to bottom, transparent, rgba(255, 235, 163, 0.9), rgba(184, 42, 42, 0.42), transparent);
+}
+
+.node-dot {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(212, 175, 55, 0.55);
+  border-radius: 50%;
+  background: #080807;
+  box-shadow:
+    0 0 0 4px rgba(5, 5, 5, 0.8),
+    0 0 0 0 rgba(212, 175, 55, 0);
+  transition: background 0.24s ease, border-color 0.24s ease, box-shadow 0.24s ease, transform 0.24s ease;
+}
+
+.rail-node:hover .node-dot,
+.rail-node:focus-visible .node-dot {
+  border-color: #f1d47b;
+  background: rgba(212, 175, 55, 0.24);
+  box-shadow:
+    0 0 0 4px rgba(5, 5, 5, 0.82),
+    0 0 18px rgba(212, 175, 55, 0.42);
+}
+
+.rail-node.is-active .node-dot {
+  border-color: #fff1b3;
+  background: var(--rail-gold);
+  transform: scale(1.28);
+  box-shadow:
+    0 0 0 5px rgba(5, 5, 5, 0.86),
+    0 0 0 8px rgba(212, 175, 55, 0.13),
+    0 0 28px rgba(212, 175, 55, 0.66);
+}
+
+.node-label {
+  max-width: 9.25rem;
+  color: rgba(255, 255, 255, 0.52);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.09em;
+  line-height: 1.3;
+  text-align: center;
+  text-transform: uppercase;
+  text-wrap: balance;
+  transition: color 0.24s ease, text-shadow 0.24s ease;
+}
+
+.rail-node:hover .node-label,
+.rail-node:focus-visible .node-label {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.rail-node.is-active .node-label {
+  color: #f0d27a;
+  text-shadow: 0 0 16px rgba(212, 175, 55, 0.36);
 }
 
 @keyframes fadeIn {
@@ -274,141 +532,96 @@ function selectGroup(index: number) {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Horizontal Rail */
-.rail-wrapper {
-  position: relative;
-  padding: 3rem 0;
-  overflow-x: auto;
-  /* Hide scrollbar for cleaner look */
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  /* Add subtle fade at edges to indicate scroll */
-  mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
-  -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
-}
-.rail-wrapper::-webkit-scrollbar {
-  display: none;
-}
+@media (max-width: 900px) {
+  .event-preview-area {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 1.25rem;
+  }
 
-.rail-track {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4) 10%, rgba(212, 175, 55, 0.4) 90%, transparent);
-  transform: translateY(-50%);
-  pointer-events: none;
-}
-
-.rail-nodes {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  min-width: max-content;
-  padding: 0 4rem;
-  gap: 4rem; /* Ensure nodes don't bunch up too much */
-}
-
-.rail-node {
-  background: none;
-  border: none;
-  padding: 1.5rem 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  cursor: pointer;
-  position: relative;
-  z-index: 2;
-  transition: transform 0.3s ease;
-}
-
-/* Add vertical tick marks to the rail line at node positions */
-.rail-node::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 1px;
-  height: 24px;
-  background: rgba(212, 175, 55, 0.2);
-  z-index: -1;
-  transition: background 0.3s ease, height 0.3s ease;
-}
-
-.rail-node:hover::before {
-  background: rgba(212, 175, 55, 0.5);
-  height: 32px;
-}
-
-.rail-node.is-active::before {
-  background: rgba(212, 175, 55, 0.8);
-  height: 40px;
-}
-
-.rail-node:hover {
-  transform: translateY(-2px);
-}
-
-.node-dot {
-  width: 10px;
-  height: 10px;
-  background: #111;
-  border: 2px solid rgba(212, 175, 55, 0.5); /* Dim gold */
-  border-radius: 50%;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
-}
-
-.rail-node:hover .node-dot {
-  border-color: #d4af37;
-  background: rgba(212, 175, 55, 0.2);
-}
-
-.rail-node.is-active .node-dot {
-  width: 14px;
-  height: 14px;
-  background: #d4af37;
-  border-color: #d4af37;
-  box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
-}
-
-.node-label {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.4);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  transition: color 0.3s ease;
-  white-space: nowrap;
-}
-
-.rail-node:hover .node-label {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.rail-node.is-active .node-label {
-  color: #d4af37;
-  font-weight: 500;
+  .micro-events-ledger {
+    width: 100%;
+    max-height: min(260px, 32dvh);
+  }
 }
 
 @media (max-width: 768px) {
+  .chronicle-rail-container {
+    gap: 1.55rem;
+  }
+
   .event-preview-area {
-    flex-direction: column;
-    align-items: flex-start;
+    padding: 0 0.2rem;
   }
-  .micro-events-ledger {
-    flex: none;
-    width: 100%;
-  }
+
   .preview-title {
-    font-size: 2rem;
+    font-size: clamp(1.75rem, 8vw, 2.2rem);
   }
+
+  .preview-content {
+    max-width: 100%;
+  }
+
+  .preview-summary {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+  }
+
+  .rail-wrapper {
+    margin-inline: -1rem;
+    padding-bottom: 0.75rem;
+    mask-image: linear-gradient(to right, transparent, black 1.25rem, black calc(100% - 1.25rem), transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 1.25rem, black calc(100% - 1.25rem), transparent);
+    scrollbar-width: thin;
+    scrollbar-color: rgba(212, 175, 55, 0.36) transparent;
+  }
+
+  .rail-wrapper::-webkit-scrollbar {
+    display: block;
+    height: 4px;
+  }
+
+  .rail-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(212, 175, 55, 0.36);
+    border-radius: 999px;
+  }
+
+  .rail-track {
+    left: 1.6rem;
+    right: 1.6rem;
+  }
+
   .rail-nodes {
-    padding: 0 2rem;
-    gap: 2.5rem;
+    justify-content: flex-start;
+    padding: 0 1.45rem;
+    gap: 1rem;
+  }
+
+  .rail-node {
+    width: 6.6rem;
+  }
+
+  .node-label {
+    font-size: 0.64rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preview-content,
+  .micro-events-ledger {
+    animation: none;
+  }
+
+  .preview-link,
+  .preview-link .arrow,
+  .ledger-item,
+  .rail-node,
+  .rail-node::before,
+  .node-dot,
+  .node-label {
+    transition: none;
   }
 }
 </style>

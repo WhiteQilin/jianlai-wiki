@@ -48,7 +48,7 @@ const importanceLabel = computed(() => {
 </script>
 
 <template>
-  <div class="article-page entry-detail-shell">
+  <div class="article-page entry-detail-shell" :class="`section-${section}`">
     <CharacterHero
       v-if="showVideoHero"
       :video="page.video"
@@ -272,6 +272,235 @@ const importanceLabel = computed(() => {
 .current {
   color: var(--c-ink);
   font-weight: 600;
+}
+
+.entry-detail-shell.section-timeline {
+  --timeline-gold: #d4af37;
+  --c-paper: #060606;
+  --c-bg: #060606;
+  --c-bg-soft: rgba(255, 255, 255, 0.055);
+  --c-bg-alt: #11100d;
+  --c-ink: #f5efe0;
+  --c-charcoal: #fff7dc;
+  --c-ink-wash: rgba(255, 255, 255, 0.76);
+  --c-text-1: #f5efe0;
+  --c-text-2: rgba(255, 255, 255, 0.72);
+  --c-text-3: rgba(255, 255, 255, 0.48);
+  --c-border: rgba(212, 175, 55, 0.2);
+  --c-divider: rgba(212, 175, 55, 0.16);
+  --c-seal-red: #d4af37;
+  --c-seal-red-soft: rgba(212, 175, 55, 0.16);
+  min-height: 100dvh;
+  color: var(--c-text-1);
+  background:
+    radial-gradient(circle at 18% 8%, rgba(212, 175, 55, 0.1), transparent 24rem),
+    radial-gradient(circle at 88% 18%, rgba(184, 42, 42, 0.08), transparent 22rem),
+    linear-gradient(180deg, #050505, #090806 42%, #050505);
+}
+
+.section-timeline .mdc-content {
+  padding-top: calc(var(--header-height) + clamp(2rem, 4vw, 3.5rem));
+  padding-bottom: clamp(4rem, 7vw, 6rem);
+}
+
+.section-timeline .breadcrumb {
+  margin-bottom: 2.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.14);
+}
+
+.section-timeline .breadcrumb a:hover {
+  color: #f0d27a;
+}
+
+.section-timeline .current {
+  color: rgba(240, 210, 122, 0.86);
+}
+
+.section-timeline .entry-header {
+  margin-bottom: clamp(2.25rem, 4vw, 3.75rem);
+  border-bottom-color: rgba(212, 175, 55, 0.2);
+}
+
+.section-timeline .entry-header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: min(11rem, 40vw);
+  height: 2px;
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.82), transparent);
+  box-shadow: 0 0 18px rgba(212, 175, 55, 0.18);
+}
+
+.section-timeline .entry-lead {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.section-timeline .entry-badge,
+.section-timeline .entry-chip {
+  border-color: rgba(212, 175, 55, 0.26);
+  background: rgba(212, 175, 55, 0.07);
+  color: rgba(240, 210, 122, 0.9);
+}
+
+.section-timeline .entry-chip {
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.section-timeline :deep(.name-en) {
+  color: #fff8e4;
+  text-shadow: 0 0 28px rgba(212, 175, 55, 0.12);
+}
+
+.section-timeline :deep(.name-zh),
+.section-timeline :deep(.name-pinyin) {
+  color: rgba(212, 175, 55, 0.68);
+}
+
+.section-timeline :deep(.name-seal),
+.section-timeline :deep(.seal-variant-outline) {
+  color: #d4af37;
+  border-color: rgba(212, 175, 55, 0.54);
+  background: rgba(212, 175, 55, 0.06);
+  box-shadow: 0 0 18px rgba(212, 175, 55, 0.12);
+}
+
+.section-timeline :deep(.entry-section-nav) {
+  border-block-color: rgba(212, 175, 55, 0.16);
+}
+
+.section-timeline :deep(.contents-link) {
+  color: rgba(255, 255, 255, 0.68);
+  border-color: rgba(212, 175, 55, 0.18);
+  background: rgba(10, 9, 7, 0.78);
+}
+
+.section-timeline :deep(.contents-link:hover) {
+  color: #f0d27a;
+  border-color: rgba(212, 175, 55, 0.5);
+  background: rgba(212, 175, 55, 0.08);
+}
+
+.section-timeline :deep(.mdc-prose) {
+  color: rgba(255, 255, 255, 0.74);
+}
+
+.section-timeline :deep(.mdc-prose h2),
+.section-timeline :deep(.mdc-prose h3),
+.section-timeline :deep(.mdc-prose h4) {
+  color: #fff6dd;
+}
+
+.section-timeline :deep(.mdc-prose h2) {
+  border-bottom-color: rgba(212, 175, 55, 0.18);
+}
+
+.section-timeline :deep(.mdc-prose h2::after) {
+  background: linear-gradient(90deg, #d4af37, transparent);
+}
+
+.section-timeline :deep(.mdc-prose a) {
+  color: #f0d27a;
+  border-bottom-color: rgba(212, 175, 55, 0.28);
+}
+
+.section-timeline :deep(.mdc-prose blockquote) {
+  border-left-color: rgba(212, 175, 55, 0.72);
+  background: rgba(212, 175, 55, 0.06);
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.section-timeline :deep(.entry-infobox),
+.section-timeline :deep(.entry-reference-block) {
+  border-color: rgba(212, 175, 55, 0.24);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(18, 15, 9, 0.92), rgba(7, 7, 7, 0.92)),
+    url('/images/textures/ink-wash-02.webp');
+  background-size: cover;
+  background-blend-mode: normal, screen;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 244, 194, 0.07),
+    0 20px 44px rgba(0, 0, 0, 0.36);
+}
+
+.section-timeline :deep(.infobox-heading),
+.section-timeline :deep(.infobox-image-wrapper) {
+  border-color: rgba(212, 175, 55, 0.18);
+}
+
+.section-timeline :deep(.infobox-heading h2),
+.section-timeline :deep(.reference-heading h2),
+.section-timeline :deep(.row-value),
+.section-timeline :deep(.relationship-name),
+.section-timeline :deep(.ranking-name),
+.section-timeline :deep(.source-fact dd) {
+  color: #fff4d6;
+}
+
+.section-timeline :deep(.eyebrow),
+.section-timeline :deep(.row-label),
+.section-timeline :deep(.footer-label),
+.section-timeline :deep(.source-fact dt) {
+  color: rgba(212, 175, 55, 0.62);
+}
+
+.section-timeline :deep(.infobox-row) {
+  border-bottom-color: rgba(212, 175, 55, 0.13);
+}
+
+.section-timeline :deep(.public-badge),
+.section-timeline :deep(.public-chip),
+.section-timeline :deep(.verification-badge) {
+  color: rgba(240, 210, 122, 0.92);
+  border-color: rgba(212, 175, 55, 0.28);
+  background: rgba(212, 175, 55, 0.07);
+}
+
+.section-timeline :deep(.route-display-link) {
+  color: rgba(255, 246, 220, 0.88);
+}
+
+.section-timeline :deep(.route-display-link:hover) {
+  color: #f0d27a;
+}
+
+.section-timeline :deep(.route-display-link.is-chip),
+.section-timeline :deep(.relationship-item),
+.section-timeline :deep(.ranking-item) {
+  border-color: rgba(212, 175, 55, 0.18);
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.section-timeline :deep(.infobox-placeholder) {
+  background:
+    radial-gradient(circle at 50% 38%, rgba(212, 175, 55, 0.14), transparent 62%),
+    url('/images/textures/ink-wash-01.webp');
+  background-size: cover;
+}
+
+.section-timeline :deep(.placeholder-char) {
+  color: rgba(212, 175, 55, 0.68);
+  border-color: rgba(212, 175, 55, 0.36);
+  background: rgba(5, 5, 5, 0.42);
+}
+
+.section-timeline :deep(.image-overlay) {
+  border-color: rgba(212, 175, 55, 0.18);
+}
+
+.section-timeline :deep(.source-notes),
+.section-timeline :deep(.reference-cta) {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.section-timeline :deep(.reference-cta) {
+  border-top-color: rgba(212, 175, 55, 0.18);
+}
+
+.section-timeline :deep(.contribute-link) {
+  color: #f0d27a;
 }
 
 @media (max-width: 1024px) {
