@@ -75,6 +75,21 @@ const eraGroups = computed(() => {
     }
   })
 })
+
+const timelineRouteLinks = computed(() => {
+  const seen = new Set<string>()
+
+  return (items.value ?? [])
+    .map((item: any) => ({
+      path: item.path,
+      title: item.title || item.path,
+    }))
+    .filter((item) => {
+      if (!item.path || seen.has(item.path)) return false
+      seen.add(item.path)
+      return true
+    })
+})
 </script>
 
 <template>
@@ -85,6 +100,17 @@ const eraGroups = computed(() => {
       desc="The chronological history of Jian Lai, from the ancient era to the present day. Witness the unfolding of the Great Dao."
     >
       <TimelineChronicleRail v-if="eraGroups.length > 0" :eraGroups="eraGroups" />
+      <!-- Static prerender route seeds: macro arc links and single-event era links can be hidden behind client interaction, so keep every timeline detail route discoverable during `nuxt generate`. -->
+      <nav v-if="timelineRouteLinks.length" class="timeline-prerender-links" aria-hidden="true">
+        <NuxtLink
+          v-for="link in timelineRouteLinks"
+          :key="link.path"
+          :to="link.path"
+          tabindex="-1"
+        >
+          {{ link.title }}
+        </NuxtLink>
+      </nav>
       <div v-else class="empty-timeline-hero">
         <p class="empty-hero-text">Chronicle awaiting inscription</p>
       </div>
@@ -217,6 +243,10 @@ const eraGroups = computed(() => {
 
 :deep(.dossier-card .card-desc) {
   color: rgba(255, 255, 255, 0.7);
+}
+
+.timeline-prerender-links {
+  display: none;
 }
 
 .empty-timeline-hero {
