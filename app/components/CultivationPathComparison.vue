@@ -85,7 +85,7 @@ const cardClass = (title?: string) => `path-card--${(title || 'path').toLowerCas
     </div>
 
     <p class="comparison-note">
-      The ladder below is the Qi Refiner realm grouping. It is not the Pure Martial Artist ladder; Sword Cultivator remains represented by its Qi Refining sword-cultivation path metadata.
+      The ladder below is the Qi Refiner realm grouping, not the Pure Martial Artist ladder. Sword Cultivator is shown here as a specialized Qi Refining sword path.
     </p>
   </section>
 </template>
