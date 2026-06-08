@@ -60,34 +60,31 @@ watch(
     </div>
 
     <div class="category-rule" aria-label="Sword manual category filters">
-      <button
+      <JadeChip
         v-for="category in categoryFilters"
         :key="category"
-        type="button"
-        class="category-tab"
-        :class="{ active: category === activeCategory }"
+        button
+        :active="category === activeCategory"
         @click="activeCategory = category"
       >
         {{ category }}
-      </button>
+      </JadeChip>
     </div>
 
     <div v-if="filteredEntries.length" class="archive-list" role="list">
-      <article
+      <LedgerRow
         v-for="entry in filteredEntries"
         :key="entry.path"
+        :to="canOpen(entry.path) ? entry.path : undefined"
         class="archive-row"
         role="listitem"
+        :aria-label="canOpen(entry.path) ? `Open ${entry.title}` : undefined"
       >
-        <NuxtLink v-if="canOpen(entry.path)" :to="entry.path" class="row-seal" :aria-label="entry.title">
-          {{ fallbackSeal(entry) }}
-        </NuxtLink>
-        <span v-else class="row-seal">{{ fallbackSeal(entry) }}</span>
+        <span class="row-seal">{{ fallbackSeal(entry) }}</span>
 
         <span class="row-main">
           <span class="row-title-line">
-            <NuxtLink v-if="canOpen(entry.path)" :to="entry.path">{{ entry.title }}</NuxtLink>
-            <strong v-else>{{ entry.title }}</strong>
+            <strong>{{ entry.title }}</strong>
             <small v-if="entry.chinese">{{ entry.chinese }}</small>
           </span>
           <span v-if="entry.description" class="row-description">{{ entry.description }}</span>
@@ -99,7 +96,7 @@ watch(
           <span>{{ formatToken(entry.importance) }}</span>
           <span>{{ formatToken(entry.verificationStatus) }}</span>
         </span>
-      </article>
+      </LedgerRow>
     </div>
 
     <div v-else class="archive-empty">
@@ -161,38 +158,6 @@ watch(
   border-bottom: 1px solid var(--c-divider);
 }
 
-.category-tab {
-  min-height: 2rem;
-  padding: 0.35rem 0.65rem;
-  color: var(--c-text-2);
-  background: color-mix(in srgb, var(--c-bg) 72%, transparent);
-  border: 1px solid var(--c-divider);
-  border-radius: 4px;
-  font: inherit;
-  font-size: 0.82rem;
-  line-height: 1.2;
-  cursor: pointer;
-  overflow-wrap: anywhere;
-  transition: color 0.24s cubic-bezier(0.32, 0.72, 0, 1), border-color 0.24s cubic-bezier(0.32, 0.72, 0, 1), background 0.24s cubic-bezier(0.32, 0.72, 0, 1), transform 0.24s cubic-bezier(0.32, 0.72, 0, 1);
-}
-
-.category-tab:hover {
-  color: var(--c-ink);
-  border-color: color-mix(in srgb, var(--sword-celadon, var(--c-teal-accent)) 36%, var(--c-border));
-  transform: translateY(-1px);
-}
-
-.category-tab.active {
-  color: var(--c-bg);
-  background: var(--sword-celadon, var(--c-ink));
-  border-color: var(--sword-celadon, var(--c-ink));
-}
-
-.category-tab:focus-visible {
-  outline: 2px solid var(--c-seal-red);
-  outline-offset: 3px;
-}
-
 .archive-list {
   display: grid;
   gap: 0.45rem;
@@ -200,20 +165,10 @@ watch(
 
 .archive-row {
   min-width: 0;
-  display: grid;
   grid-template-columns: auto minmax(0, 1fr) minmax(8rem, 0.18fr) minmax(10rem, 0.22fr);
   gap: 0.75rem;
   align-items: center;
   padding: 0.72rem 0.85rem;
-  color: inherit;
-  border: 1px solid var(--c-divider);
-  border-left: 2px solid color-mix(in srgb, var(--sword-celadon, var(--c-teal-accent)) 46%, transparent);
-  border-radius: 6px;
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--c-paper-alt) 68%, transparent), color-mix(in srgb, var(--c-bg-soft) 78%, transparent)),
-    url('/images/textures/ink-wash-02.webp');
-  background-size: auto, cover;
-  background-blend-mode: normal, multiply;
 }
 
 .row-seal {
@@ -222,25 +177,12 @@ watch(
   display: grid;
   place-items: center;
   color: var(--c-seal-red);
-  text-decoration: none;
   border: 1px solid color-mix(in srgb, var(--c-seal-red) 64%, transparent);
   border-radius: 3px;
   background: color-mix(in srgb, var(--c-bg) 72%, transparent);
   font-family: var(--font-zh-display);
   font-size: 1rem;
   line-height: 1;
-  transition: background 0.24s cubic-bezier(0.32, 0.72, 0, 1), transform 0.24s cubic-bezier(0.32, 0.72, 0, 1);
-}
-
-a.row-seal:hover {
-  transform: translateY(-1px);
-  background: color-mix(in srgb, var(--c-seal-red) 7%, transparent);
-}
-
-.row-seal:focus-visible,
-.row-title-line a:focus-visible {
-  outline: 2px solid var(--c-seal-red);
-  outline-offset: 3px;
 }
 
 .row-main {
@@ -257,7 +199,6 @@ a.row-seal:hover {
   align-items: baseline;
 }
 
-.row-title-line a,
 .row-title-line strong {
   min-width: 0;
   color: var(--c-ink);
@@ -269,7 +210,7 @@ a.row-seal:hover {
   overflow-wrap: anywhere;
 }
 
-.row-title-line a:hover {
+a.archive-row:hover .row-title-line strong {
   color: var(--c-seal-red);
 }
 

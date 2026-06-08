@@ -262,6 +262,8 @@ useSeoMeta({
         />
       </ScrollReveal>
 
+      <SwordSlashDivider />
+
       <ScrollReveal animation="reveal-fade-up" delay="stagger-2">
         <SwordAssociationStrip
           :known-users="knownUserLinks"
@@ -269,6 +271,8 @@ useSeoMeta({
           :referenced-by="inverseReferenceLinks"
         />
       </ScrollReveal>
+
+      <SwordSlashDivider />
 
       <ScrollReveal animation="reveal-fade-up" delay="stagger-3">
         <SwordCompactArchive
@@ -299,6 +303,7 @@ useSeoMeta({
   --sword-celadon-soft: rgba(49, 95, 89, 0.1);
   --sword-bronze: #8f7048;
   --sword-seal: #a92e28;
+  --sword-silver: #aeb8b4;
   --c-paper: var(--sword-paper);
   --c-paper-alt: var(--sword-paper-alt);
   --c-bg: var(--sword-paper);

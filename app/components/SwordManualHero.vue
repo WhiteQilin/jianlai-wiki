@@ -31,36 +31,43 @@ const sealMarks = computed(() => {
   if (marks.length) return marks
   return [...(props.chinese || props.title || 'Sword')].filter((char) => char.trim()).slice(0, 4)
 })
+
+const primarySeal = computed(() => sealMarks.value[0] || props.chinese?.charAt(0) || '剑')
 </script>
 
 <template>
   <section class="sword-manual-hero" aria-labelledby="sword-manual-title">
     <div class="hero-paper" aria-hidden="true"></div>
     <div class="hero-wash" aria-hidden="true"></div>
-    <div class="hero-brush" aria-hidden="true"></div>
+    <div class="hero-blade" aria-hidden="true"></div>
+    <div class="hero-ghost-seal zh-display" aria-hidden="true">{{ primarySeal }}</div>
 
     <div class="hero-inner">
+      <div class="hero-vertical-label" aria-hidden="true">
+        <span>Sword Dao Manual</span>
+      </div>
+
       <div class="hero-copy">
-        <p class="hero-kicker">Sword Dao Manual / Recorded Arts</p>
+        <p class="hero-kicker">Sword Dao Manual</p>
         <h1 id="sword-manual-title" class="hero-title">
           <span>{{ title }}</span>
           <span v-if="chinese" class="hero-title-zh zh-display">{{ chinese }}</span>
         </h1>
         <p v-if="description" class="hero-description">{{ description }}</p>
+        <span class="hero-brush-rule" aria-hidden="true"></span>
       </div>
 
-      <aside class="manual-slip" aria-label="Sword Dao Manual summary">
-        <div class="slip-heading">
-          <span class="slip-label">Sword Dao Manual</span>
-          <span class="slip-rule"></span>
+      <aside class="manual-register" aria-label="Sword Dao Manual summary">
+        <div class="register-heading">
+          <span class="register-title">Manual register</span>
+          <span class="register-rule"></span>
         </div>
-
-        <div class="slip-stats">
-          <div v-for="stat in manualStats" :key="stat.label" class="slip-stat">
-            <span>{{ stat.value }}</span>
-            <small>{{ stat.label }}</small>
-          </div>
-        </div>
+        <SealStatBlock
+          v-for="stat in manualStats"
+          :key="stat.label"
+          :value="stat.value"
+          :label="stat.label"
+        />
       </aside>
     </div>
 
@@ -73,29 +80,34 @@ const sealMarks = computed(() => {
 <style scoped>
 .sword-manual-hero {
   position: relative;
-  min-height: clamp(450px, 64vh, 680px);
+  min-height: clamp(500px, 68vh, 710px);
   overflow: hidden;
   isolation: isolate;
   border-bottom: 1px solid var(--c-divider);
   background:
-    linear-gradient(112deg, color-mix(in srgb, var(--c-paper-alt) 88%, transparent), color-mix(in srgb, var(--c-bg-soft) 88%, transparent)),
+    linear-gradient(112deg, color-mix(in srgb, var(--c-paper-alt) 90%, transparent), color-mix(in srgb, var(--c-bg-soft) 86%, transparent)),
     var(--c-bg);
 }
 
 .hero-paper,
 .hero-wash,
-.hero-brush {
+.hero-blade,
+.hero-ghost-seal {
   position: absolute;
-  inset: 0;
   pointer-events: none;
+}
+
+.hero-paper,
+.hero-wash {
+  inset: 0;
 }
 
 .hero-paper {
   z-index: -4;
   background:
-    repeating-linear-gradient(90deg, color-mix(in srgb, var(--c-ink) 2.6%, transparent) 0 1px, transparent 1px 2.7rem),
-    repeating-linear-gradient(0deg, color-mix(in srgb, var(--c-ink) 1.8%, transparent) 0 1px, transparent 1px 2.35rem);
-  opacity: 0.45;
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--c-ink) 2.2%, transparent) 0 1px, transparent 1px 2.7rem),
+    repeating-linear-gradient(0deg, color-mix(in srgb, var(--c-ink) 1.5%, transparent) 0 1px, transparent 1px 2.35rem);
+  opacity: 0.42;
 }
 
 .hero-wash {
@@ -111,16 +123,41 @@ const sealMarks = computed(() => {
   opacity: 0.88;
 }
 
-.hero-brush {
-  inset: auto 0 -1px;
+.hero-blade {
+  left: 0;
+  right: 0;
+  bottom: -1px;
   z-index: -1;
-  height: clamp(6rem, 17vw, 14rem);
+  height: clamp(7rem, 19vw, 15rem);
   background:
     linear-gradient(180deg, transparent, color-mix(in srgb, var(--c-bg) 94%, transparent)),
-    radial-gradient(ellipse at 18% 100%, color-mix(in srgb, var(--sword-celadon, #315f59) 17%, transparent) 0 24%, transparent 54%),
-    radial-gradient(ellipse at 52% 104%, color-mix(in srgb, var(--c-ink) 13%, transparent) 0 22%, transparent 58%),
-    radial-gradient(ellipse at 80% 100%, color-mix(in srgb, var(--c-bronze) 18%, transparent) 0 20%, transparent 52%);
-  opacity: 0.78;
+    radial-gradient(ellipse at 18% 100%, color-mix(in srgb, var(--sword-celadon, #315f59) 16%, transparent) 0 24%, transparent 54%),
+    radial-gradient(ellipse at 52% 104%, color-mix(in srgb, var(--c-ink) 12%, transparent) 0 22%, transparent 58%),
+    radial-gradient(ellipse at 80% 100%, color-mix(in srgb, var(--c-bronze) 16%, transparent) 0 20%, transparent 52%);
+  opacity: 0.76;
+}
+
+.hero-blade::after {
+  content: '';
+  position: absolute;
+  left: 12%;
+  right: 8%;
+  bottom: 36%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--sword-silver, #aeb8b4), var(--c-seal-red), transparent);
+  transform: skewX(-18deg);
+  opacity: 0.72;
+}
+
+.hero-ghost-seal {
+  right: max(1rem, calc((100% - 1200px) / 2 + 6rem));
+  bottom: 3.8rem;
+  z-index: -1;
+  color: var(--c-seal-red);
+  font-size: clamp(8rem, 22vw, 17rem);
+  line-height: 1;
+  opacity: 0.045;
+  transform: rotate(-8deg);
 }
 
 .hero-inner {
@@ -128,10 +165,27 @@ const sealMarks = computed(() => {
   min-height: inherit;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(270px, 370px);
-  gap: clamp(2rem, 5vw, 5rem);
+  grid-template-columns: auto minmax(0, 1fr) minmax(250px, 350px);
+  gap: clamp(1.25rem, 4.2vw, 4rem);
   align-items: center;
   padding: calc(var(--header-height) + 2.8rem) 0 4.25rem;
+}
+
+.hero-vertical-label {
+  align-self: stretch;
+  display: grid;
+  place-items: center;
+  min-width: 2.6rem;
+  padding: 1rem 0.25rem;
+  color: color-mix(in srgb, var(--c-seal-red) 78%, var(--c-ink));
+  border-left: 1px solid color-mix(in srgb, var(--c-seal-red) 24%, transparent);
+  border-right: 1px solid color-mix(in srgb, var(--c-seal-red) 16%, transparent);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  line-height: 1.3;
+  text-transform: uppercase;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
 }
 
 .hero-copy {
@@ -142,8 +196,8 @@ const sealMarks = computed(() => {
   display: inline-flex;
   margin: 0;
   padding-bottom: 0.45rem;
-  color: var(--sword-celadon, var(--c-teal-accent));
-  border-bottom: 1px solid color-mix(in srgb, var(--sword-celadon, var(--c-teal-accent)) 42%, transparent);
+  color: var(--c-seal-red);
+  border-bottom: 1px solid color-mix(in srgb, var(--c-seal-red) 34%, transparent);
   font-family: var(--font-mono);
   font-size: 0.8rem;
   line-height: 1.25;
@@ -180,90 +234,51 @@ const sealMarks = computed(() => {
   text-wrap: pretty;
 }
 
-.manual-slip {
+.hero-brush-rule {
+  display: block;
+  width: min(28rem, 72vw);
+  height: 0.7rem;
+  margin-top: 1.35rem;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--c-ink) 22%, transparent), color-mix(in srgb, var(--sword-celadon, var(--c-teal-accent)) 34%, transparent), transparent);
+  mask-image: linear-gradient(90deg, black, transparent 92%);
+  -webkit-mask-image: linear-gradient(90deg, black, transparent 92%);
+  transform: skewX(-14deg);
+  opacity: 0.65;
+}
+
+.manual-register {
   position: relative;
   align-self: end;
   min-width: 0;
-  padding: 1.15rem;
-  border: 1px solid color-mix(in srgb, var(--sword-celadon, var(--c-ink)) 24%, var(--c-border));
-  border-radius: 8px;
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--c-paper-alt) 82%, transparent), color-mix(in srgb, var(--c-bg-soft) 90%, transparent)),
-    url('/images/textures/ink-wash-02.webp');
-  background-size: auto, cover;
-  background-blend-mode: normal, multiply;
-  box-shadow: 0 24px 48px color-mix(in srgb, var(--sword-celadon, #315f59) 10%, transparent);
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.8rem;
+  border: 1px solid color-mix(in srgb, var(--c-seal-red) 18%, var(--c-border));
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--c-paper-alt) 42%, transparent);
+  box-shadow: 0 18px 42px color-mix(in srgb, var(--sword-celadon, #315f59) 7%, transparent);
 }
 
-.manual-slip::before {
-  content: '';
-  position: absolute;
-  inset: 0.55rem;
-  border: 1px solid color-mix(in srgb, var(--c-border) 62%, transparent);
-  border-radius: 5px;
-  pointer-events: none;
-}
-
-.slip-heading,
-.slip-stats {
-  position: relative;
-  z-index: 1;
-}
-
-.slip-heading {
+.register-heading {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
-  padding: 0.75rem 0.8rem 1rem;
-  border-bottom: 1px solid var(--c-divider);
+  gap: 0.65rem;
+  padding: 0.1rem 0.15rem 0.35rem;
 }
 
-.slip-label {
+.register-title {
   color: var(--c-ink);
-  font-family: var(--font-heading);
-  font-size: 1.15rem;
-  line-height: 1.15;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  line-height: 1.2;
+  text-transform: uppercase;
 }
 
-.slip-rule {
+.register-rule {
   min-width: 2rem;
   height: 1px;
   flex: 1;
   background: linear-gradient(90deg, var(--c-seal-red), transparent);
-}
-
-.slip-stats {
-  display: grid;
-  gap: 1px;
-  padding: 1px;
-  margin-top: 1rem;
-  background: var(--c-divider);
-}
-
-.slip-stat {
-  min-height: 4.45rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.9rem;
-  background: color-mix(in srgb, var(--c-bg) 84%, var(--c-bg-soft));
-}
-
-.slip-stat span {
-  color: var(--c-seal-red);
-  font-family: var(--font-heading);
-  font-size: 2.05rem;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-
-.slip-stat small {
-  color: var(--c-text-3);
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  line-height: 1.35;
-  text-align: right;
 }
 
 .seal-stack {
@@ -300,7 +315,11 @@ const sealMarks = computed(() => {
     padding-bottom: 3rem;
   }
 
-  .manual-slip {
+  .hero-vertical-label {
+    display: none;
+  }
+
+  .manual-register {
     align-self: auto;
   }
 
@@ -334,17 +353,16 @@ const sealMarks = computed(() => {
     font-size: 2.55rem;
   }
 
-  .manual-slip {
+  .manual-register {
     padding: 0.9rem;
-  }
-
-  .slip-stat {
-    min-height: 4rem;
-    padding: 0.75rem;
   }
 
   .seal-stack {
     opacity: 0.1;
+  }
+
+  .hero-ghost-seal {
+    display: none;
   }
 }
 </style>

@@ -34,7 +34,7 @@ const resolvedImage = computed(() => (props.entry ? resolvePublicImage(props.ent
 
 const fallbackSeal = computed(() => {
   const entry = props.entry
-  if (!entry) return 'S'
+  if (!entry) return '剑'
   return entry.seal || entry.chinese?.charAt(0) || entry.title.charAt(0)
 })
 
@@ -46,138 +46,150 @@ const formatToken = (value?: string, fallback = 'Unmarked') => {
     .map((part) => `${part.charAt(0).toUpperCase()}${part.slice(1)}`)
     .join(' ')
 }
+
+const pendingReason = (link: ResolvedEntryLink): 'missing' | 'internal' | 'plain' => {
+  if (link.isInternalOnly) return 'internal'
+  if (link.isMissingRoute) return 'missing'
+  return 'plain'
+}
 </script>
 
 <template>
-  <section class="featured-slip" aria-labelledby="featured-manual-title">
-    <template v-if="entry">
-      <div class="slip-media" aria-label="Manual seal">
+  <ManualSlip
+    v-if="entry"
+    featured
+    tone="sword"
+    class="featured-manual-slip"
+    aria-labelledby="featured-manual-title"
+  >
+    <template #margin>
+      <span>剑术手录</span>
+    </template>
+
+    <div class="manual-feature">
+      <aside class="manual-seal-plate" aria-label="Manual seal">
         <img v-if="resolvedImage" :src="resolvedImage" :alt="entry.title" loading="lazy">
         <div v-else class="seal-fallback">
           <span class="seal-mark zh-display">{{ fallbackSeal }}</span>
-          <small>Recorded Art</small>
+          <small>Featured Manual Slip</small>
         </div>
-      </div>
+      </aside>
 
-      <div class="slip-copy">
-        <p class="slip-kicker">Current authored manual record</p>
+      <article class="manual-copy">
+        <p class="manual-kicker">Current authored manual record</p>
 
-        <header class="slip-title-block">
+        <header class="manual-title-block">
           <h2 id="featured-manual-title">{{ entry.title }}</h2>
-          <span v-if="entry.chinese" class="title-zh zh-display">{{ entry.chinese }}</span>
+          <span v-if="entry.chinese" class="manual-title-zh zh-display">{{ entry.chinese }}</span>
         </header>
 
-        <p v-if="entry.description" class="slip-description">{{ entry.description }}</p>
+        <p v-if="entry.description" class="manual-description">{{ entry.description }}</p>
 
-        <div class="field-grid" aria-label="Manual record metadata">
-          <div class="field-pair">
+        <div class="annotation-grid" aria-label="Manual record annotations">
+          <div class="annotation-pair">
             <span>Category</span>
             <strong>{{ entry.category || 'Swordsmanship' }}</strong>
           </div>
-          <div class="field-pair">
-            <span>Editorial prominence</span>
+          <div class="annotation-pair">
+            <span>Editorial mark</span>
             <strong>{{ formatToken(entry.importance) }}</strong>
           </div>
-          <div class="field-pair">
+          <div class="annotation-pair">
             <span>Verification</span>
             <strong>{{ formatToken(entry.verificationStatus) }}</strong>
           </div>
-          <div v-if="entry.lastUpdated" class="field-pair">
+          <div v-if="entry.lastUpdated" class="annotation-pair">
             <span>Last updated</span>
             <strong>{{ entry.lastUpdated }}</strong>
           </div>
         </div>
 
-        <div v-if="entry.tags.length" class="tag-row" aria-label="Recorded tags">
-          <span v-for="tag in entry.tags" :key="tag" class="manual-tag">{{ tag }}</span>
+        <div v-if="entry.tags.length" class="manual-tags" aria-label="Recorded tags">
+          <JadeChip v-for="tag in entry.tags" :key="tag">{{ tag }}</JadeChip>
         </div>
 
-        <div class="link-panels">
-          <div v-if="entry.knownUserLinks.length" class="link-group">
-            <span class="link-label">Known users</span>
+        <div class="manual-link-panels">
+          <div v-if="entry.knownUserLinks.length" class="manual-link-group">
+            <span class="link-label">Known User</span>
             <div class="link-wrap">
-              <RouteDisplayLink
-                v-for="user in entry.knownUserLinks"
-                :key="user.raw"
-                :item="user"
-                variant="chip"
-              />
+              <template v-for="user in entry.knownUserLinks" :key="user.raw">
+                <JadeChip v-if="user.shouldLink" :to="user.path">
+                  {{ user.label }}
+                  <span v-if="user.chinese" class="chip-chinese">{{ user.chinese }}</span>
+                </JadeChip>
+                <PendingRouteChip
+                  v-else
+                  :label="user.label"
+                  :chinese="user.chinese"
+                  :reason="pendingReason(user)"
+                />
+              </template>
             </div>
           </div>
 
-          <div v-if="entry.relatedLinks.length" class="link-group">
-            <span class="link-label">Related records</span>
+          <div v-if="entry.relatedLinks.length" class="manual-link-group">
+            <span class="link-label">Related Records</span>
             <div class="link-wrap">
-              <RouteDisplayLink
-                v-for="related in entry.relatedLinks"
-                :key="related.raw"
-                :item="related"
-                variant="chip"
-              />
+              <template v-for="related in entry.relatedLinks" :key="related.raw">
+                <JadeChip v-if="related.shouldLink" :to="related.path">
+                  {{ related.label }}
+                  <span v-if="related.chinese" class="chip-chinese">{{ related.chinese }}</span>
+                </JadeChip>
+                <PendingRouteChip
+                  v-else
+                  :label="related.label"
+                  :chinese="related.chinese"
+                  :reason="pendingReason(related)"
+                />
+              </template>
             </div>
           </div>
         </div>
 
         <p v-if="entry.sourceNotes" class="source-note">{{ entry.sourceNotes }}</p>
 
-        <NuxtLink v-if="canOpen" :to="entry.path" class="detail-link">
-          <span>Open manual record</span>
-          <span class="detail-mark" aria-hidden="true">/</span>
-        </NuxtLink>
-      </div>
-    </template>
+        <div class="manual-actions">
+          <SealButton v-if="canOpen" :to="entry.path" aria-label="Open manual record">
+            Open manual record
+          </SealButton>
+          <InkButton v-if="entry.relatedLinks.length" to="/artifacts">
+            Trace related artifacts
+          </InkButton>
+        </div>
+      </article>
+    </div>
+  </ManualSlip>
 
-    <EmptyArchiveState v-else />
+  <section v-else class="featured-manual-empty">
+    <EmptyArchiveState />
   </section>
 </template>
 
 <style scoped>
-.featured-slip {
-  position: relative;
-  overflow: hidden;
+.featured-manual-slip {
+  margin-bottom: clamp(1.4rem, 3vw, 2rem);
+}
+
+.manual-feature {
+  min-width: 0;
   display: grid;
-  grid-template-columns: minmax(220px, 0.38fr) minmax(0, 1fr);
-  gap: clamp(1rem, 3vw, 2rem);
-  padding: clamp(1rem, 3vw, 1.55rem);
-  border: 1px solid color-mix(in srgb, var(--sword-celadon, var(--c-ink)) 22%, var(--c-border));
-  border-radius: 8px;
-  background:
-    linear-gradient(120deg, color-mix(in srgb, var(--c-paper-alt) 82%, transparent), color-mix(in srgb, var(--c-bg-soft) 90%, transparent)),
-    url('/images/textures/ink-wash-02.webp');
-  background-size: auto, cover;
-  background-blend-mode: normal, multiply;
-  box-shadow: 0 22px 48px color-mix(in srgb, var(--sword-celadon, #315f59) 8%, transparent);
+  grid-template-columns: minmax(210px, 0.36fr) minmax(0, 1fr);
+  gap: clamp(1rem, 3.5vw, 2.1rem);
 }
 
-.featured-slip::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--sword-celadon, #315f59) 8%, transparent), transparent 34%),
-    radial-gradient(ellipse at 90% 8%, color-mix(in srgb, var(--c-bronze) 14%, transparent), transparent 30rem);
-  pointer-events: none;
-}
-
-.slip-media,
-.slip-copy {
-  position: relative;
-  z-index: 1;
-}
-
-.slip-media {
-  min-height: 22rem;
+.manual-seal-plate {
+  min-height: 24rem;
   display: grid;
   place-items: center;
   border: 1px solid color-mix(in srgb, var(--c-ink) 12%, transparent);
-  border-radius: 6px;
+  border-radius: 3px;
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--c-paper-alt) 72%, transparent), color-mix(in srgb, var(--c-bg) 84%, transparent)),
-    repeating-linear-gradient(90deg, color-mix(in srgb, var(--c-ink) 3%, transparent) 0 1px, transparent 1px 1.6rem);
+    linear-gradient(180deg, color-mix(in srgb, var(--c-paper-alt) 74%, transparent), color-mix(in srgb, var(--c-bg) 86%, transparent)),
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--c-ink) 3%, transparent) 0 1px, transparent 1px 1.7rem);
   overflow: hidden;
 }
 
-.slip-media img {
+.manual-seal-plate img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -187,7 +199,8 @@ const formatToken = (value?: string, fallback = 'Unmarked') => {
 .seal-fallback {
   display: grid;
   justify-items: center;
-  gap: 0.9rem;
+  gap: 1rem;
+  padding: 1rem;
 }
 
 .seal-mark {
@@ -195,12 +208,12 @@ const formatToken = (value?: string, fallback = 'Unmarked') => {
   aspect-ratio: 1;
   display: grid;
   place-items: center;
-  padding: 0.7rem;
+  padding: 0.8rem;
   color: var(--c-seal-red);
   border: 3px double currentColor;
-  border-radius: 6px;
+  border-radius: 4px;
   background: color-mix(in srgb, var(--c-seal-red) 4%, transparent);
-  font-size: clamp(2.35rem, 6vw, 4.5rem);
+  font-size: clamp(2.45rem, 6vw, 4.8rem);
   line-height: 1;
   text-align: center;
   overflow-wrap: anywhere;
@@ -210,93 +223,90 @@ const formatToken = (value?: string, fallback = 'Unmarked') => {
 .seal-fallback small {
   color: var(--c-text-3);
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   line-height: 1.25;
 }
 
-.slip-copy {
+.manual-copy {
   min-width: 0;
   display: grid;
   gap: 1rem;
   align-content: center;
 }
 
-.slip-kicker {
+.manual-kicker {
   width: fit-content;
   margin: 0;
   padding-bottom: 0.38rem;
-  color: var(--sword-celadon, var(--c-teal-accent));
-  border-bottom: 1px solid color-mix(in srgb, var(--sword-celadon, var(--c-teal-accent)) 42%, transparent);
+  color: var(--c-seal-red);
+  border-bottom: 1px solid color-mix(in srgb, var(--c-seal-red) 38%, transparent);
   font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   line-height: 1.3;
-  letter-spacing: 0;
 }
 
-.slip-title-block {
+.manual-title-block {
   min-width: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem 1rem;
-  align-items: baseline;
+  display: grid;
+  gap: 0.45rem;
 }
 
-.slip-title-block h2 {
+.manual-title-block h2 {
   min-width: 0;
   margin: 0;
   color: var(--c-ink);
   font-family: var(--font-heading);
-  font-size: clamp(2.35rem, 5vw, 4.3rem);
+  font-size: clamp(2.45rem, 5.2vw, 4.45rem);
   font-weight: 500;
-  line-height: 0.98;
+  line-height: 0.96;
   letter-spacing: 0;
   text-wrap: balance;
   overflow-wrap: anywhere;
 }
 
-.title-zh {
-  color: color-mix(in srgb, var(--c-ink) 68%, var(--c-seal-red));
-  font-size: clamp(1.75rem, 4vw, 3rem);
+.manual-title-zh {
+  color: color-mix(in srgb, var(--c-ink) 66%, var(--c-seal-red));
+  font-size: clamp(1.8rem, 4vw, 3.05rem);
   line-height: 1;
 }
 
-.slip-description {
+.manual-description {
   max-width: 64ch;
   margin: 0;
   color: var(--c-text-2);
   font-size: 1rem;
-  line-height: 1.7;
+  line-height: 1.72;
   text-wrap: pretty;
 }
 
-.field-grid {
+.annotation-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1px;
   padding: 1px;
   background: var(--c-divider);
   border: 1px solid var(--c-divider);
-  border-radius: 6px;
+  border-radius: 4px;
   overflow: hidden;
 }
 
-.field-pair {
+.annotation-pair {
   min-width: 0;
   display: grid;
   align-content: start;
   gap: 0.34rem;
-  padding: 0.72rem;
+  padding: 0.75rem;
   background: color-mix(in srgb, var(--c-bg) 84%, transparent);
 }
 
-.field-pair span {
+.annotation-pair span {
   color: var(--sword-celadon, var(--c-teal-accent));
   font-family: var(--font-mono);
   font-size: 0.66rem;
   line-height: 1.3;
 }
 
-.field-pair strong {
+.annotation-pair strong {
   color: var(--c-ink);
   font-family: var(--font-mono);
   font-size: 0.78rem;
@@ -305,43 +315,31 @@ const formatToken = (value?: string, fallback = 'Unmarked') => {
   overflow-wrap: anywhere;
 }
 
-.tag-row,
-.link-wrap {
+.manual-tags,
+.link-wrap,
+.manual-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.45rem;
 }
 
-.manual-tag {
-  min-height: 1.75rem;
-  display: inline-flex;
-  align-items: center;
-  padding: 0.22rem 0.52rem;
-  color: var(--c-text-2);
-  border: 1px solid var(--c-divider);
-  border-radius: 4px;
-  background: color-mix(in srgb, var(--c-bg) 72%, transparent);
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  line-height: 1.25;
-  overflow-wrap: anywhere;
-}
-
-.link-panels {
+.manual-link-panels {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.8rem;
 }
 
-.link-group {
+.manual-link-group {
   min-width: 0;
   display: grid;
   gap: 0.55rem;
   align-content: start;
   padding: 0.75rem;
   border: 1px solid var(--c-divider);
-  border-radius: 6px;
-  background: color-mix(in srgb, var(--c-bg) 64%, transparent);
+  border-radius: 4px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--c-bg) 70%, transparent), color-mix(in srgb, var(--c-bg-soft) 68%, transparent)),
+    var(--c-bg);
 }
 
 .link-label {
@@ -349,6 +347,11 @@ const formatToken = (value?: string, fallback = 'Unmarked') => {
   font-family: var(--font-mono);
   font-size: 0.68rem;
   line-height: 1.3;
+}
+
+.chip-chinese {
+  color: color-mix(in srgb, var(--c-text-3) 82%, var(--c-seal-red));
+  font-size: 0.9em;
 }
 
 .source-note {
@@ -360,82 +363,42 @@ const formatToken = (value?: string, fallback = 'Unmarked') => {
   line-height: 1.55;
 }
 
-.detail-link {
-  width: fit-content;
-  display: inline-flex;
+.manual-actions {
   align-items: center;
-  gap: 0.75rem;
-  min-height: 2.5rem;
-  padding: 0.32rem 0.38rem 0.32rem 0.85rem;
-  color: var(--c-bg);
-  background: var(--c-ink);
-  border: 1px solid var(--c-ink);
-  border-radius: 999px;
-  font-family: var(--font-mono);
-  font-size: 0.76rem;
-  line-height: 1.2;
-  text-decoration: none;
-  transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1), background 0.28s cubic-bezier(0.32, 0.72, 0, 1), border-color 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+  margin-top: 0.2rem;
 }
 
-.detail-link:hover {
-  transform: translateY(-1px);
-  background: var(--c-seal-red);
-  border-color: var(--c-seal-red);
-}
-
-.detail-link:active {
-  transform: translateY(0) scale(0.98);
-}
-
-.detail-link:focus-visible {
-  outline: 2px solid var(--c-seal-red);
-  outline-offset: 3px;
-}
-
-.detail-mark {
-  width: 1.72rem;
-  aspect-ratio: 1;
-  display: grid;
-  place-items: center;
-  color: var(--c-ink);
-  background: color-mix(in srgb, var(--c-bg) 88%, transparent);
-  border-radius: 999px;
+.featured-manual-empty {
+  border: 1px dashed var(--c-divider);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--c-bg-soft) 54%, transparent);
 }
 
 @media (max-width: 980px) {
-  .featured-slip {
+  .manual-feature {
     grid-template-columns: 1fr;
   }
 
-  .slip-media {
+  .manual-seal-plate {
     min-height: 16rem;
   }
 }
 
 @media (max-width: 760px) {
-  .field-grid,
-  .link-panels {
+  .annotation-grid,
+  .manual-link-panels {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 540px) {
-  .featured-slip {
-    padding: 1rem;
-  }
-
-  .slip-media {
+  .manual-seal-plate {
     min-height: 13rem;
   }
 
-  .field-grid,
-  .link-panels {
+  .annotation-grid,
+  .manual-link-panels {
     grid-template-columns: 1fr;
-  }
-
-  .detail-link {
-    max-width: 100%;
   }
 }
 </style>
