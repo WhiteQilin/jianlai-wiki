@@ -44,6 +44,239 @@
   --font-zh-display: 'HYDiShengHero', 'STKaiti', 'KaiTi', 'Noto Serif SC', serif;
 
   --header-height: 80px;
+
+  /* Jian Lai interaction primitives */
+  --jl-ink-black: var(--c-ink);
+  --jl-charcoal: var(--c-charcoal);
+  --jl-parchment: var(--c-paper);
+  --jl-mist-gray: #d8d6cf;
+  --jl-cinnabar: var(--c-seal-red);
+  --jl-celadon: var(--c-teal-accent);
+  --jl-antique-gold: var(--c-bronze);
+  --jl-paper-ivory: #f7f1e4;
+  --jl-aged-paper: #ece0c8;
+  --jl-mist-blue: #d7e3e7;
+  --jl-river-gray: #9aa7aa;
+  --jl-blue-gray-ink: #39484f;
+  --jl-charcoal-black: #161514;
+  --jl-cinnabar-red: #a9352c;
+  --jl-jade: #34645d;
+  --jl-celadon-green: #93aa8f;
+  --jl-deep-teal: #1f4b49;
+  --jl-bronze: #846b43;
+  --jl-muted-gold: #b49a62;
+  --jl-lacquer: #2b2520;
+  --jl-quiet-motion: 220ms cubic-bezier(0.32, 0.72, 0, 1);
+
+  --jl-section-accent: var(--jl-celadon);
+  --jl-section-accent-soft: color-mix(in srgb, var(--jl-section-accent) 12%, transparent);
+  --jl-section-ink: var(--jl-blue-gray-ink);
+  --jl-section-mist: var(--jl-mist-blue);
+  --jl-section-frame: color-mix(in srgb, var(--jl-bronze) 34%, transparent);
+  --jl-section-seal: var(--jl-cinnabar-red);
+  --jl-section-gold: var(--jl-muted-gold);
+  --jl-section-bg-wash: linear-gradient(135deg, color-mix(in srgb, var(--jl-section-mist) 34%, transparent), transparent 68%);
+  --jl-section-paper: var(--jl-paper-ivory);
+  --jl-section-title-ink: var(--jl-charcoal-black);
+  --jl-section-ornament-opacity: 0.24;
+  --jl-section-brush-opacity: 0.2;
+
+  --jl-hover-brush: url('/images/ui/generated/hover-marks/generated-hover-brush-soft-02.webp');
+  --jl-active-underline: url('/images/ui/generated/hover-marks/generated-underline-ink-thin-03.webp');
+  --jl-active-ring: url('/images/ui/generated/hover-marks/generated-active-ring-gray-01.webp');
+  --jl-active-seal: url('/images/ui/generated/hover-marks/generated-active-seal-cinnabar-02.webp');
+  --jl-title-brush: url('/images/ui/purchased/ink/ink-title-stroke-long-06.webp');
+  --jl-divider-ink: url('/images/ui/purchased/ink/ink-divider-thin-01.webp');
+}
+
+:where([data-jl-section], .jl-section-theme) {
+  --jl-ink-black: var(--jl-section-ink);
+  --jl-charcoal: var(--jl-section-title-ink);
+  --jl-parchment: var(--jl-section-paper);
+  --jl-mist-gray: var(--jl-section-mist);
+  --jl-cinnabar: var(--jl-section-seal);
+  --jl-celadon: var(--jl-section-accent);
+  --jl-antique-gold: var(--jl-section-gold);
+}
+
+:where([data-jl-section='home'], .jl-section-home) {
+  --jl-section-accent: #667d81;
+  --jl-section-accent-soft: rgba(102, 125, 129, 0.12);
+  --jl-section-ink: #324247;
+  --jl-section-mist: #dce7e8;
+  --jl-section-frame: rgba(132, 107, 67, 0.28);
+  --jl-section-seal: #a9352c;
+  --jl-section-gold: #ac925e;
+  --jl-section-bg-wash: linear-gradient(135deg, rgba(220, 231, 232, 0.62), rgba(247, 241, 228, 0.12) 72%);
+  --jl-section-paper: #f8f2e6;
+  --jl-section-title-ink: #24211d;
+  --jl-section-ornament-opacity: 0.22;
+  --jl-section-brush-opacity: 0.18;
+}
+
+:where([data-jl-section='characters'], .jl-section-characters) {
+  --jl-section-accent: #5d857b;
+  --jl-section-accent-soft: rgba(93, 133, 123, 0.12);
+  --jl-section-ink: #354640;
+  --jl-section-mist: #e5e1d7;
+  --jl-section-frame: rgba(91, 120, 106, 0.28);
+  --jl-section-seal: #a83a32;
+  --jl-section-gold: #a68855;
+  --jl-section-bg-wash: linear-gradient(135deg, rgba(230, 225, 214, 0.72), rgba(93, 133, 123, 0.08));
+  --jl-section-paper: #fbf5e8;
+  --jl-section-title-ink: #24251f;
+  --jl-section-ornament-opacity: 0.26;
+  --jl-section-brush-opacity: 0.2;
+}
+
+:where([data-jl-section='world'], .jl-section-world) {
+  --jl-section-accent: #6f9391;
+  --jl-section-accent-soft: rgba(111, 147, 145, 0.13);
+  --jl-section-ink: #31464d;
+  --jl-section-mist: #d6e3e6;
+  --jl-section-frame: rgba(89, 111, 112, 0.26);
+  --jl-section-seal: #9f332d;
+  --jl-section-gold: #a99a6a;
+  --jl-section-bg-wash: linear-gradient(140deg, rgba(214, 227, 230, 0.72), rgba(168, 185, 155, 0.12) 70%);
+  --jl-section-paper: #f5f0e4;
+  --jl-section-title-ink: #23363c;
+  --jl-section-ornament-opacity: 0.24;
+  --jl-section-brush-opacity: 0.16;
+}
+
+:where([data-jl-section='cultivation'], .jl-section-cultivation) {
+  --jl-section-accent: #8fae92;
+  --jl-section-accent-soft: rgba(143, 174, 146, 0.14);
+  --jl-section-ink: #33463d;
+  --jl-section-mist: #e4eadc;
+  --jl-section-frame: rgba(160, 138, 82, 0.3);
+  --jl-section-seal: #a6362d;
+  --jl-section-gold: #b59b5d;
+  --jl-section-bg-wash: linear-gradient(135deg, rgba(228, 234, 220, 0.74), rgba(181, 155, 93, 0.1) 76%);
+  --jl-section-paper: #f8f2e4;
+  --jl-section-title-ink: #25382f;
+  --jl-section-ornament-opacity: 0.26;
+  --jl-section-brush-opacity: 0.18;
+}
+
+:where([data-jl-section='swordsmanship'], .jl-section-swordsmanship) {
+  --jl-section-accent: #587988;
+  --jl-section-accent-soft: rgba(88, 121, 136, 0.14);
+  --jl-section-ink: #18262d;
+  --jl-section-mist: #d8e8ee;
+  --jl-section-frame: rgba(55, 76, 86, 0.34);
+  --jl-section-seal: #a9342d;
+  --jl-section-gold: #70878a;
+  --jl-section-bg-wash: linear-gradient(135deg, rgba(216, 232, 238, 0.78), rgba(24, 38, 45, 0.055) 72%);
+  --jl-section-paper: #f6f9f5;
+  --jl-section-title-ink: #10181d;
+  --jl-section-ornament-opacity: 0.28;
+  --jl-section-brush-opacity: 0.32;
+}
+
+:where([data-jl-section='factions'], .jl-section-factions) {
+  --jl-section-accent: #2f6255;
+  --jl-section-accent-soft: rgba(47, 98, 85, 0.13);
+  --jl-section-ink: #263d37;
+  --jl-section-mist: #dce3d9;
+  --jl-section-frame: rgba(119, 91, 54, 0.34);
+  --jl-section-seal: #9e332c;
+  --jl-section-gold: #9f8050;
+  --jl-section-bg-wash: linear-gradient(135deg, rgba(220, 227, 217, 0.7), rgba(47, 98, 85, 0.1) 74%);
+  --jl-section-paper: #f3ead8;
+  --jl-section-title-ink: #20332f;
+  --jl-section-ornament-opacity: 0.3;
+  --jl-section-brush-opacity: 0.2;
+}
+
+:where([data-jl-section='artifacts'], .jl-section-artifacts) {
+  --jl-section-accent: #6f5a38;
+  --jl-section-accent-soft: rgba(111, 90, 56, 0.14);
+  --jl-section-ink: #2b2520;
+  --jl-section-mist: #e0d7c7;
+  --jl-section-frame: rgba(128, 99, 57, 0.38);
+  --jl-section-seal: #9f332b;
+  --jl-section-gold: #b39654;
+  --jl-section-bg-wash: linear-gradient(135deg, rgba(224, 215, 199, 0.68), rgba(43, 37, 32, 0.06) 70%);
+  --jl-section-paper: #f2e6d1;
+  --jl-section-title-ink: #241f1a;
+  --jl-section-ornament-opacity: 0.32;
+  --jl-section-brush-opacity: 0.18;
+}
+
+:where([data-jl-section='timeline'], .jl-section-timeline) {
+  --jl-section-accent: #9b6f4b;
+  --jl-section-accent-soft: rgba(155, 111, 75, 0.13);
+  --jl-section-ink: #3f332a;
+  --jl-section-mist: #e4d9c8;
+  --jl-section-frame: rgba(140, 106, 63, 0.3);
+  --jl-section-seal: #a33b31;
+  --jl-section-gold: #aa8c55;
+  --jl-section-bg-wash: linear-gradient(135deg, rgba(228, 217, 200, 0.76), rgba(163, 59, 49, 0.06) 72%);
+  --jl-section-paper: #f4e8d1;
+  --jl-section-title-ink: #2d241d;
+  --jl-section-ornament-opacity: 0.25;
+  --jl-section-brush-opacity: 0.17;
+}
+
+:where([data-jl-section='rankings'], .jl-section-rankings) {
+  --jl-section-accent: #8a7448;
+  --jl-section-accent-soft: rgba(138, 116, 72, 0.12);
+  --jl-section-ink: #332c22;
+  --jl-section-mist: #e8dfcc;
+  --jl-section-frame: rgba(149, 113, 58, 0.32);
+  --jl-section-seal: #aa352d;
+  --jl-section-gold: #b29555;
+  --jl-section-bg-wash: linear-gradient(135deg, rgba(232, 223, 204, 0.72), rgba(178, 149, 85, 0.08) 74%);
+  --jl-section-paper: #f6ecd8;
+  --jl-section-title-ink: #2c251b;
+  --jl-section-ornament-opacity: 0.24;
+  --jl-section-brush-opacity: 0.16;
+}
+
+:where([data-jl-section='teachings'], .jl-section-teachings) {
+  --jl-section-accent: #687f87;
+  --jl-section-accent-soft: rgba(104, 127, 135, 0.12);
+  --jl-section-ink: #34454a;
+  --jl-section-mist: #e2e6e4;
+  --jl-section-frame: rgba(104, 127, 135, 0.26);
+  --jl-section-seal: #a53931;
+  --jl-section-gold: #a58b57;
+  --jl-section-bg-wash: linear-gradient(135deg, rgba(226, 230, 228, 0.74), rgba(104, 127, 135, 0.08) 72%);
+  --jl-section-paper: #f8f1e3;
+  --jl-section-title-ink: #28383d;
+  --jl-section-ornament-opacity: 0.22;
+  --jl-section-brush-opacity: 0.15;
+}
+
+:where([data-jl-section='pantheon'], .jl-section-pantheon) {
+  --jl-section-accent: #746949;
+  --jl-section-accent-soft: rgba(116, 105, 73, 0.13);
+  --jl-section-ink: #252522;
+  --jl-section-mist: #dad9d0;
+  --jl-section-frame: rgba(173, 143, 83, 0.3);
+  --jl-section-seal: #96332d;
+  --jl-section-gold: #b99b5c;
+  --jl-section-bg-wash: linear-gradient(135deg, rgba(218, 217, 208, 0.72), rgba(185, 155, 92, 0.08) 72%);
+  --jl-section-paper: #f2e9d8;
+  --jl-section-title-ink: #20201d;
+  --jl-section-ornament-opacity: 0.3;
+  --jl-section-brush-opacity: 0.18;
+}
+
+:where([data-jl-section='glossary'], .jl-section-glossary) {
+  --jl-section-accent: #647071;
+  --jl-section-accent-soft: rgba(100, 112, 113, 0.1);
+  --jl-section-ink: #303839;
+  --jl-section-mist: #e7e5dd;
+  --jl-section-frame: rgba(100, 112, 113, 0.24);
+  --jl-section-seal: #a83a32;
+  --jl-section-gold: #9c8558;
+  --jl-section-bg-wash: linear-gradient(135deg, rgba(231, 229, 221, 0.74), rgba(100, 112, 113, 0.06) 72%);
+  --jl-section-paper: #fbf6ea;
+  --jl-section-title-ink: #282c2c;
+  --jl-section-ornament-opacity: 0.18;
+  --jl-section-brush-opacity: 0.13;
 }
 
 .dark {
@@ -71,6 +304,8 @@
   --c-text-1: var(--c-ink);
   --c-text-2: var(--c-ink-wash);
   --c-text-3: #a3a3a3;
+
+  --jl-mist-gray: #303336;
 }
 
 *, *::before, *::after {
@@ -353,46 +588,44 @@ body::after {
 
 /* Animations */
 @media (prefers-reduced-motion: no-preference) {
-  /* Reveal Animations */
-  .reveal-fade-up {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-  }
-  .reveal-fade-up.revealed {
-    opacity: 1;
-    transform: translateY(0);
+  /* Reveal Animations
+   *
+   * Hidden state is gated behind html[data-reveal-ready], which is set by the
+   * reveal-ready.client.ts plugin only after Vue has hydrated. If JS fails or
+   * hydration is blocked, the attribute is never set and all reveal-wrapped
+   * content remains visible — no invisible content on no-JS, search bots, or
+   * broken hydration.
+   *
+   * Transitions stay on the base class so the .revealed state still animates.
+   */
+  .reveal-fade-up,
+  .reveal-blur-clear,
+  .reveal-line,
+  .reveal-seal {
+    transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1),
+                transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1),
+                filter 1s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
-  .reveal-blur-clear {
+  html[data-reveal-ready] .reveal-fade-up:not(.revealed) {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  html[data-reveal-ready] .reveal-blur-clear:not(.revealed) {
     opacity: 0;
     filter: blur(4px);
     transform: scale(0.98);
-    transition: all 1s cubic-bezier(0.2, 0.8, 0.2, 1);
-  }
-  .reveal-blur-clear.revealed {
-    opacity: 1;
-    filter: blur(0);
-    transform: scale(1);
   }
 
-  .reveal-line {
+  html[data-reveal-ready] .reveal-line:not(.revealed) {
     transform: scaleX(0);
     transform-origin: left;
-    transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1);
-  }
-  .reveal-line.revealed {
-    transform: scaleX(1);
   }
 
-  .reveal-seal {
+  html[data-reveal-ready] .reveal-seal:not(.revealed) {
     opacity: 0;
     transform: scale(1.6) rotate(-15deg);
-    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-  .reveal-seal.revealed {
-    opacity: 1;
-    transform: scale(1) rotate(0);
   }
 
   /* Staggers */
