@@ -4,10 +4,11 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const isTimeline = computed(() => route.path === '/timeline' || route.path.startsWith('/timeline/'))
+const isSwordsmanship = computed(() => route.path === '/swordsmanship' || route.path.startsWith('/swordsmanship/'))
 </script>
 
 <template>
-  <footer class="site-footer" :class="{ 'is-timeline': isTimeline }">
+  <footer class="site-footer" :class="{ 'is-timeline': isTimeline, 'is-swordsmanship': isSwordsmanship }">
     <div class="footer-container">
       <div class="footer-top">
         <div class="footer-brand">
@@ -82,6 +83,22 @@ const isTimeline = computed(() => route.path === '/timeline' || route.path.start
 
 .site-footer.is-timeline .link-group a:hover {
   color: var(--c-gold, #d4af37);
+}
+
+/* Swordsmanship Dark Footer Variant */
+.site-footer.is-swordsmanship {
+  background-color: #080f16;
+  border-top: 1px solid rgba(74, 114, 132, 0.18);
+  --c-charcoal: #c8dce6;
+  --c-text-2: rgba(200, 220, 230, 0.8);
+  --c-text-3: rgba(154, 184, 200, 0.55);
+  --c-border: rgba(74, 114, 132, 0.15);
+  --c-divider: rgba(74, 114, 132, 0.12);
+  --c-seal-red-soft: rgba(204, 82, 72, 0.12);
+}
+
+.site-footer.is-swordsmanship .link-group a:hover {
+  color: #cc5248;
 }
 
 .footer-container {
