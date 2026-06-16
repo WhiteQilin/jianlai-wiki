@@ -11,6 +11,7 @@ const route = useRoute()
 const { open: openSearch, toggle: toggleSearch, close: closeSearch, isOpen: isSearchOpen } = useSearchState()
 
 const isTimelineRoute = computed(() => route.path === '/timeline' || route.path.startsWith('/timeline/'))
+const isSwordsmanshipRoute = computed(() => route.path === '/swordsmanship' || route.path.startsWith('/swordsmanship/'))
 
 // Secondary sections surfaced via the "More" dropdown (titles intentionally excluded).
 const moreLinks = [
@@ -92,7 +93,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <header class="site-header" :class="{ 'is-scrolled': isScrolled, 'is-timeline': isTimelineRoute }">
+  <header class="site-header" :class="{ 'is-scrolled': isScrolled, 'is-timeline': isTimelineRoute, 'is-swordsmanship': isSwordsmanshipRoute }">
     <div class="header-bg-texture"></div>
     <div class="header-container">
       <NuxtLink to="/" class="site-logo">
@@ -305,6 +306,107 @@ onUnmounted(() => {
 .site-header.is-timeline .nav-more-item:hover .more-zh,
 .site-header.is-timeline .nav-more-item.router-link-active .more-zh {
   color: var(--c-gold, #d4af37);
+}
+
+/* --- Swordsmanship Header Variant --- */
+.site-header.is-swordsmanship {
+  --c-ink: #c8dce6;
+  --c-text-2: rgba(200, 220, 230, 0.8);
+  --c-text-3: rgba(154, 184, 200, 0.65);
+  --c-border: rgba(74, 114, 132, 0.25);
+  --c-bg-soft: rgba(14, 30, 42, 0.4);
+  --c-bg-alt: rgba(14, 30, 42, 0.6);
+  --c-charcoal: #c8dce6; /* Hamburger bars */
+  --c-divider: rgba(74, 114, 132, 0.2);
+}
+
+.site-header.is-swordsmanship .header-bg-texture {
+  opacity: 0 !important;
+}
+
+.site-header.is-swordsmanship.is-scrolled {
+  background-color: rgba(8, 15, 22, 0.88);
+  border-bottom: 1px solid rgba(74, 114, 132, 0.18);
+  box-shadow: 0 4px 28px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.site-header.is-swordsmanship .logo-en {
+  border-left-color: rgba(74, 114, 132, 0.25);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.site-header.is-swordsmanship .nav-zh {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+/* Cinnabar active underline for swordsmanship */
+.site-header.is-swordsmanship .site-nav a::after,
+.site-header.is-swordsmanship .nav-more-trigger::after {
+  background: #cc5248;
+}
+
+.site-header.is-swordsmanship .site-nav a:hover .nav-zh,
+.site-header.is-swordsmanship .site-nav a.router-link-active .nav-zh,
+.site-header.is-swordsmanship .nav-more:hover .nav-more-trigger .nav-zh,
+.site-header.is-swordsmanship .nav-more-trigger.is-active .nav-zh {
+  color: #cc5248;
+}
+
+.site-header.is-swordsmanship .site-nav a:hover .nav-en,
+.site-header.is-swordsmanship .site-nav a.router-link-active .nav-en {
+  color: #c8dce6;
+}
+
+.site-header.is-swordsmanship .nav-more-panel {
+  background: rgba(8, 15, 22, 0.96);
+  border-color: rgba(74, 114, 132, 0.2);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+.site-header.is-swordsmanship .nav-more-item:hover {
+  background: rgba(204, 82, 72, 0.1);
+}
+
+.site-header.is-swordsmanship .nav-more-item:hover .more-zh,
+.site-header.is-swordsmanship .nav-more-item.router-link-active .more-zh {
+  color: #cc5248;
+}
+
+/* Search pill dark mode for swordsmanship */
+.site-header.is-swordsmanship .search-placeholder {
+  background: rgba(14, 30, 42, 0.5);
+  border-color: rgba(74, 114, 132, 0.25);
+}
+
+.site-header.is-swordsmanship .search-placeholder:hover {
+  border-color: rgba(74, 114, 132, 0.45);
+  background: rgba(14, 30, 42, 0.7);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+.site-header.is-swordsmanship .search-kbd {
+  border-color: rgba(74, 114, 132, 0.25);
+}
+
+/* Mobile nav dark mode for swordsmanship */
+.site-header.is-swordsmanship .mobile-nav-bg {
+  background: rgba(8, 15, 22, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.site-header.is-swordsmanship .mobile-nav-item {
+  border-bottom-color: rgba(74, 114, 132, 0.15);
+}
+
+.site-header.is-swordsmanship .mobile-nav-item:active .m-zh {
+  color: #cc5248;
+}
+
+.site-header.is-swordsmanship .mobile-nav-seal {
+  color: rgba(204, 82, 72, 0.12);
 }
 
 .header-container {
