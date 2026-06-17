@@ -882,4 +882,484 @@ function timelineRecordMeta(record?: TimelineNavigationRecord | null) {
     transform: none;
   }
 }
+
+/* Swordsmanship / Blade Path — dark steel-blue dossier theme.
+   Mirrors the timeline pattern: remap shared --c-* tokens onto a
+   nighttime palette, then deep-override child components so the
+   infobox, TOC, prose, and relationship surfaces all read as one
+   manual slip rather than a bright card pasted on a dark page. */
+
+.entry-detail-shell.section-swordsmanship {
+  --sword-jade: #7ab4a4;
+  --sword-jade-bright: #9dd0c0;
+  --sword-cinnabar: #d85a52;
+  --sword-steel: #4a7284;
+  --c-paper: #080f16;
+  --c-bg: #080f16;
+  --c-bg-soft: #0e1e2a;
+  --c-bg-alt: #132a38;
+  --c-ink: #c8dce6;
+  --c-charcoal: #dce8ef;
+  --c-ink-wash: #9ab8c8;
+  --c-text-1: #c8dce6;
+  --c-text-2: #9ab8c8;
+  --c-text-3: #8fb3c4;
+  --c-border: rgba(74, 114, 132, 0.28);
+  --c-divider: rgba(74, 114, 132, 0.18);
+  --c-seal-red: #7ab4a4;
+  --c-seal-red-soft: rgba(122, 180, 164, 0.14);
+  min-height: 100dvh;
+  color: var(--c-text-1);
+  background:
+    radial-gradient(circle at 15% 8%, rgba(122, 180, 164, 0.07), transparent 24rem),
+    radial-gradient(circle at 88% 22%, rgba(204, 82, 72, 0.04), transparent 22rem),
+    linear-gradient(180deg, #060a10, #080f16 42%, #060a10);
+}
+
+.section-swordsmanship .mdc-content {
+  padding-top: calc(var(--header-height) + clamp(2rem, 4vw, 3.5rem));
+  padding-bottom: clamp(4rem, 7vw, 6rem);
+}
+
+.section-swordsmanship .breadcrumb {
+  margin-bottom: 1.15rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(74, 114, 132, 0.16);
+}
+
+.section-swordsmanship .breadcrumb a:hover {
+  color: var(--sword-jade);
+}
+
+.section-swordsmanship :where(a, button):focus-visible,
+.section-swordsmanship :deep(a:focus-visible),
+.section-swordsmanship :deep(button:focus-visible) {
+  outline: 2px solid var(--sword-jade);
+  outline-offset: 3px;
+}
+
+.section-swordsmanship .current {
+  color: #dce8ef;
+}
+
+.section-swordsmanship .entry-header {
+  margin-bottom: clamp(2.25rem, 4vw, 3.75rem);
+  border-bottom-color: rgba(74, 114, 132, 0.24);
+}
+
+.section-swordsmanship .entry-header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: min(11rem, 40vw);
+  height: 2px;
+  background: linear-gradient(90deg, rgba(122, 180, 164, 0.7), transparent);
+  box-shadow: 0 0 16px rgba(122, 180, 164, 0.18);
+}
+
+.section-swordsmanship .entry-lead {
+  color: var(--c-text-2);
+}
+
+.section-swordsmanship .entry-badge {
+  color: var(--sword-cinnabar);
+  border-color: var(--sword-cinnabar);
+  background: rgba(216, 90, 82, 0.1);
+}
+
+.section-swordsmanship .entry-chip {
+  color: var(--c-text-2);
+  border-color: rgba(74, 114, 132, 0.26);
+  background: rgba(14, 30, 42, 0.6);
+}
+
+.section-swordsmanship .entry-chip.is-importance {
+  color: #c8dce6;
+}
+
+.section-swordsmanship :deep(.name-en) {
+  color: #dce8ef;
+  text-shadow: 0 0 24px rgba(122, 180, 164, 0.12);
+}
+
+.section-swordsmanship :deep(.name-zh),
+.section-swordsmanship :deep(.name-pinyin) {
+  color: #9ab8c8;
+}
+
+.section-swordsmanship :deep(.name-seal),
+.section-swordsmanship :deep(.seal-variant-outline) {
+  color: var(--sword-cinnabar);
+  border-color: var(--sword-cinnabar);
+  background: rgba(216, 90, 82, 0.08);
+  box-shadow: 0 0 14px rgba(216, 90, 82, 0.12);
+}
+
+.section-swordsmanship :deep(.entry-section-nav) {
+  border-block-color: rgba(74, 114, 132, 0.2);
+}
+
+.section-swordsmanship :deep(.contents-label) {
+  color: var(--c-text-3);
+}
+
+.section-swordsmanship :deep(.contents-link) {
+  color: var(--c-text-2);
+  border-color: rgba(74, 114, 132, 0.24);
+  background: rgba(14, 30, 42, 0.7);
+}
+
+.section-swordsmanship :deep(.contents-link:hover) {
+  color: var(--sword-jade);
+  border-color: rgba(122, 180, 164, 0.5);
+  background: rgba(122, 180, 164, 0.08);
+}
+
+.section-swordsmanship :deep(.entry-section-nav)::after {
+  background: linear-gradient(to right, transparent, #080f16);
+}
+
+.section-swordsmanship :deep(.mdc-prose) {
+  color: var(--c-text-2);
+}
+
+.section-swordsmanship :deep(.mdc-prose h2),
+.section-swordsmanship :deep(.mdc-prose h3),
+.section-swordsmanship :deep(.mdc-prose h4) {
+  color: #dce8ef;
+}
+
+.section-swordsmanship :deep(.mdc-prose h2) {
+  border-bottom-color: rgba(74, 114, 132, 0.22);
+}
+
+.section-swordsmanship :deep(.mdc-prose h2::after) {
+  background: linear-gradient(90deg, var(--sword-jade), transparent);
+}
+
+.section-swordsmanship :deep(.mdc-prose a) {
+  color: var(--sword-jade);
+  border-bottom-color: rgba(122, 180, 164, 0.32);
+}
+
+.section-swordsmanship :deep(.mdc-prose a:hover) {
+  color: var(--sword-jade-bright);
+  border-bottom-color: rgba(157, 208, 192, 0.6);
+}
+
+.section-swordsmanship :deep(.mdc-prose blockquote) {
+  border-left-color: rgba(122, 180, 164, 0.65);
+  background: linear-gradient(to right, rgba(122, 180, 164, 0.07), transparent);
+  color: var(--c-text-1);
+}
+
+.section-swordsmanship :deep(.mdc-prose li::before) {
+  color: rgba(122, 180, 164, 0.52);
+}
+
+.section-swordsmanship :deep(.mdc-prose hr) {
+  background: rgba(74, 114, 132, 0.22);
+}
+
+.section-swordsmanship :deep(.mdc-prose hr::after) {
+  background: #080f16;
+  color: rgba(122, 180, 164, 0.42);
+}
+
+.section-swordsmanship :deep(.mdc-prose code) {
+  background: rgba(14, 30, 42, 0.7);
+  color: var(--c-text-1);
+  border: 1px solid rgba(74, 114, 132, 0.22);
+  border-radius: 3px;
+  padding: 0.1em 0.35em;
+}
+
+.section-swordsmanship :deep(.mdc-prose pre) {
+  background: rgba(8, 18, 26, 0.85);
+  border: 1px solid rgba(74, 114, 132, 0.2);
+  border-radius: 4px;
+  color: var(--c-text-1);
+}
+
+.section-swordsmanship :deep(.mdc-prose pre code) {
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
+.section-swordsmanship :deep(.mdc-prose table) {
+  border-color: rgba(74, 114, 132, 0.22);
+}
+
+.section-swordsmanship :deep(.mdc-prose th) {
+  background: rgba(14, 30, 42, 0.55);
+  color: var(--c-text-1);
+  border-color: rgba(74, 114, 132, 0.2);
+}
+
+.section-swordsmanship :deep(.mdc-prose td) {
+  border-color: rgba(74, 114, 132, 0.16);
+}
+
+.section-swordsmanship :deep(.entry-infobox) {
+  border-color: rgba(74, 114, 132, 0.28);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(19, 42, 56, 0.92), rgba(14, 30, 42, 0.94)),
+    url('/images/textures/ink-wash-02.webp');
+  background-size: cover;
+  background-blend-mode: normal, screen;
+  box-shadow:
+    inset 0 1px 0 rgba(200, 220, 230, 0.06),
+    0 18px 45px rgba(0, 0, 0, 0.32);
+}
+
+.section-swordsmanship :deep(.infobox-heading) {
+  border-bottom-color: rgba(74, 114, 132, 0.22);
+}
+
+.section-swordsmanship :deep(.infobox-heading h2) {
+  color: #dce8ef;
+}
+
+.section-swordsmanship :deep(.infobox-image-wrapper) {
+  border-bottom-color: rgba(74, 114, 132, 0.2);
+  background: rgba(8, 15, 22, 0.6);
+}
+
+.section-swordsmanship :deep(.image-overlay) {
+  border-color: rgba(74, 114, 132, 0.22);
+}
+
+.section-swordsmanship :deep(.infobox-row) {
+  border-bottom-color: rgba(74, 114, 132, 0.14);
+}
+
+.section-swordsmanship :deep(.row-label),
+.section-swordsmanship :deep(.footer-label),
+.section-swordsmanship :deep(.eyebrow) {
+  color: #7ab4a4;
+}
+
+.section-swordsmanship :deep(.row-value) {
+  color: #dce8ef;
+}
+
+.section-swordsmanship :deep(.public-badge) {
+  color: var(--sword-cinnabar);
+  border-color: var(--sword-cinnabar);
+  background: rgba(216, 90, 82, 0.1);
+}
+
+.section-swordsmanship :deep(.public-chip) {
+  color: var(--c-text-1);
+  border-color: rgba(74, 114, 132, 0.26);
+  background: rgba(19, 42, 56, 0.55);
+}
+
+.section-swordsmanship :deep(.verification-badge) {
+  color: var(--sword-cinnabar);
+  border-color: var(--sword-cinnabar);
+  background: rgba(216, 90, 82, 0.08);
+}
+
+.section-swordsmanship :deep(.route-display-link) {
+  color: #c8dce6;
+}
+
+.section-swordsmanship :deep(.route-display-link:hover) {
+  color: var(--sword-jade);
+}
+
+.section-swordsmanship :deep(.route-display-link.is-chip) {
+  border-color: rgba(74, 114, 132, 0.24);
+  background: rgba(14, 30, 42, 0.55);
+}
+
+.entry-detail-shell.section-swordsmanship :deep(.relationship-item),
+.entry-detail-shell.section-swordsmanship :deep(.ranking-item) {
+  border: 1px solid rgba(74, 114, 132, 0.24);
+  background: rgba(19, 42, 56, 0.4);
+  padding: 0.5rem 0.6rem;
+}
+
+.section-swordsmanship :deep(.relationship-name),
+.section-swordsmanship :deep(.ranking-name) {
+  color: #dce8ef;
+}
+
+.section-swordsmanship :deep(.relationship-relation),
+.section-swordsmanship :deep(.ranking-note) {
+  color: var(--c-text-3);
+}
+
+.section-swordsmanship :deep(.ranking-rank) {
+  color: var(--sword-jade);
+}
+
+.section-swordsmanship :deep(.infobox-placeholder) {
+  background:
+    radial-gradient(circle at 50% 38%, rgba(122, 180, 164, 0.12), transparent 62%),
+    url('/images/textures/ink-wash-01.webp');
+  background-size: cover;
+}
+
+.section-swordsmanship :deep(.placeholder-char) {
+  color: #7ab4a4;
+  border-color: rgba(122, 180, 164, 0.42);
+  background: rgba(8, 15, 22, 0.5);
+}
+
+.section-swordsmanship :deep(.infobox-footer) {
+  border-top-color: rgba(74, 114, 132, 0.2);
+}
+
+.section-swordsmanship :deep(.footer-value) {
+  color: var(--c-text-2);
+}
+
+.entry-detail-shell.section-swordsmanship :deep(.relationship-card) {
+  border: 1px solid rgba(74, 114, 132, 0.28);
+  border-radius: 6px;
+  background:
+    linear-gradient(180deg, rgba(19, 42, 56, 0.65), rgba(14, 30, 42, 0.85)),
+    url('/images/textures/ink-wash-02.webp');
+  background-size: cover;
+  background-blend-mode: normal, screen;
+  box-shadow:
+    inset 0 1px 0 rgba(200, 220, 230, 0.05),
+    0 12px 30px rgba(0, 0, 0, 0.22);
+}
+
+.entry-detail-shell.section-swordsmanship :deep(.relationship-card)::after {
+  background: linear-gradient(180deg, rgba(122, 180, 164, 0.05), transparent 60%);
+  opacity: 1;
+}
+
+.section-swordsmanship :deep(.relationship-card .relationship-name) {
+  color: #dce8ef;
+}
+
+.section-swordsmanship :deep(.relationship-label) {
+  color: var(--c-text-3);
+}
+
+.section-swordsmanship :deep(.panel-heading h2) {
+  color: #dce8ef;
+}
+
+.section-swordsmanship :deep(.expand-button) {
+  border-color: rgba(74, 114, 132, 0.28);
+  color: var(--c-text-2);
+  background: rgba(14, 30, 42, 0.45);
+}
+
+.section-swordsmanship :deep(.expand-button:hover) {
+  color: var(--sword-jade);
+  border-color: rgba(122, 180, 164, 0.45);
+  background: rgba(122, 180, 164, 0.08);
+}
+
+.section-swordsmanship :deep(.entry-reference-block) {
+  border-color: rgba(74, 114, 132, 0.26);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(19, 42, 56, 0.88), rgba(14, 30, 42, 0.9)),
+    url('/images/textures/ink-wash-01.webp');
+  background-size: cover;
+  background-blend-mode: normal, screen;
+  box-shadow:
+    inset 0 1px 0 rgba(200, 220, 230, 0.05),
+    0 16px 38px rgba(0, 0, 0, 0.28);
+}
+
+.section-swordsmanship :deep(.reference-heading h2) {
+  color: #dce8ef;
+}
+
+.section-swordsmanship :deep(.source-notes) {
+  color: var(--c-text-2);
+}
+
+.section-swordsmanship :deep(.source-fact dt) {
+  color: #7ab4a4;
+}
+
+.section-swordsmanship :deep(.source-fact dd) {
+  color: #dce8ef;
+}
+
+.section-swordsmanship :deep(.reference-cta) {
+  color: var(--c-text-2);
+  border-top-color: rgba(74, 114, 132, 0.2);
+}
+
+.section-swordsmanship :deep(.contribute-link) {
+  color: var(--sword-jade);
+}
+
+.section-swordsmanship :deep(.contribute-link:hover) {
+  color: var(--sword-jade-bright);
+}
+
+.section-swordsmanship :deep(.related-card-groups .related-entry-card),
+.section-swordsmanship :deep(.related-card-groups article) {
+  border-color: rgba(74, 114, 132, 0.24);
+  background:
+    linear-gradient(180deg, rgba(19, 42, 56, 0.55), rgba(14, 30, 42, 0.75));
+  color: var(--c-text-2);
+}
+
+.section-swordsmanship :deep(.related-card-groups a) {
+  color: #c8dce6;
+}
+
+.section-swordsmanship :deep(.related-card-groups a:hover) {
+  color: var(--sword-jade);
+}
+
+.section-swordsmanship .infobox-sticky-frame {
+  scrollbar-color: rgba(122, 180, 164, 0.32) transparent;
+}
+
+.section-swordsmanship .infobox-sticky-frame::-webkit-scrollbar-thumb {
+  background: rgba(122, 180, 164, 0.32);
+}
+
+@media (max-width: 1024px) {
+  .section-swordsmanship .article-layout {
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .section-swordsmanship .mdc-content {
+    padding-top: calc(var(--header-height) + 1.5rem);
+  }
+
+  .section-swordsmanship :deep(.name-en) {
+    font-size: clamp(2.05rem, 11vw, 3rem);
+    line-height: 1.08;
+  }
+
+  .section-swordsmanship .article-layout {
+    gap: 1.65rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-swordsmanship .entry-header::after {
+    box-shadow: none;
+  }
+
+  .section-swordsmanship :deep(.name-en) {
+    text-shadow: none;
+  }
+
+  .section-swordsmanship :deep(.name-seal),
+  .section-swordsmanship :deep(.seal-variant-outline) {
+    box-shadow: none;
+  }
+}
 </style>
