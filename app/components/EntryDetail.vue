@@ -112,6 +112,18 @@ function timelineRecordMeta(record?: TimelineNavigationRecord | null) {
         </div>
       </ScrollReveal>
 
+      <ScrollReveal v-if="section === 'swordsmanship'" animation="reveal-fade-up" delay="stagger-1">
+        <nav class="sword-context-bar" aria-label="Swordsmanship context navigation">
+          <div class="sword-context-copy">
+            <span class="sword-context-kicker">Sword Art Record</span>
+            <span class="sword-context-label">{{ page?.category || 'Flying-Sword Art' }}</span>
+          </div>
+          <NuxtLink class="sword-context-return" to="/swordsmanship">
+            Return to Swordsmanship
+          </NuxtLink>
+        </nav>
+      </ScrollReveal>
+
       <ScrollReveal v-if="isTimelineDetail" animation="reveal-fade-up" delay="stagger-1">
         <nav class="timeline-context-bar" aria-label="Timeline context navigation">
           <div class="timeline-context-copy">
@@ -315,14 +327,16 @@ function timelineRecordMeta(record?: TimelineNavigationRecord | null) {
 .article-sidebar {
   width: min(320px, 29vw);
   flex-shrink: 0;
+  align-self: flex-start;
+  position: sticky;
+  top: calc(var(--header-height) + 1rem);
   display: flex;
   flex-direction: column;
   gap: 2rem;
 }
 
 .infobox-sticky-frame {
-  position: sticky;
-  top: calc(var(--header-height) + 1rem);
+  position: static;
   max-height: calc(100dvh - var(--header-height) - 2rem);
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -798,6 +812,7 @@ function timelineRecordMeta(record?: TimelineNavigationRecord | null) {
 
   .article-sidebar {
     width: 100%;
+    position: static;
   }
 
   .infobox-sticky-frame {
@@ -929,6 +944,80 @@ function timelineRecordMeta(record?: TimelineNavigationRecord | null) {
 
 .section-swordsmanship .breadcrumb a:hover {
   color: var(--sword-jade);
+}
+
+.section-swordsmanship .sword-context-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(74, 114, 132, 0.24);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(14, 30, 42, 0.82), rgba(8, 15, 22, 0.86)),
+    radial-gradient(circle at 0% 0%, rgba(122, 180, 164, 0.08), transparent 16rem);
+  box-shadow: inset 0 1px 0 rgba(200, 220, 230, 0.05);
+}
+
+.section-swordsmanship .sword-context-copy {
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.85rem;
+}
+
+.section-swordsmanship .sword-context-kicker {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  line-height: 1.35;
+  text-transform: uppercase;
+  color: rgba(122, 180, 164, 0.56);
+}
+
+.section-swordsmanship .sword-context-label {
+  min-width: 0;
+  color: var(--sword-jade-bright);
+  font-family: var(--font-heading);
+  font-size: 1.02rem;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.section-swordsmanship .sword-context-return {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.45rem;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid rgba(74, 114, 132, 0.26);
+  border-radius: 6px;
+  color: rgba(157, 208, 192, 0.88);
+  background: rgba(122, 180, 164, 0.06);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  line-height: 1.35;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    border-color 0.24s ease,
+    background-color 0.24s ease,
+    color 0.24s ease,
+    box-shadow 0.24s ease;
+}
+
+.section-swordsmanship .sword-context-return:hover,
+.section-swordsmanship .sword-context-return:focus-visible {
+  color: #dce8ef;
+  border-color: rgba(122, 180, 164, 0.58);
+  background: rgba(122, 180, 164, 0.12);
+  box-shadow: 0 0 18px rgba(122, 180, 164, 0.1);
+  outline: none;
 }
 
 .section-swordsmanship :where(a, button):focus-visible,
@@ -1346,6 +1435,20 @@ function timelineRecordMeta(record?: TimelineNavigationRecord | null) {
   .section-swordsmanship .article-layout {
     gap: 1.65rem;
   }
+
+  .section-swordsmanship .sword-context-bar {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0.65rem;
+    margin-bottom: 2rem;
+    padding: 0.85rem;
+  }
+
+  .section-swordsmanship .sword-context-return {
+    width: 100%;
+    white-space: normal;
+    text-align: center;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1360,6 +1463,10 @@ function timelineRecordMeta(record?: TimelineNavigationRecord | null) {
   .section-swordsmanship :deep(.name-seal),
   .section-swordsmanship :deep(.seal-variant-outline) {
     box-shadow: none;
+  }
+
+  .section-swordsmanship .sword-context-return {
+    transition: none;
   }
 }
 </style>
