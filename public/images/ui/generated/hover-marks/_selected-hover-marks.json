@@ -1,0 +1,353 @@
+{
+  "stage": "30E-1",
+  "sourceFolder": "artifacts/generated-ui/extracted/hover-marks",
+  "outputFolder": "public/images/ui/generated/hover-marks",
+  "rawFilesScanned": 25,
+  "selectedAssetCount": 19,
+  "contactSheet": "public/images/ui/generated/hover-marks/_hover-marks-contact-sheet.webp",
+  "inventory": "plans/stage-30e-1-generated-hover-marks-inventory.md",
+  "categories": {
+    "hover brush marks": [
+      "generated-hover-brush-soft-01.webp",
+      "generated-hover-brush-soft-02.webp",
+      "generated-hover-brush-soft-03.webp",
+      "generated-hover-brush-soft-04.webp"
+    ],
+    "underline marks": [
+      "generated-underline-ink-thin-01.webp",
+      "generated-underline-ink-thin-02.webp",
+      "generated-underline-ink-thin-03.webp",
+      "generated-underline-ink-thin-04.webp",
+      "generated-underline-ink-thin-05.webp",
+      "generated-underline-ink-thin-06.webp"
+    ],
+    "active rings": [
+      "generated-active-ring-black-01.webp",
+      "generated-active-ring-gray-01.webp",
+      "generated-active-ring-black-02.webp",
+      "generated-active-ring-cinnabar-01.webp"
+    ],
+    "hover blots": [
+      "generated-hover-blot-gray-01.webp",
+      "generated-hover-blot-ink-01.webp"
+    ],
+    "active seal accents": [
+      "generated-active-seal-cinnabar-01.webp",
+      "generated-active-seal-cinnabar-02.webp",
+      "generated-active-seal-cinnabar-03.webp"
+    ]
+  },
+  "assets": [
+    {
+      "filename": "generated-hover-brush-soft-01.webp",
+      "category": "hover brush marks",
+      "use": "broad soft horizontal brush hover for nav rows or large buttons",
+      "cssHint": "Use behind text at 28-42% opacity with background-size: 100% 100%.",
+      "source": "artifacts/generated-ui/extracted/hover-marks/sprite-1-1.png",
+      "sourceFile": "sprite-1-1.png",
+      "sourceWidth": 395,
+      "sourceHeight": 180,
+      "width": 419,
+      "height": 204,
+      "aspect": 2.194,
+      "hasAlpha": true,
+      "sizeKB": 31.5
+    },
+    {
+      "filename": "generated-hover-brush-soft-02.webp",
+      "category": "hover brush marks",
+      "use": "feathered horizontal hover brush for filters or secondary tabs",
+      "cssHint": "Use as a pseudo-element under labels at 24-36% opacity.",
+      "source": "artifacts/generated-ui/extracted/hover-marks/sprite-1-4.png",
+      "sourceFile": "sprite-1-4.png",
+      "sourceWidth": 372,
+      "sourceHeight": 175,
+      "width": 396,
+      "height": 199,
+      "aspect": 2.126,
+      "hasAlpha": true,
+      "sizeKB": 25.4
+    },
+    {
+      "filename": "generated-hover-brush-soft-03.webp",
+      "category": "hover brush marks",
+      "use": "slim gray brush sweep for compact navigation hover",
+      "cssHint": "Use at low opacity for dense UI lists and menu items.",
+      "source": "artifacts/generated-ui/extracted/hover-marks/sprite-1-6.png",
+      "sourceFile": "sprite-1-6.png",
+      "sourceWidth": 368,
+      "sourceHeight": 163,
+      "width": 392,
+      "height": 187,
+      "aspect": 2.258,
+      "hasAlpha": true,
+      "sizeKB": 26.2
+    },
+    {
+      "filename": "generated-underline-ink-thin-01.webp",
+      "category": "underline marks",
+      "use": "dry compact underline for active tabs and selected filters",
+      "cssHint": "Use as a bottom pseudo-element with height around 12-22px.",
+      "source": "artifacts/generated-ui/extracted/hover-marks/sprite-1-10.png",
+      "sourceFile": "sprite-1-10.png",
+      "sourceWidth": 372,
+      "sourceHeight": 175,
+      "width": 396,
+      "height": 199,
+      "aspect": 2.126,
+      "hasAlpha": true,
+      "sizeKB": 21.5
+    },
+    {
+      "filename": "generated-underline-ink-thin-02.webp",
+      "category": "underline marks",
+      "use": "thin uneven underline for small inline links or chip hover",
+      "cssHint": "Use below short labels; avoid stretching beyond 1.4x.",
+      "source": "artifacts/generated-ui/extracted/hover-marks/sprite-1-16.png",
+      "sourceFile": "sprite-1-16.png",
+      "sourceWidth": 345,
+      "sourceHeight": 142,
+      "width": 369,
+      "height": 166,
+      "aspect": 2.43,
+      "hasAlpha": true,
+      "sizeKB": 29.0
+    },
+    {
+      "filename": "generated-hover-brush-soft-04.webp",
+      "category": "hover brush marks",
+      "use": "dark narrow brush hover for stronger selected navigation rows",
+      "cssHint": "Use where a clearer hover sweep is needed; keep opacity low.",
+      "source": "artifacts/generated-ui/extracted/hover-marks/sprite-1-24.png",
+      "sourceFile": "sprite-1-24.png",
+      "sourceWidth": 390,
+      "sourceHeight": 144,
+      "width": 414,
+      "height": 168,
+      "aspect": 2.708,
+      "hasAlpha": true,
+      "sizeKB": 19.2
+    },
+    {
+      "filename": "generated-underline-ink-thin-03.webp",
+      "category": "underline marks",
+      "use": "very thin gray hover underline for compact menu labels",
+      "cssHint": "Use below dense nav labels at 8-14px visual height.",
+      "source": "artifacts/generated-ui/extracted/hover-marks/sprite-19-1.png",
+      "sourceFile": "sprite-19-1.png",
+      "sourceWidth": 368,
+      "sourceHeight": 33,
+      "width": 384,
+      "height": 49,
+      "aspect": 11.152,
+      "hasAlpha": true,
+      "sizeKB": 7.4
+    },
+    {
+      "filename": "generated-underline-ink-thin-04.webp",
+      "category": "underline marks",
+      "use": "dense thin ink underline for active filter labels",
+      "cssHint": "Use as a short underline stroke; avoid stretching vertically.",
+      "source": "artifacts/generated-ui/extracted/hover-marks/sprite-19-3.png",
+      "sourceFile": "sprite-19-3.png",
+      "sourceWidth": 378,
+      "sourceHeight": 29,
+      "width": 394,
+      "height": 45,
+      "aspect": 13.034,
+      "hasAlpha": true,
+      "sizeKB": 7.0
+    },
+    {
+      "filename": "generated-underline-ink-thin-05.webp",
+      "category": "underline marks",
+      "use": "light thin underline for subtle hover or focus state",
+      "cssHint": "Use for quiet hover feedback on small controls.",
+      "source": "artifacts/generated-ui/extracted/hover-marks/sprite-19-7.png",
+      "sourceFile": "sprite-19-7.png",
+      "sourceWidth": 370,
+      "sourceHeight": 28,
+      "width": 386,
+      "height": 44,
+      "aspect": 13.214,
+      "hasAlpha": true,
+      "sizeKB": 5.7
+    },
+    {
+      "filename": "generated-underline-ink-thin-06.webp",
+      "category": "underline marks",
+      "use": "pale thin underline for secondary hover state",
+      "cssHint": "Use where active feedback should remain understated.",
+      "source": "artifacts/generated-ui/extracted/hover-marks/sprite-19-8.png",
+      "sourceFile": "sprite-19-8.png",
+      "sourceWidth": 329,
+      "sourceHeight": 29,
+      "width": 345,
+      "height": 45,
+      "aspect": 11.345,
+      "hasAlpha": true,
+      "sizeKB": 6.8
+    },
+    {
+      "filename": "generated-active-ring-black-01.webp",
+      "category": "active rings",
+      "use": "open black ink ring for selected icon or tab marker",
+      "cssHint": "Use around small icon buttons or as a 44-72px active halo.",
+      "source": "artifacts/generated-ui/extracted/hover-marks/sprite-23-1.png",
+      "sourceFile": "sprite-23-1.png",
+      "sourceWidth": 314,
+      "sourceHeight": 318,
+      "width": 338,
+      "height": 342,
+      "aspect": 0.987,
+      "hasAlpha": true,
+      "sizeKB": 38.6
+    },
+    {
+      "filename": "generated-active-ring-gray-01.webp",
+      "category": "active rings",
+      "use": "soft gray active ring for quiet selected states",
+      "cssHint": "Use for lower-contrast selected chips at 40-68px.",
+      "source": "artifacts/generated-ui/extracted/hover-marks/sprite-23-6.png",
+      "sourceFile": "sprite-23-6.png",
+      "sourceWidth": 320,
+      "sourceHeight": 322,
+      "width": 344,
+      "height": 346,
+      "aspect": 0.994,
+      "hasAlpha": true,
+      "sizeKB": 40.0
+    },
+    {
+      "filename": "generated-active-ring-black-02.webp",
+      "category": "active rings",
+      "use": "rough black circular active ring for focused tab state",
+      "cssHint": "Use where stronger active feedback is needed; keep text outside.",
+      "source": "artifacts/generated-ui/extracted/hover-marks/sprite-23-21.png",
+      "sourceFile": "sprite-23-21.png",
+      "sourceWidth": 300,
+      "sourceHeight": 316,
+      "width": 324,
+      "height": 340,
+      "aspect": 0.949,
+      "hasAlpha": true,
+      "sizeKB": 33.4
+    },
+    {
+      "filename": "generated-active-ring-cinnabar-01.webp",
+      "category": "active rings",
+      "use": "cinnabar active ring for selected seal-like states",
+      "cssHint": "Use as a 38-62px active marker with muted opacity.",
+      "source": "artifacts/generated-ui/extracted/hover-marks/sprite-23-33.png",
+      "sourceFile": "sprite-23-33.png",
+      "sourceWidth": 292,
+      "sourceHeight": 304,
+      "width": 316,
+      "height": 328,
+      "aspect": 0.961,
+      "hasAlpha": true,
+      "sizeKB": 37.1
+    },
+    {
+      "filename": "generated-hover-blot-gray-01.webp",
+      "category": "hover blots",
+      "use": "compact smoky gray blot for icon-button hover",
+      "cssHint": "Use as a soft 28-48px aura behind icons or count chips.",
+      "source": "artifacts/generated-ui/extracted/hover-marks/sprite-37-3.png",
+      "sourceFile": "sprite-37-3.png",
+      "sourceWidth": 198,
+      "sourceHeight": 200,
+      "width": 222,
+      "height": 224,
+      "aspect": 0.99,
+      "hasAlpha": true,
+      "sizeKB": 21.4
+    },
+    {
+      "filename": "generated-hover-blot-ink-01.webp",
+      "category": "hover blots",
+      "use": "compact dark ink blot for selected-count or dot accents",
+      "cssHint": "Use under tiny badges or icon-only controls.",
+      "source": "artifacts/generated-ui/extracted/hover-marks/sprite-37-23.png",
+      "sourceFile": "sprite-37-23.png",
+      "sourceWidth": 211,
+      "sourceHeight": 211,
+      "width": 235,
+      "height": 235,
+      "aspect": 1.0,
+      "hasAlpha": true,
+      "sizeKB": 14.2
+    },
+    {
+      "filename": "generated-active-seal-cinnabar-01.webp",
+      "category": "active seal accents",
+      "use": "irregular cinnabar active accent for seal-flavored UI states",
+      "cssHint": "Use as a small corner stamp or active route indicator.",
+      "source": "artifacts/generated-ui/extracted/hover-marks/sprite-37-28.png",
+      "sourceFile": "sprite-37-28.png",
+      "sourceWidth": 230,
+      "sourceHeight": 241,
+      "width": 244,
+      "height": 255,
+      "aspect": 0.952,
+      "hasAlpha": true,
+      "sizeKB": 38.4
+    },
+    {
+      "filename": "generated-active-seal-cinnabar-02.webp",
+      "category": "active seal accents",
+      "use": "compact cinnabar seal blot for selected filters and tabs",
+      "cssHint": "Use beside active labels or as a selected-state stamp.",
+      "source": "artifacts/generated-ui/extracted/hover-marks/sprite-37-29.png",
+      "sourceFile": "sprite-37-29.png",
+      "sourceWidth": 244,
+      "sourceHeight": 242,
+      "width": 244,
+      "height": 242,
+      "aspect": 1.009,
+      "hasAlpha": true,
+      "sizeKB": 29.8
+    },
+    {
+      "filename": "generated-active-seal-cinnabar-03.webp",
+      "category": "active seal accents",
+      "use": "soft cinnabar stamp accent for button or tab active state",
+      "cssHint": "Use as a muted 24-40px active accent; avoid text overlay.",
+      "source": "artifacts/generated-ui/extracted/hover-marks/sprite-37-31.png",
+      "sourceFile": "sprite-37-31.png",
+      "sourceWidth": 254,
+      "sourceHeight": 258,
+      "width": 244,
+      "height": 247,
+      "aspect": 0.987,
+      "hasAlpha": true,
+      "sizeKB": 40.1
+    }
+  ],
+  "rejected": [
+    {
+      "sourceFile": "sprite-19-10.png",
+      "reason": "Rejected as duplicate-like and too compressed for a reliable hover underline."
+    },
+    {
+      "sourceFile": "sprite-19-4.png",
+      "reason": "Rejected as duplicate-like: similar to selected thin underline strokes with less distinct silhouette."
+    },
+    {
+      "sourceFile": "sprite-23-43.png",
+      "reason": "Rejected as a duplicate-like active ring with a less balanced crop."
+    },
+    {
+      "sourceFile": "sprite-23-47.png",
+      "reason": "Rejected as a weaker active-ring candidate with less useful contrast than the selected black, gray, and cinnabar rings."
+    },
+    {
+      "sourceFile": "sprite-37-34.png",
+      "reason": "Rejected because the mark is heavier and less legible at small hover/accent sizes."
+    },
+    {
+      "sourceFile": "sprite-37-35.png",
+      "reason": "Rejected as duplicate-like and less clean than the selected dark hover blots."
+    }
+  ]
+}
