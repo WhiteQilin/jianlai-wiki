@@ -30,6 +30,11 @@ Thumbs.db
 .qoder/
 .roo/
 .windsurf/
+.agents/
+.impeccable/
+.kilo/
+.playwright-mcp/
+.trae/documents/
 
 # Raw official/media archives - local only
 public/images/official/
@@ -38,6 +43,12 @@ public/videos/official/
 public/videos/raw/
 public/media/official/
 public/media/raw/
+
+# Local generated reports/artifacts
+artifacts/
+
+# Local media cache / heavy curated videos
+public/videos/curated/*.mp4
 
 # Design/reference drafts
 design-references/
