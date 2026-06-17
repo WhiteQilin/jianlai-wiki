@@ -568,7 +568,8 @@ function timelineRecordMeta(record?: TimelineNavigationRecord | null) {
 }
 
 .section-timeline :deep(.name-seal),
-.section-timeline :deep(.seal-variant-outline) {
+.section-timeline :deep(.seal-variant-outline),
+.section-timeline :deep(.seal-stamp) {
   color: #d4af37;
   border-color: rgba(212, 175, 55, 0.54);
   background: rgba(212, 175, 55, 0.06);
@@ -1078,7 +1079,8 @@ function timelineRecordMeta(record?: TimelineNavigationRecord | null) {
 }
 
 .section-swordsmanship :deep(.name-seal),
-.section-swordsmanship :deep(.seal-variant-outline) {
+.section-swordsmanship :deep(.seal-variant-outline),
+.section-swordsmanship :deep(.seal-stamp) {
   color: var(--sword-cinnabar);
   border-color: var(--sword-cinnabar);
   background: rgba(216, 90, 82, 0.08);
@@ -1461,7 +1463,8 @@ function timelineRecordMeta(record?: TimelineNavigationRecord | null) {
   }
 
   .section-swordsmanship :deep(.name-seal),
-  .section-swordsmanship :deep(.seal-variant-outline) {
+  .section-swordsmanship :deep(.seal-variant-outline),
+  .section-swordsmanship :deep(.seal-stamp) {
     box-shadow: none;
   }
 
