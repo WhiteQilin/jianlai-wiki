@@ -11,7 +11,14 @@ defineProps<{
   <div class="name-block">
     <div class="name-primary">
       <h1 class="name-en">{{ nameEn }}</h1>
-      <span v-if="seal" class="name-seal">{{ seal }}</span>
+      <UiSealStamp
+        v-if="seal"
+        :text="seal"
+        variant="carved"
+        size="md"
+        writing="vertical"
+        :decorative="true"
+      />
     </div>
     <div class="name-secondary">
       <span class="name-zh">{{ nameZh }}</span>
@@ -47,20 +54,7 @@ defineProps<{
   overflow-wrap: anywhere;
 }
 
-.name-seal {
-  font-family: var(--font-zh-display);
-  color: var(--c-seal-red);
-  border: 2px solid var(--c-seal-red-soft);
-  background: rgba(184, 42, 42, 0.05);
-  padding: 6px 8px;
-  font-size: 1.4rem;
-  border-radius: 2px;
-  line-height: 1;
-  writing-mode: vertical-rl;
-  text-orientation: upright;
-  transform: rotate(-3deg);
-  box-shadow: 2px 2px 0 rgba(184, 42, 42, 0.1);
-}
+/* SealStamp replaces inline .name-seal — sizing handled by component props */
 
 .name-secondary {
   display: flex;
@@ -92,7 +86,7 @@ defineProps<{
   .name-en { font-size: clamp(2.35rem, 13vw, 3.2rem); }
   .name-zh { font-size: 2.2rem; letter-spacing: 0.1em; }
   .name-primary { gap: 0.8rem; flex-wrap: wrap; }
-  .name-seal { font-size: 1.2rem; padding: 4px 6px; }
+  :deep(.seal-stamp) { font-size: 0.88rem; }
   .name-secondary { gap: 1rem; flex-wrap: wrap; min-width: 0; }
 }
 </style>

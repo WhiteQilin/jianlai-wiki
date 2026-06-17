@@ -178,7 +178,7 @@ const hasContent = computed(() => Boolean(resolvedImage.value) || mainFields.val
 <template>
   <aside v-if="hasContent" class="entry-infobox" :class="`mode-${heroMode}`">
     <div class="infobox-heading">
-      <SealBadge :text="fallbackChar" variant="outline" shape="square" />
+      <UiSealStamp :text="fallbackChar" variant="carved" size="sm" writing="vertical" :decorative="true" />
       <div>
         <p class="eyebrow">{{ profile.title }}</p>
         <h2>{{ page?.title }}</h2>
