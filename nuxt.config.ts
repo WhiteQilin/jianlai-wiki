@@ -19,7 +19,7 @@ export default defineNuxtConfig({
   sitemap: {
     // /admin is an editor-only route (never prerendered) and /titles is an
     // intentionally ungenerated section — keep both out of the sitemap.
-    exclude: ['/admin', '/titles', '/titles/**'],
+    exclude: ['/admin', '/titles', '/titles/**', '/dev', '/dev/**'],
   },
   // The dev-only font override stops localhost from fetching the decorative R2
   // font (and the resulting CORS/font console noise). `import.meta.dev` is false
@@ -35,6 +35,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   compatibilityDate: '2024-04-03',
   routeRules: {
-    '/admin': { prerender: false }
+    '/admin': { prerender: false },
+    '/dev/**': { prerender: false }
   }
 })
