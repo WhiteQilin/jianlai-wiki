@@ -44,7 +44,7 @@ entries:
     note: A sword cultivator and the head of the Hundred Sword Immortals of Tuoyue Mountain in the Wild World.
   - rank: Unranked
     name: Liu Cai (刘材)
-    link: /characters/liu-cai
+    link: ""
     note: A mountain-and-marsh rogue sword cultivator of Haoran Heaven who entered the list at merely the Golden Core realm.
   - rank: Unranked
     name: She Yue (赊月)
