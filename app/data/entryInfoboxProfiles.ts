@@ -173,7 +173,6 @@ export const ENTRY_INFOBOX_PROFILES: Record<PublicSection, EntryInfoboxProfile> 
       { key: 'category', label: 'Category', kind: 'badge' },
       { key: 'subcategory', label: 'Classification', kind: 'chip' },
       { key: 'listType', label: 'List Type', kind: 'text' },
-      { key: 'entries', label: 'Entries', kind: 'ranking-list', maxItems: 8 },
       { key: 'related', label: 'Related Entries', kind: 'list', maxItems: 8 },
     ],
     footerFields: SOURCE_FOOTER,

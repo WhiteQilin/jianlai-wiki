@@ -166,6 +166,21 @@ function timelineRecordMeta(record?: TimelineNavigationRecord | null) {
         </header>
       </ScrollReveal>
 
+      <ScrollReveal
+        v-if="section === 'rankings' && page?.entries?.length"
+        animation="reveal-fade-up"
+        delay="stagger-2"
+      >
+        <div data-rankings-register="true">
+          <RankingsRankingRegister
+            :entries="page.entries"
+            :category="page.category || 'Named-List'"
+            :list-type="page.listType || page.subcategory || 'Ranking List'"
+            :verification-status="page.verificationStatus"
+          />
+        </div>
+      </ScrollReveal>
+
       <div class="article-layout">
         <aside class="article-sidebar">
           <ScrollReveal class="infobox-sticky-frame" animation="reveal-fade-up" delay="stagger-2">
@@ -1043,6 +1058,21 @@ function timelineRecordMeta(record?: TimelineNavigationRecord | null) {
 
 .section-rankings :deep(.ranking-note) {
   color: color-mix(in srgb, var(--rankings-ink) 62%, transparent);
+}
+
+/* Suppress Markdown ## The List table when data-driven RankingRegister is rendered.
+   Use ~ (general sibling) not + (adjacent) because a paragraph precedes the table
+   in the rendered Markdown. */
+.section-rankings:has([data-rankings-register="true"]) :deep(.mdc-prose h2[id="the-list"]),
+.section-rankings:has([data-rankings-register="true"]) :deep(.mdc-prose h2[id="the-list-1"]),
+.section-rankings:has([data-rankings-register="true"]) :deep(.mdc-prose h2[id="the-list-2"]) {
+  display: none;
+}
+
+.section-rankings:has([data-rankings-register="true"]) :deep(.mdc-prose h2[id="the-list"] ~ table),
+.section-rankings:has([data-rankings-register="true"]) :deep(.mdc-prose h2[id="the-list-1"] ~ table),
+.section-rankings:has([data-rankings-register="true"]) :deep(.mdc-prose h2[id="the-list-2"] ~ table) {
+  display: none;
 }
 
 @media (max-width: 640px) {
