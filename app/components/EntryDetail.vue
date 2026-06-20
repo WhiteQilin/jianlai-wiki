@@ -143,6 +143,10 @@ function timelineRecordMeta(record?: TimelineNavigationRecord | null) {
         </nav>
       </ScrollReveal>
 
+      <ScrollReveal v-if="section === 'rankings'" animation="reveal-fade-up" delay="stagger-1">
+        <RankingsRankingContextBar :page="page" />
+      </ScrollReveal>
+
       <ScrollReveal animation="reveal-fade-up" delay="stagger-1">
         <header class="entry-header">
           <div class="header-copy">
@@ -896,6 +900,169 @@ function timelineRecordMeta(record?: TimelineNavigationRecord | null) {
   .section-timeline .timeline-reader-card:hover,
   .section-timeline .timeline-reader-card:focus-visible {
     transform: none;
+  }
+}
+
+.entry-detail-shell.section-rankings {
+  --rankings-accent: #8a7448;
+  --rankings-paper: #f6ecd8;
+  --rankings-ink: #332c22;
+  --rankings-mist: #e8dfcc;
+  --rankings-frame: rgba(149, 113, 58, 0.32);
+  --rankings-seal: #aa352d;
+  --rankings-gold: #b29555;
+  --rankings-title-ink: #2c251b;
+  min-height: 100dvh;
+  background:
+    radial-gradient(circle at 16% 6%, rgba(178, 149, 85, 0.1), transparent 26rem),
+    radial-gradient(circle at 88% 16%, rgba(170, 53, 45, 0.055), transparent 24rem),
+    linear-gradient(180deg, color-mix(in srgb, var(--rankings-paper) 56%, var(--c-paper)), var(--c-paper) 46%);
+}
+
+.section-rankings .breadcrumb {
+  margin-bottom: 1.15rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--rankings-frame) 54%, transparent);
+}
+
+.section-rankings .breadcrumb a:hover {
+  color: var(--rankings-seal);
+}
+
+.section-rankings .current {
+  color: var(--rankings-title-ink);
+}
+
+.section-rankings .entry-header {
+  border-bottom-color: color-mix(in srgb, var(--rankings-frame) 72%, transparent);
+}
+
+.section-rankings .entry-header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: min(11rem, 40vw);
+  height: 2px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--rankings-gold) 78%, transparent), transparent);
+}
+
+.section-rankings .entry-badge {
+  color: var(--rankings-seal);
+  border-color: color-mix(in srgb, var(--rankings-seal) 36%, transparent);
+  background: color-mix(in srgb, var(--rankings-seal) 6%, transparent);
+}
+
+.section-rankings .entry-chip {
+  color: color-mix(in srgb, var(--rankings-ink) 74%, transparent);
+  border-color: color-mix(in srgb, var(--rankings-frame) 54%, transparent);
+  background: color-mix(in srgb, var(--rankings-paper) 56%, transparent);
+}
+
+.section-rankings :where(a, button):focus-visible,
+.section-rankings :deep(a:focus-visible),
+.section-rankings :deep(button:focus-visible) {
+  outline: 2px solid var(--rankings-seal);
+  outline-offset: 3px;
+}
+
+.section-rankings :deep(.mdc-prose table) {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 1.5rem 0 2.5rem;
+  overflow-x: auto;
+  border: 1px solid color-mix(in srgb, var(--rankings-frame) 70%, transparent);
+  border-collapse: collapse;
+  background: color-mix(in srgb, var(--rankings-paper) 72%, white);
+}
+
+.section-rankings :deep(.mdc-prose thead),
+.section-rankings :deep(.mdc-prose tbody) {
+  display: table;
+  width: 100%;
+  min-width: 44rem;
+  border-collapse: collapse;
+}
+
+.section-rankings :deep(.mdc-prose th) {
+  padding: 0.72rem 0.82rem;
+  color: color-mix(in srgb, var(--rankings-accent) 84%, var(--rankings-ink));
+  border: 1px solid color-mix(in srgb, var(--rankings-frame) 62%, transparent);
+  background: color-mix(in srgb, var(--rankings-mist) 72%, white);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  line-height: 1.2;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.section-rankings :deep(.mdc-prose td) {
+  padding: 0.78rem 0.82rem;
+  color: color-mix(in srgb, var(--rankings-ink) 82%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rankings-frame) 46%, transparent);
+  font-size: 0.98rem;
+  line-height: 1.55;
+  vertical-align: top;
+}
+
+.section-rankings :deep(.mdc-prose tbody tr:nth-child(even) td) {
+  background: color-mix(in srgb, var(--rankings-paper) 54%, transparent);
+}
+
+.section-rankings :deep(.mdc-prose td:first-child) {
+  width: 7.5rem;
+  color: var(--rankings-seal);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.entry-detail-shell.section-rankings :deep(.entry-infobox) {
+  border-color: color-mix(in srgb, var(--rankings-frame) 74%, transparent);
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--rankings-paper) 78%, white), color-mix(in srgb, var(--rankings-mist) 58%, white)),
+    url('/images/textures/ink-wash-02.webp');
+  background-size: cover;
+  background-blend-mode: normal, multiply;
+}
+
+.entry-detail-shell.section-rankings :deep(.ranking-item) {
+  border: 1px solid color-mix(in srgb, var(--rankings-frame) 58%, transparent);
+  border-left-width: 1px;
+  background: color-mix(in srgb, var(--rankings-paper) 64%, transparent);
+}
+
+.section-rankings :deep(.ranking-rank) {
+  color: var(--rankings-seal);
+}
+
+.section-rankings :deep(.ranking-note) {
+  color: color-mix(in srgb, var(--rankings-ink) 62%, transparent);
+}
+
+@media (max-width: 640px) {
+  .section-rankings .mdc-content {
+    padding-top: calc(var(--header-height) + 1.5rem);
+  }
+
+  .section-rankings :deep(.name-en) {
+    font-size: clamp(2rem, 10vw, 2.9rem);
+    line-height: 1.08;
+  }
+
+  .section-rankings :deep(.mdc-prose table) {
+    font-size: 0.92rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-rankings .entry-header::after {
+    box-shadow: none;
   }
 }
 
