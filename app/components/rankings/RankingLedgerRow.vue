@@ -22,9 +22,17 @@ defineProps<{
 }>()
 
 function rankLabel(rank?: string | number) {
-  if (rank === undefined || rank === null || rank === '') return 'Listed'
+  if (rank === undefined || rank === null || rank === '') return null
   return String(rank)
 }
+
+function isNumericRank(rank?: string | number) {
+  const r = rankLabel(rank)
+  if (!r) return false
+  return r.match(/^\d+$/) !== null
+}
+
+const CIRCLES = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩']
 </script>
 
 <template>
@@ -46,16 +54,18 @@ function rankLabel(rank?: string | number) {
 
       <p class="ledger-row-description">{{ record.description }}</p>
 
-      <ol v-if="record.previewEntries.length" class="ledger-preview" aria-label="Preview entries">
-        <li v-for="entry in record.previewEntries" :key="`${entry.rank || 'listed'}-${entry.name}`">
-          <span class="preview-rank">{{ rankLabel(entry.rank) }}</span>
+      <div v-if="record.previewEntries.length" class="ledger-preview" aria-label="Preview entries">
+        <template v-for="(entry, i) in record.previewEntries" :key="`${entry.rank || 'listed'}-${entry.name}`">
+          <span class="preview-marker" aria-hidden="true">{{ CIRCLES[i] || '' }}</span>
+          <span class="preview-rank" v-if="isNumericRank(entry.rank)">{{ rankLabel(entry.rank) }}</span>
           <span class="preview-name">{{ entry.name }}</span>
-        </li>
-      </ol>
+          <span v-if="i < record.previewEntries.length - 1" class="preview-sep" aria-hidden="true">;</span>
+        </template>
+      </div>
       <p v-else class="ledger-preview-empty">Roster awaiting inscription.</p>
     </div>
 
-    <dl class="ledger-row-facts" aria-label="Ledger facts">
+    <dl class="ledger-row-facts" aria-label="Register notes">
       <div>
         <dt>Entries</dt>
         <dd>{{ record.entryCount }}</dd>
@@ -79,40 +89,23 @@ function rankLabel(rank?: string | number) {
   grid-template-columns: minmax(0, 1fr) minmax(11rem, 15rem);
   gap: clamp(1.1rem, 3vw, 2rem);
   padding: clamp(1.15rem, 2.4vw, 1.6rem);
+  padding-left: 1.05rem;
   color: var(--rankings-ink, #332c22);
   background:
     linear-gradient(135deg, color-mix(in srgb, var(--rankings-paper, #f6ecd8) 92%, white), color-mix(in srgb, var(--rankings-mist, #e8dfcc) 72%, white)),
     radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--rankings-gold, #b29555) 10%, transparent), transparent 18rem);
   border: 1px solid color-mix(in srgb, var(--rankings-frame, rgba(149, 113, 58, 0.32)) 78%, transparent);
+  border-left-width: 2px;
+  border-left-color: color-mix(in srgb, var(--rankings-frame, rgba(149, 113, 58, 0.42)) 82%, transparent);
   transition:
-    border-color 0.24s ease,
+    border-left-color 0.24s ease,
     background-color 0.24s ease,
     transform 0.24s ease;
 }
 
-.ranking-ledger-row::before,
-.ranking-ledger-row::after {
-  content: '';
-  position: absolute;
-  pointer-events: none;
-}
-
-.ranking-ledger-row::before {
-  inset: 0.45rem;
-  border: 1px solid color-mix(in srgb, var(--rankings-frame, rgba(149, 113, 58, 0.32)) 34%, transparent);
-}
-
-.ranking-ledger-row::after {
-  width: 3.2rem;
-  height: 0.18rem;
-  top: 0.88rem;
-  right: 0.95rem;
-  background: color-mix(in srgb, var(--rankings-seal, #aa352d) 58%, transparent);
-}
-
 .ranking-ledger-row:hover {
-  border-color: color-mix(in srgb, var(--rankings-gold, #b29555) 72%, var(--rankings-frame, rgba(149, 113, 58, 0.32)));
-  transform: translateY(-2px);
+  border-left-color: color-mix(in srgb, var(--rankings-gold, #b29555) 72%, var(--rankings-frame, rgba(149, 113, 58, 0.32)));
+  transform: translateY(-1px);
 }
 
 .ledger-row-main,
@@ -191,46 +184,45 @@ function rankLabel(rank?: string | number) {
 .ledger-preview {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.46rem;
-  margin: 1rem 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.ledger-preview li {
-  display: inline-flex;
   align-items: baseline;
-  max-width: 100%;
-  min-height: 2rem;
-  color: var(--rankings-ink, #332c22);
-  border: 1px solid color-mix(in srgb, var(--rankings-frame, rgba(149, 113, 58, 0.32)) 52%, transparent);
-  background: color-mix(in srgb, white 42%, var(--rankings-paper, #f6ecd8));
+  gap: 0.28rem;
+  margin: 0.95rem 0 0;
 }
 
-.preview-rank {
-  align-self: stretch;
-  display: inline-flex;
-  align-items: center;
-  padding: 0.32rem 0.45rem;
+.ledger-preview .preview-marker {
   color: var(--rankings-seal, #aa352d);
-  border-right: 1px solid color-mix(in srgb, var(--rankings-frame, rgba(149, 113, 58, 0.32)) 46%, transparent);
-  font-family: var(--font-mono);
-  font-size: 0.66rem;
-  letter-spacing: 0.06em;
-  line-height: 1.1;
-  text-transform: uppercase;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  flex-shrink: 0;
 }
 
-.preview-name {
-  min-width: 0;
-  padding: 0.32rem 0.52rem;
-  font-size: 0.84rem;
-  line-height: 1.25;
-  overflow-wrap: anywhere;
+.ledger-preview .preview-rank {
+  color: color-mix(in srgb, var(--rankings-seal, #aa352d) 68%, var(--rankings-ink, #332c22));
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.ledger-preview .preview-name {
+  color: color-mix(in srgb, var(--rankings-ink, #332c22) 88%, transparent);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+
+.ledger-preview .preview-sep {
+  color: color-mix(in srgb, var(--rankings-frame, rgba(149, 113, 58, 0.28)) 52%, transparent);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  margin-left: 0.1rem;
+  flex-shrink: 0;
 }
 
 .ledger-preview-empty {
-  margin: 1rem 0 0;
+  margin: 0.95rem 0 0;
   color: color-mix(in srgb, var(--rankings-ink, #332c22) 58%, transparent);
   font-family: var(--font-mono);
   font-size: 0.72rem;
@@ -274,6 +266,7 @@ function rankLabel(rank?: string | number) {
 @media (max-width: 860px) {
   .ranking-ledger-row {
     grid-template-columns: 1fr;
+    padding-left: 0.95rem;
   }
 
   .ledger-row-facts {
@@ -284,10 +277,7 @@ function rankLabel(rank?: string | number) {
 @media (max-width: 620px) {
   .ranking-ledger-row {
     padding: 1rem;
-  }
-
-  .ranking-ledger-row::before {
-    inset: 0.32rem;
+    padding-left: 0.9rem;
   }
 
   .ledger-row-heading {
@@ -300,6 +290,25 @@ function rankLabel(rank?: string | number) {
 
   .ledger-row-facts {
     grid-template-columns: 1fr;
+  }
+
+  .ledger-preview {
+    gap: 0.2rem;
+  }
+
+  .ledger-preview .preview-name {
+    font-size: 0.86rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .ledger-preview .preview-sep {
+    display: none;
+  }
+
+  .ledger-preview {
+    flex-direction: column;
+    gap: 0.2rem;
   }
 }
 

@@ -158,6 +158,12 @@ useSeoMeta({
         <RankingsRankingLedger :records="filteredItems" />
       </ScrollReveal>
 
+      <ScrollReveal v-if="filteredItems.length > 0 && activeCategory === 'All'" animation="reveal-fade-up" delay="stagger-3">
+        <p class="rankings-register-count">
+          <span class="count-number">{{ totalEntries }}</span> inscribed entries across {{ ledgerRecords.length }} registers
+        </p>
+      </ScrollReveal>
+
       <ScrollReveal v-else animation="reveal-fade-up">
         <section class="rankings-empty" aria-live="polite">
           <p class="rankings-empty-seal" aria-hidden="true">榜</p>
@@ -230,14 +236,16 @@ useSeoMeta({
   font-family: var(--font-zh-display);
   font-size: clamp(11rem, 24vw, 22rem);
   line-height: 1;
-  opacity: 0.055;
+  opacity: 0.09;
   pointer-events: none;
 }
 
 .rankings-hero-frame {
   position: absolute;
   inset: calc(var(--header-height) + 1.4rem) clamp(1rem, 5vw, 5rem) 1.25rem;
-  border: 1px solid color-mix(in srgb, var(--rankings-frame) 48%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rankings-frame) 42%, transparent);
+  border-left-width: 2px;
+  border-left-color: color-mix(in srgb, var(--rankings-frame) 58%, transparent);
   pointer-events: none;
 }
 
@@ -288,9 +296,13 @@ useSeoMeta({
 }
 
 .rankings-ledger-summary {
-  display: grid;
-  gap: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
   margin: 0;
+  border: 1px solid color-mix(in srgb, var(--rankings-frame) 52%, transparent);
+  border-left: 2px solid color-mix(in srgb, var(--rankings-frame) 68%, transparent);
+  background: color-mix(in srgb, var(--rankings-paper) 52%, transparent);
 }
 
 .rankings-ledger-summary div {
@@ -298,9 +310,12 @@ useSeoMeta({
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 1rem;
   align-items: baseline;
-  padding: 0.85rem 1rem;
-  border: 1px solid color-mix(in srgb, var(--rankings-frame) 58%, transparent);
-  background: color-mix(in srgb, var(--rankings-paper) 68%, transparent);
+  padding: 0.78rem 1rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--rankings-frame) 38%, transparent);
+}
+
+.rankings-ledger-summary div:last-child {
+  border-bottom: none;
 }
 
 .rankings-ledger-summary dt {
@@ -406,6 +421,26 @@ useSeoMeta({
 .rankings-filter-button.is-active strong {
   color: var(--rankings-paper);
   border-color: color-mix(in srgb, var(--rankings-paper) 44%, transparent);
+}
+
+.rankings-register-count {
+  margin: 1.5rem 0 0;
+  padding: 0.85rem 0;
+  border-top: 1px solid color-mix(in srgb, var(--rankings-frame) 48%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--rankings-frame) 48%, transparent);
+  color: color-mix(in srgb, var(--rankings-ink) 62%, transparent);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.rankings-register-count .count-number {
+  color: var(--rankings-seal);
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 500;
 }
 
 .rankings-empty {
