@@ -38,11 +38,11 @@ entries:
     note: Patriarch of the Chen clan and one of the great sword immortals who carved words on the wall.
   - rank: Unranked
     name: Qi Tingji (齐廷济)
-    link: /characters/qi-tingji
+    link: ""
     note: Patriarch of the Qi clan, a peak sword immortal with great ambition who also carved words on the wall.
   - rank: Unranked
     name: Lu Zhi (陆芝)
-    link: /characters/lu-zhi
+    link: ""
     note: A peerless female great sword immortal renowned for her lethal sword arts.
   - rank: Unranked
     name: Xiao Xun (萧愻)
@@ -50,7 +50,7 @@ entries:
     note: The former Hidden Official who later defected to the Wild World.
   - rank: Unranked
     name: A Liang (阿良)
-    link: /characters/aliang
+    link: ""
     note: A foreign sword immortal who earned his place among the peak ten through unparalleled combat merit.
   - rank: Unranked
     name: Lao Long'er (老聋儿)
