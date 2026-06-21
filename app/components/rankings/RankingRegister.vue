@@ -38,6 +38,7 @@ const documentKicker = computed(() => {
       <div class="register-header-left">
         <span class="register-kicker">{{ documentKicker }}</span>
         <span class="register-category">{{ categoryLabel }}</span>
+        <UiBrushUnderline tone="section" weight="regular" width="medium" class="register-header-underline" />
       </div>
       <span class="register-seal" aria-hidden="true">榜</span>
     </header>
@@ -91,8 +92,13 @@ const documentKicker = computed(() => {
 .register-header-left {
   display: flex;
   flex-direction: column;
-  gap: 0.18rem;
+  gap: 0.22rem;
   min-width: 0;
+}
+
+.register-header-underline {
+  margin-top: 0.32rem;
+  pointer-events: none;
 }
 
 .register-kicker {

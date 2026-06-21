@@ -53,13 +53,23 @@ const isTied = computed(() => {
 
 const editorialStatus = computed(() => {
   const raw = rankStr.value.toLowerCase()
-  if (raw === 'unranked') return { label: 'Member', variant: 'member' }
-  if (raw === 'listed / candidate' || raw === 'candidate' || raw === 'listed') return { label: 'Awaiting Confirmation', variant: 'candidate' }
+  if (raw === 'unranked') {
+    return { label: 'Member', tone: 'ghost' as const, glyph: '\u25C6' }
+  }
+  if (raw === 'listed / candidate' || raw === 'candidate' || raw === 'listed') {
+    return { label: 'Awaiting Confirmation', tone: 'bronze' as const, glyph: '\u2014' }
+  }
   if (raw.startsWith('removed')) {
     const match = raw.match(/removed\s*\(?\s*former\s*(\d+)/i)
     const num = match ? match[1] : null
-    if (num) return { label: `Former ${num}${ordinalSuffix(Number(num))} — Struck from Record`, variant: 'removed' }
-    return { label: 'Struck from Record', variant: 'removed' }
+    if (num) {
+      return {
+        label: `Former ${num}${ordinalSuffix(Number(num))} \u2014 Struck from Record`,
+        tone: 'cinnabar' as const,
+        glyph: '\u2425',
+      }
+    }
+    return { label: 'Struck from Record', tone: 'cinnabar' as const, glyph: '\u2425' }
   }
   return null
 })
@@ -86,7 +96,7 @@ const rankMark = computed(() => {
 })
 
 const rankVariant = computed(() => {
-  if (editorialStatus.value) return editorialStatus.value.variant
+  if (editorialStatus.value) return editorialStatus.value.tone
   if (displayRank.value) return 'ranked'
   return 'unmarked'
 })
@@ -106,17 +116,17 @@ const rankVariant = computed(() => {
       <template v-if="rankMark && isNumericRank">
         <span class="rank-numeral" aria-hidden="true">{{ rankMark }}</span>
       </template>
-      <template v-else-if="rankVariant === 'member'">
-        <span class="rank-glyph member-glyph" aria-hidden="true">&#9670;</span>
-        <span class="rank-label status-label">{{ editorialStatus!.label }}</span>
+      <template v-else-if="rankVariant === 'ghost'">
+        <span class="rank-glyph member-glyph" aria-hidden="true">{{ editorialStatus!.glyph }}</span>
+        <UiCinnabarTag tone="ghost" size="sm" class="status-tag">{{ editorialStatus!.label }}</UiCinnabarTag>
       </template>
-      <template v-else-if="rankVariant === 'candidate'">
-        <span class="rank-glyph candidate-glyph" aria-hidden="true">&#8212;</span>
-        <span class="rank-label status-label">{{ editorialStatus!.label }}</span>
+      <template v-else-if="rankVariant === 'bronze'">
+        <span class="rank-glyph candidate-glyph" aria-hidden="true">{{ editorialStatus!.glyph }}</span>
+        <UiCinnabarTag tone="bronze" size="sm" class="status-tag">{{ editorialStatus!.label }}</UiCinnabarTag>
       </template>
-      <template v-else-if="rankVariant === 'removed'">
-        <span class="rank-glyph removed-glyph" aria-hidden="true">&#9249;</span>
-        <span class="rank-label status-label removed-label">{{ editorialStatus!.label }}</span>
+      <template v-else-if="rankVariant === 'cinnabar'">
+        <span class="rank-glyph removed-glyph" aria-hidden="true">{{ editorialStatus!.glyph }}</span>
+        <UiCinnabarTag tone="cinnabar" size="sm" class="status-tag">{{ editorialStatus!.label }}</UiCinnabarTag>
       </template>
       <template v-else>
         <span class="rank-glyph unmarked-glyph" aria-hidden="true">&#8212;</span>
@@ -164,27 +174,27 @@ const rankVariant = computed(() => {
   background: color-mix(in srgb, var(--rankings-mist, #e8dfcc) 36%, var(--rankings-paper, #f6ecd8));
 }
 
-.register-row.variant-removed {
+.register-row.variant-cinnabar {
   background: color-mix(in srgb, var(--rankings-paper, #f6ecd8) 72%, transparent);
 }
 
-.register-row.variant-removed.is-odd {
+.register-row.variant-cinnabar.is-odd {
   background: color-mix(in srgb, var(--rankings-paper, #f6ecd8) 56%, transparent);
 }
 
-.register-row.variant-removed .row-name,
-.register-row.variant-removed .row-annotation {
+.register-row.variant-cinnabar .row-name,
+.register-row.variant-cinnabar .row-annotation {
   text-decoration: line-through;
   text-decoration-color: color-mix(in srgb, var(--rankings-seal, #aa352d) 42%, transparent);
   opacity: 0.72;
 }
 
-.register-row.variant-candidate .row-name {
+.register-row.variant-bronze .row-name {
   font-style: italic;
   color: color-mix(in srgb, var(--rankings-ink, #332c22) 72%, transparent);
 }
 
-.register-row.variant-candidate .row-annotation {
+.register-row.variant-bronze .row-annotation {
   font-style: italic;
 }
 
@@ -193,10 +203,10 @@ const rankVariant = computed(() => {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  gap: 0.2rem;
-  min-width: 5.25rem;
-  max-width: 5.5rem;
-  padding: 0.82rem 0.75rem 0.82rem 0.9rem;
+  gap: 0.32rem;
+  min-width: 6.4rem;
+  max-width: 6.6rem;
+  padding: 0.82rem 0.55rem 0.82rem 0.9rem;
   border-right: 1px solid color-mix(in srgb, var(--rankings-frame, rgba(149, 113, 58, 0.24)) 38%, transparent);
   background: color-mix(in srgb, var(--rankings-paper, #f6ecd8) 48%, transparent);
 }
@@ -220,7 +230,7 @@ const rankVariant = computed(() => {
 
 .rank-glyph {
   display: block;
-  font-size: 0.58rem;
+  font-size: 0.66rem;
   line-height: 1;
   letter-spacing: 0.06em;
   text-align: center;
@@ -231,39 +241,26 @@ const rankVariant = computed(() => {
 }
 
 .candidate-glyph {
-  color: color-mix(in srgb, var(--rankings-accent, #8a7448) 48%, transparent);
+  color: color-mix(in srgb, var(--rankings-accent, #8a7448) 64%, transparent);
 }
 
 .removed-glyph {
-  color: color-mix(in srgb, var(--rankings-seal, #aa352d) 48%, transparent);
+  color: color-mix(in srgb, var(--rankings-seal, #aa352d) 64%, transparent);
 }
 
 .unmarked-glyph {
   color: color-mix(in srgb, var(--rankings-frame, rgba(149, 113, 58, 0.28)) 48%, transparent);
 }
 
-.rank-label {
-  display: block;
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  letter-spacing: 0.06em;
-  line-height: 1.2;
+.status-tag {
   text-align: center;
-  text-transform: uppercase;
-}
-
-.status-label {
-  color: color-mix(in srgb, var(--rankings-ink, #332c22) 64%, transparent);
-  font-size: 0.58rem;
-  max-width: 4rem;
-  word-break: break-word;
-  hyphens: auto;
   text-transform: none;
   letter-spacing: 0.02em;
-}
-
-.removed-label {
-  color: color-mix(in srgb, var(--rankings-seal, #aa352d) 58%, transparent);
+  line-height: 1.2;
+  max-width: 4.6rem;
+  white-space: normal;
+  word-break: break-word;
+  hyphens: auto;
 }
 
 .row-content {
@@ -322,43 +319,61 @@ const rankVariant = computed(() => {
   word-break: break-word;
 }
 
-@media (max-width: 390px) {
-  .register-row {
-    grid-template-columns: auto 1fr;
-  }
-
+@media (max-width: 620px) {
   .row-rank-cell {
-    min-width: 4.25rem;
-    max-width: 4.5rem;
-    padding: 0.68rem 0.5rem 0.68rem 0.7rem;
-    gap: 0.15rem;
+    min-width: 5.6rem;
+    max-width: 5.8rem;
+    padding: 0.72rem 0.4rem 0.72rem 0.7rem;
+    gap: 0.28rem;
   }
 
   .rank-numeral {
-    width: 1.6rem;
-    height: 1.6rem;
-    font-size: 0.78rem;
+    width: 1.7rem;
+    height: 1.7rem;
+    font-size: 0.8rem;
   }
 
-  .rank-label {
+  .status-tag {
     font-size: 0.55rem;
+    padding: 0.1rem 0.32rem 0.12rem;
+    max-width: 4.2rem;
+  }
+}
+
+@media (max-width: 390px) {
+  .row-rank-cell {
+    min-width: 4.8rem;
+    max-width: 5rem;
+    padding: 0.6rem 0.3rem 0.6rem 0.55rem;
   }
 
-  .status-label {
-    font-size: 0.52rem;
-    max-width: 3.2rem;
+  .rank-numeral {
+    width: 1.55rem;
+    height: 1.55rem;
+    font-size: 0.74rem;
+  }
+
+  .rank-glyph {
+    font-size: 0.6rem;
+  }
+
+  .status-tag {
+    font-size: 0.5rem;
+    padding: 0.08rem 0.26rem 0.1rem;
+    max-width: 3.8rem;
+    letter-spacing: 0.01em;
   }
 
   .row-content {
-    padding: 0.68rem 0.75rem 0.65rem;
+    padding: 0.6rem 0.6rem 0.55rem;
   }
 
   .row-name {
-    font-size: 0.94rem;
+    font-size: 0.92rem;
   }
 
   .row-annotation {
-    font-size: 0.84rem;
+    font-size: 0.82rem;
   }
 }
 

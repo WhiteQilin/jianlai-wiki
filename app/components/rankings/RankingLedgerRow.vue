@@ -32,7 +32,7 @@ function isNumericRank(rank?: string | number) {
   return r.match(/^\d+$/) !== null
 }
 
-const CIRCLES = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩']
+const CIRCLES = ['\u2460', '\u2461', '\u2462', '\u2463', '\u2464', '\u2465', '\u2466', '\u2467', '\u2468', '\u2469']
 </script>
 
 <template>
@@ -43,12 +43,13 @@ const CIRCLES = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', 
           <NuxtLink :to="record.path" class="ledger-row-title">
             {{ record.title }}
           </NuxtLink>
+          <UiBrushUnderline tone="section" weight="regular" width="medium" class="ledger-row-underline" />
           <p v-if="record.chinese" class="ledger-row-chinese">{{ record.chinese }}</p>
         </div>
 
         <div class="ledger-row-meta" aria-label="Ranking classification">
-          <span>{{ record.category }}</span>
-          <span>{{ record.listType }}</span>
+          <UiCinnabarTag tone="section" size="sm">{{ record.category }}</UiCinnabarTag>
+          <UiCinnabarTag tone="ghost" size="sm">{{ record.listType }}</UiCinnabarTag>
         </div>
       </div>
 
@@ -72,7 +73,9 @@ const CIRCLES = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', 
       </div>
       <div>
         <dt>Verification</dt>
-        <dd>{{ record.verificationStatus }}</dd>
+        <dd>
+          <UiCinnabarTag tone="ghost" size="sm">{{ record.verificationStatus }}</UiCinnabarTag>
+        </dd>
       </div>
       <div v-if="record.lastUpdated">
         <dt>Updated</dt>
@@ -122,10 +125,13 @@ const CIRCLES = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', 
 }
 
 .ledger-row-title-block {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
 }
 
 .ledger-row-title {
+  display: inline-block;
   color: var(--rankings-title-ink, #2c251b);
   font-family: var(--font-heading);
   font-size: clamp(1.25rem, 2vw, 1.55rem);
@@ -140,8 +146,13 @@ const CIRCLES = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', 
   outline: none;
 }
 
+.ledger-row-underline {
+  margin: 0.38rem 0 0;
+  pointer-events: none;
+}
+
 .ledger-row-chinese {
-  margin: 0.28rem 0 0;
+  margin: 0.42rem 0 0;
   color: color-mix(in srgb, var(--rankings-accent, #8a7448) 82%, var(--rankings-ink, #332c22));
   font-family: var(--font-zh-display);
   font-size: 1rem;
@@ -153,23 +164,8 @@ const CIRCLES = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', 
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 0.38rem;
+  gap: 0.4rem;
   max-width: 18rem;
-}
-
-.ledger-row-meta span {
-  display: inline-flex;
-  align-items: center;
-  min-height: 1.72rem;
-  padding: 0.28rem 0.55rem;
-  color: var(--rankings-ink, #332c22);
-  border: 1px solid color-mix(in srgb, var(--rankings-frame, rgba(149, 113, 58, 0.32)) 62%, transparent);
-  background: color-mix(in srgb, var(--rankings-paper, #f6ecd8) 72%, transparent);
-  font-family: var(--font-mono);
-  font-size: 0.66rem;
-  letter-spacing: 0.08em;
-  line-height: 1.15;
-  text-transform: uppercase;
 }
 
 .ledger-row-description {
@@ -239,7 +235,7 @@ const CIRCLES = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', 
 
 .ledger-row-facts div {
   display: grid;
-  gap: 0.16rem;
+  gap: 0.22rem;
   padding: 0.62rem 0.72rem;
   border: 1px solid color-mix(in srgb, var(--rankings-frame, rgba(149, 113, 58, 0.32)) 48%, transparent);
   background: color-mix(in srgb, var(--rankings-paper, #f6ecd8) 62%, transparent);
@@ -286,6 +282,7 @@ const CIRCLES = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', 
 
   .ledger-row-meta {
     justify-content: flex-start;
+    max-width: none;
   }
 
   .ledger-row-facts {

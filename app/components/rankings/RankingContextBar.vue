@@ -41,9 +41,9 @@ const verificationLabel = computed(() => {
       </div>
     </dl>
 
-    <NuxtLink class="ranking-context-return" to="/rankings">
-      Return to Rankings
-    </NuxtLink>
+    <UiInkButton to="/rankings" tone="cinnabar" class="ranking-context-return">
+      Return to Register
+    </UiInkButton>
   </nav>
 </template>
 
@@ -98,51 +98,21 @@ const verificationLabel = computed(() => {
 }
 
 .ranking-context-return {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 2.45rem;
   align-self: center;
-  padding: 0.65rem 0.85rem;
-  color: var(--rankings-seal, #aa352d);
-  border: 1px solid color-mix(in srgb, var(--rankings-seal, #aa352d) 36%, transparent);
-  background: color-mix(in srgb, var(--rankings-seal, #aa352d) 6%, transparent);
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   letter-spacing: 0.12em;
-  line-height: 1.35;
   text-transform: uppercase;
-  text-decoration: none;
   white-space: nowrap;
-  transition:
-    border-color 0.24s ease,
-    background-color 0.24s ease,
-    color 0.24s ease;
-}
-
-.ranking-context-return:hover,
-.ranking-context-return:focus-visible {
-  color: var(--rankings-title-ink, #2c251b);
-  border-color: color-mix(in srgb, var(--rankings-seal, #aa352d) 68%, transparent);
-  background: color-mix(in srgb, var(--rankings-seal, #aa352d) 10%, transparent);
-  outline: none;
 }
 
 @media (max-width: 760px) {
   .ranking-context-bar {
     flex-direction: column;
+    align-items: stretch;
   }
 
   .ranking-context-return {
-    width: 100%;
-    white-space: normal;
-    text-align: center;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ranking-context-return {
-    transition: none;
+    align-self: flex-start;
   }
 }
 </style>
