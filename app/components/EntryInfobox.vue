@@ -2,6 +2,8 @@
 import { profileForSection, type InfoboxFieldProfile } from '~/data/entryInfoboxProfiles'
 import { createEntryResolver, humanizePlainValue, type EntryRecordLike, type ResolvedEntryLink } from '~/utils/entryLinkResolver'
 import { resolvePublicImage } from '~/utils/publicMedia'
+import ImageWashFrame from '~/components/ui/ImageWashFrame.vue'
+import CinnabarTag from '~/components/ui/CinnabarTag.vue'
 
 interface DisplayField {
   key: string
@@ -47,6 +49,36 @@ const PUBLIC_VALUE_LABELS: Record<string, Record<string, string>> = {
   },
 }
 
+const STATUS_TONE_MAP: Record<string, 'jade' | 'cinnabar' | 'bronze' | 'ghost'> = {
+  alive: 'jade',
+  '存世': 'jade',
+  active: 'jade',
+  deceased: 'ghost',
+  dead: 'ghost',
+  '已故': 'ghost',
+  'destroyed': 'ghost',
+  'destroyed / merged': 'ghost',
+  lost: 'ghost',
+  missing: 'ghost',
+  '下落不明': 'ghost',
+  unknown: 'ghost',
+  '未详': 'ghost',
+  'to be verified': 'bronze',
+  '待考证': 'bronze',
+  verified: 'cinnabar',
+  '已校验': 'cinnabar',
+  disputed: 'bronze',
+  speculative: 'ghost',
+}
+
+const VERIFICATION_TONE_MAP: Record<string, 'cinnabar' | 'bronze' | 'ghost'> = {
+  verified: 'cinnabar',
+  'to be verified': 'bronze',
+  disputed: 'bronze',
+  speculative: 'ghost',
+  unknown: 'ghost',
+}
+
 function isEmptyValue(value: unknown, field?: InfoboxFieldProfile): boolean {
   if (value == null) return true
   if (typeof value === 'string') {
@@ -84,6 +116,21 @@ function resolveTextValue(value: unknown, field?: InfoboxFieldProfile): string {
     return mapped || humanizePlainValue(raw)
   }
   return ''
+}
+
+function normalizeStatusKey(value: string): string {
+  return value.trim().toLowerCase()
+}
+
+function statusToneFor(field: DisplayField): 'jade' | 'cinnabar' | 'bronze' | 'ghost' | null {
+  if (field.kind !== 'badge' || !field.value) return null
+  if (field.key === 'status') {
+    return STATUS_TONE_MAP[normalizeStatusKey(field.value)] || 'ghost'
+  }
+  if (field.key === 'verificationStatus') {
+    return VERIFICATION_TONE_MAP[normalizeStatusKey(field.value)] || 'ghost'
+  }
+  return null
 }
 
 function resolveList(value: unknown, field: InfoboxFieldProfile): ResolvedEntryLink[] {
@@ -186,11 +233,19 @@ const hasContent = computed(() => Boolean(resolvedImage.value) || mainFields.val
     </div>
 
     <div class="infobox-image-wrapper" :class="`image-${heroMode}`">
-      <img v-if="resolvedImage" :src="resolvedImage" :alt="page?.title || 'Entry image'" class="infobox-image" />
+      <ImageWashFrame
+        v-if="resolvedImage"
+        :src="resolvedImage"
+        :alt="page?.title || 'Entry portrait'"
+        :aspect="heroMode === 'portrait' ? '3:4' : heroMode === 'landscape' ? '16:9' : '3:2'"
+        :wash="heroMode === 'portrait' ? 'cloth' : 'mist'"
+        :wash-opacity="heroMode === 'portrait' ? 0.12 : 0.08"
+        :frame="true"
+        scale="cover"
+      />
       <div v-else class="infobox-placeholder" aria-hidden="true">
         <span class="placeholder-char">{{ fallbackChar }}</span>
       </div>
-      <div class="image-overlay"></div>
     </div>
 
     <div class="infobox-content">
@@ -204,7 +259,13 @@ const hasContent = computed(() => Boolean(resolvedImage.value) || mainFields.val
       >
         <span class="row-label">{{ field.label }}</span>
 
-        <span v-if="field.value && field.kind === 'badge'" class="public-badge">{{ field.value }}</span>
+        <CinnabarTag
+          v-if="field.value && field.kind === 'badge' && statusToneFor(field)"
+          :tone="statusToneFor(field)!"
+          size="sm"
+          :dot="field.key === 'status' || field.key === 'verificationStatus'"
+        >{{ field.value }}</CinnabarTag>
+        <span v-else-if="field.value && field.kind === 'badge'" class="public-badge">{{ field.value }}</span>
         <span v-else-if="field.value && field.kind === 'chip'" class="public-chip">{{ field.value }}</span>
         <span v-else-if="field.value" class="row-value">{{ field.value }}</span>
 
@@ -252,7 +313,13 @@ const hasContent = computed(() => Boolean(resolvedImage.value) || mainFields.val
       <div v-if="footerFields.length" class="infobox-footer">
         <div v-for="field in footerFields" :key="field.key" class="footer-row">
           <span class="footer-label">{{ field.label }}</span>
-          <span v-if="field.value && field.kind === 'badge'" class="verification-badge">{{ field.value }}</span>
+          <CinnabarTag
+            v-if="field.value && field.key === 'verificationStatus' && statusToneFor(field)"
+            :tone="statusToneFor(field)!"
+            size="sm"
+            dot
+          >{{ field.value }}</CinnabarTag>
+          <span v-else-if="field.value && field.kind === 'badge'" class="verification-badge">{{ field.value }}</span>
           <span v-else-if="field.value" class="footer-value">{{ field.value }}</span>
         </div>
       </div>
@@ -312,35 +379,42 @@ const hasContent = computed(() => Boolean(resolvedImage.value) || mainFields.val
 }
 
 .image-portrait {
-  aspect-ratio: 4 / 5;
-  max-height: min(34dvh, 300px);
+  aspect-ratio: 3 / 4;
+  max-height: min(34dvh, 320px);
+  display: flex;
+  align-items: stretch;
 }
 
 .image-landscape {
-  aspect-ratio: 16 / 10;
-  max-height: min(28dvh, 220px);
+  aspect-ratio: 16 / 9;
+  max-height: min(28dvh, 240px);
+  display: flex;
+  align-items: stretch;
 }
 
 .image-seal {
-  aspect-ratio: 16 / 8;
-  max-height: min(22dvh, 170px);
+  aspect-ratio: 3 / 2;
+  max-height: min(22dvh, 180px);
+  display: flex;
+  align-items: stretch;
 }
 
-.infobox-image,
-.infobox-placeholder {
+.infobox-image-wrapper :deep(.image-wash-frame) {
   width: 100%;
-  height: 100%;
-  display: block;
+  margin: 0;
 }
 
-.infobox-image {
-  object-fit: cover;
+.infobox-image-wrapper :deep(.image-wash-frame__inner) {
+  height: 100%;
+  border-color: color-mix(in srgb, var(--jl-section-frame) 70%, var(--c-border));
 }
 
 .infobox-placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  height: 100%;
   background:
     radial-gradient(circle at 50% 38%, color-mix(in srgb, var(--c-paper) 68%, transparent), transparent 62%),
     url('/images/textures/ink-wash-01.webp');
@@ -359,13 +433,6 @@ const hasContent = computed(() => Boolean(resolvedImage.value) || mainFields.val
   border-radius: 0.1em;
   transform: rotate(-3deg);
   background: color-mix(in srgb, var(--c-paper) 40%, transparent);
-}
-
-.image-overlay {
-  position: absolute;
-  inset: 0;
-  border: 5px solid color-mix(in srgb, var(--c-border) 38%, transparent);
-  pointer-events: none;
 }
 
 .infobox-content {
