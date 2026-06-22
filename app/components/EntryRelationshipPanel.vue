@@ -45,7 +45,7 @@ const hasMoreRelationships = computed(() => structuredRelationships.value.length
 <template>
   <section v-if="hasContent" class="entry-relationship-panel">
     <div class="panel-heading">
-      <SealBadge text="联" variant="outline" shape="square" />
+      <UiSealStamp text="联" variant="carved" size="sm" writing="horizontal" decorative />
       <div>
         <p class="eyebrow">Connections</p>
         <h2>Relationships & Related Entries</h2>

@@ -10,7 +10,7 @@ defineProps<{
   <div v-if="groups.length" class="related-entries">
     <section v-for="group in groups" :key="`${group.direction}-${group.label}`" class="related-group">
       <div class="related-group-heading">
-        <SealBadge text="联" variant="outline" shape="square" />
+        <UiSealStamp text="联" variant="carved" size="sm" writing="horizontal" decorative />
         <h3 class="related-group-title">{{ group.label }}</h3>
       </div>
 
