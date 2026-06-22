@@ -4,6 +4,9 @@ import { createEntryResolver, humanizePath, type ResolvedEntryLink } from '~/uti
 import { RELATIONSHIP_FIELDS, extractPaths, isRoutedPath } from '~/utils/relationshipConfig'
 import SwordDaoManualHero from '~/components/swordsmanship-v2/SwordDaoManualHero.vue'
 import { useSpineDraw } from '~/composables/useSpineDraw'
+import CinnabarTag from '~/components/ui/CinnabarTag.vue'
+import LedgerTab from '~/components/ui/LedgerTab.vue'
+import InkButton from '~/components/ui/InkButton.vue'
 
 type ContentRecord = Record<string, any> & {
   path?: string
@@ -328,10 +331,10 @@ useSeoMeta({
               <p v-if="featuredEntry.chinese" class="tang-plate__zh">{{ featuredEntry.chinese }}</p>
 
               <div class="tang-plate__meta">
-                <span v-if="featuredEntry.category" class="bp-tag">{{ featuredEntry.category }}</span>
-                <span v-if="featuredEntry.status" class="bp-tag">{{ featuredEntry.status }}</span>
-                <span class="bp-tag bp-tag--cinnabar">{{ verificationLabel(featuredEntry) }}</span>
-                <span v-if="featuredEntry.lastUpdated" class="bp-tag">{{ featuredEntry.lastUpdated }}</span>
+                <CinnabarTag v-if="featuredEntry.category" tone="section">{{ featuredEntry.category }}</CinnabarTag>
+                <CinnabarTag v-if="featuredEntry.status" tone="ghost">{{ featuredEntry.status }}</CinnabarTag>
+                <CinnabarTag tone="cinnabar">{{ verificationLabel(featuredEntry) }}</CinnabarTag>
+                <CinnabarTag v-if="featuredEntry.lastUpdated" tone="ghost">{{ featuredEntry.lastUpdated }}</CinnabarTag>
               </div>
 
               <p v-if="featuredEntry.description" class="tang-plate__desc">{{ featuredEntry.description }}</p>
@@ -360,9 +363,9 @@ useSeoMeta({
 
               <div class="tang-plate__footer">
                 <p v-if="cleanSourceNotes(featuredEntry)" class="tang-plate__source">{{ cleanSourceNotes(featuredEntry) }}</p>
-                <NuxtLink v-if="existingPaths.includes(featuredEntry.path)" class="bp-cta" :to="featuredEntry.path">
+                <InkButton v-if="existingPaths.includes(featuredEntry.path)" :to="featuredEntry.path" tone="section">
                   Open canonical record
-                </NuxtLink>
+                </InkButton>
                 <span v-else class="bp-cta bp-cta--disabled">Canonical route pending</span>
               </div>
             </div>
@@ -566,6 +569,32 @@ useSeoMeta({
 /* ===========================
    BLADE PATH DESCENT — V3
    =========================== */
+
+/* Map Blade Path tokens to --jl-section-* so primitives (LedgerTab,
+   CinnabarTag, InkButton, BrushUnderline) render in the dark steel-blue
+   palette rather than the light section defaults. Scoped to this component;
+   inheritance reaches into child component shadow DOM via CSS custom props. */
+@layer base {
+  .blade-path {
+    --jl-section-accent: var(--bp-jade);
+    --jl-section-ink: var(--bp-ink);
+    --jl-section-mist: var(--bp-mist);
+    --jl-section-frame: rgba(122, 180, 164, 0.22);
+    --jl-section-seal: var(--bp-cinnabar);
+    --jl-section-gold: var(--bp-jade);
+    --jl-section-paper: var(--bp-bg);
+    --jl-section-title-ink: var(--bp-ink);
+    --jl-paper: var(--bp-bg);
+    --jl-ink-black: var(--bp-jade);
+    --jl-lacquer: var(--bp-ink);
+    --jl-cinnabar: var(--bp-cinnabar);
+    --jl-jade: var(--bp-jade);
+    --jl-antique-gold: var(--bp-jade);
+    --c-bg: var(--bp-bg);
+    --c-paper: var(--bp-bg);
+    --c-text-3: var(--bp-ink-muted);
+  }
+}
 
 .blade-path {
   --bp-bg: #080f16;
@@ -1915,5 +1944,60 @@ useSeoMeta({
   .bp-hamon__glow {
     animation: none;
   }
+}
+
+/* ===========================
+   PRIMITIVE CALIBRATION
+   ===========================
+   Calibrate CinnabarTag / LedgerTab / InkButton to fit the Blade Path
+   layout grid. These are scoped to the Blade Path section only and do not
+   affect the primitives elsewhere in the wiki. */
+
+.tang-plate__meta :deep(.cinnabar-tag) {
+  letter-spacing: 0.1em;
+}
+
+.tang-plate__footer :deep(.ink-button) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.75rem 1.1rem;
+  border: 1px solid rgba(122, 180, 164, 0.35);
+  color: var(--bp-jade);
+  background: rgba(14, 30, 42, 0.65);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition:
+    color 0.22s ease,
+    border-color 0.22s ease,
+    background-color 0.22s ease,
+    transform 0.22s ease;
+}
+
+.tang-plate__footer :deep(.ink-button:hover),
+.tang-plate__footer :deep(.ink-button:focus-visible) {
+  border-color: rgba(122, 180, 164, 0.5);
+  color: #a8dccb;
+  background: rgba(14, 30, 42, 0.85);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.tang-plate__footer :deep(.ink-button:focus-visible) {
+  outline: 2px solid var(--bp-cinnabar);
+  outline-offset: 0.2rem;
+}
+
+.tang-plate__footer :deep(.ink-button::before),
+.tang-plate__footer :deep(.ink-button::after) {
+  display: none;
+}
+
+.tang-plate__footer :deep(.ink-button__label) {
+  position: static;
 }
 </style>
