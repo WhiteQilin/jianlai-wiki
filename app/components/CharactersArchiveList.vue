@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, resolveComponent, watch } from 'vue'
+import LedgerTab from '@/components/ui/LedgerTab.vue'
+import BrushUnderline from '@/components/ui/BrushUnderline.vue'
 
 type ArchiveEntry = {
   path: string
@@ -70,9 +72,12 @@ watch(
 <template>
   <section class="characters-archive" aria-labelledby="characters-archive-title">
     <div class="archive-heading">
-      <div>
+      <div class="archive-heading-text">
         <p class="archive-kicker">Archive</p>
-        <h2 id="characters-archive-title">All Character Records</h2>
+        <div class="archive-title-wrap">
+          <h2 id="characters-archive-title">All Character Records</h2>
+          <BrushUnderline tone="section" weight="bold" width="long" />
+        </div>
       </div>
       <span class="archive-count">{{ filteredEntries.length }} / {{ entries.length }}</span>
     </div>
@@ -81,32 +86,32 @@ watch(
       <div class="filter-group">
         <span class="filter-label">Category</span>
         <div class="filter-buttons">
-          <button
+          <LedgerTab
             v-for="category in categoryFilters"
             :key="category"
-            type="button"
-            class="filter-button"
-            :class="{ active: category === activeCategory }"
+            :active="category === activeCategory"
+            tone="section"
+            variant="compact"
             @click="activeCategory = category"
           >
             {{ category }}
-          </button>
+          </LedgerTab>
         </div>
       </div>
 
       <div class="filter-group">
         <span class="filter-label">Importance</span>
         <div class="filter-buttons">
-          <button
+          <LedgerTab
             v-for="importance in importanceFilters"
             :key="importance"
-            type="button"
-            class="filter-button"
-            :class="{ active: importance === activeImportance }"
+            :active="importance === activeImportance"
+            tone="section"
+            variant="compact"
             @click="activeImportance = importance"
           >
             {{ importance }}
-          </button>
+          </LedgerTab>
         </div>
       </div>
     </div>
@@ -152,6 +157,10 @@ watch(
   margin-bottom: 1.2rem;
 }
 
+.archive-heading-text {
+  min-width: 0;
+}
+
 .archive-kicker {
   margin: 0 0 0.3rem;
   color: var(--c-seal-red);
@@ -160,7 +169,14 @@ watch(
   letter-spacing: 0;
 }
 
-.archive-heading h2 {
+.archive-title-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.18rem;
+}
+
+.archive-title-wrap h2 {
   margin: 0;
   color: var(--c-ink);
   font-family: var(--font-heading);
@@ -168,6 +184,7 @@ watch(
   font-weight: 500;
   line-height: 1;
   letter-spacing: 0;
+  text-wrap: balance;
 }
 
 .archive-count {
@@ -203,37 +220,11 @@ watch(
 .filter-buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.45rem;
+  gap: 0.4rem;
 }
 
-.filter-button {
-  min-height: 2rem;
-  padding: 0.36rem 0.7rem;
-  color: var(--c-text-2);
-  background: var(--c-bg);
-  border: 1px solid var(--c-divider);
-  border-radius: 5px;
-  font: inherit;
-  font-size: 0.86rem;
-  line-height: 1.2;
-  cursor: pointer;
-  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
-}
-
-.filter-button:hover {
-  color: var(--c-ink);
-  border-color: color-mix(in srgb, var(--c-seal-red) 28%, var(--c-border));
-}
-
-.filter-button.active {
-  color: var(--c-bg);
-  background: var(--c-ink);
-  border-color: var(--c-ink);
-}
-
-.filter-button:focus-visible {
-  outline: 2px solid var(--c-seal-red);
-  outline-offset: 3px;
+.filter-label ~ .filter-buttons {
+  margin-top: 0;
 }
 
 .archive-list {
@@ -370,7 +361,7 @@ watch(
     flex-direction: column;
   }
 
-  .archive-heading h2 {
+  .archive-title-wrap h2 {
     font-size: 2.15rem;
   }
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, resolveComponent } from 'vue'
+import BrushUnderline from '@/components/ui/BrushUnderline.vue'
 
 type DossierEntry = {
   path: string
@@ -42,9 +43,12 @@ const visibleEntries = computed(() => props.entries.slice(0, 6))
 <template>
   <section v-if="visibleEntries.length" class="dossier-strip" aria-labelledby="dossier-strip-title">
     <div class="strip-heading">
-      <div>
+      <div class="strip-heading-text">
         <p class="strip-kicker">Start Here</p>
-        <h2 id="dossier-strip-title">Central Records</h2>
+        <div class="strip-title-wrap">
+          <h2 id="dossier-strip-title">Central Records</h2>
+          <BrushUnderline tone="section" weight="bold" width="long" />
+        </div>
       </div>
       <span class="strip-count">{{ visibleEntries.length }} dossiers</span>
     </div>
@@ -110,6 +114,10 @@ const visibleEntries = computed(() => props.entries.slice(0, 6))
   margin-bottom: 1.2rem;
 }
 
+.strip-heading-text {
+  min-width: 0;
+}
+
 .strip-kicker {
   margin: 0 0 0.3rem;
   color: var(--c-seal-red);
@@ -118,7 +126,14 @@ const visibleEntries = computed(() => props.entries.slice(0, 6))
   letter-spacing: 0;
 }
 
-.strip-heading h2 {
+.strip-title-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+}
+
+.strip-title-wrap h2 {
   margin: 0;
   color: var(--c-ink);
   font-family: var(--font-heading);
@@ -126,6 +141,7 @@ const visibleEntries = computed(() => props.entries.slice(0, 6))
   font-weight: 500;
   line-height: 1;
   letter-spacing: 0;
+  text-wrap: balance;
 }
 
 .strip-count {
@@ -253,7 +269,7 @@ const visibleEntries = computed(() => props.entries.slice(0, 6))
     overflow-x: visible;
   }
 
-  .strip-heading h2 {
+  .strip-title-wrap h2 {
     font-size: 2.2rem;
   }
 

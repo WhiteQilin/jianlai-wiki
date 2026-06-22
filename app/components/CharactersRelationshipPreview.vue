@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, resolveComponent } from 'vue'
+import BrushUnderline from '@/components/ui/BrushUnderline.vue'
 
 type PreviewCharacter = {
   path: string
@@ -59,7 +60,10 @@ const formatRelation = (value?: string) => value || 'Referenced'
   <section v-if="preview.central" class="relationship-preview" aria-labelledby="relationship-preview-title">
     <div class="section-heading">
       <p class="section-kicker">Relationship Atlas</p>
-      <h2 id="relationship-preview-title">Preview Web</h2>
+      <div class="section-title-wrap">
+        <h2 id="relationship-preview-title">Preview Web</h2>
+        <BrushUnderline tone="section" weight="bold" width="long" />
+      </div>
     </div>
 
     <div class="web-stage" aria-hidden="true">
@@ -164,6 +168,13 @@ const formatRelation = (value?: string) => value || 'Referenced'
   margin-bottom: 1rem;
 }
 
+.section-title-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+}
+
 .section-kicker {
   margin: 0 0 0.3rem;
   color: var(--c-seal-red);
@@ -172,7 +183,7 @@ const formatRelation = (value?: string) => value || 'Referenced'
   letter-spacing: 0;
 }
 
-.section-heading h2 {
+.section-title-wrap h2 {
   margin: 0;
   color: var(--c-ink);
   font-family: var(--font-heading);
@@ -180,6 +191,7 @@ const formatRelation = (value?: string) => value || 'Referenced'
   font-weight: 500;
   line-height: 1;
   letter-spacing: 0;
+  text-wrap: balance;
 }
 
 .web-stage {
@@ -366,7 +378,7 @@ const formatRelation = (value?: string) => value || 'Referenced'
 }
 
 @media (max-width: 760px) {
-  .section-heading h2 {
+  .section-title-wrap h2 {
     font-size: 2.15rem;
   }
 
