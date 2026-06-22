@@ -15,182 +15,156 @@ const resolvedImage = computed(() => resolvePublicImage(props.image))
 </script>
 
 <template>
-  <NuxtLink :to="link" class="dossier-card">
-    <div class="card-texture"></div>
-    <div v-if="resolvedImage" class="card-image-wrap">
-      <img :src="resolvedImage" :alt="nameEn" class="card-image" loading="lazy" />
-      <div class="card-image-overlay"></div>
+  <UiPaperSlipCard :to="link" accent seal-corner lift class="dossier-card">
+    <div v-if="resolvedImage" class="dossier-card__art-wrap">
+      <UiImageWashFrame
+        :src="resolvedImage"
+        :alt="nameEn"
+        aspect="4:5"
+        wash="cloth"
+        :wash-opacity="0.2"
+        :frame="false"
+        class="dossier-card__art"
+      />
     </div>
-    <div v-else class="card-image-placeholder">
-      <span class="placeholder-char">{{ nameZh.charAt(0) || '无' }}</span>
+    <div v-else class="dossier-card__placeholder" aria-hidden="true">
+      <span class="dossier-card__placeholder-char">{{ nameZh.charAt(0) || '无' }}</span>
     </div>
-    
-    <div class="card-content">
-      <div class="card-meta">
-        <span class="category">{{ category }}</span>
-        <span class="status">{{ status }}</span>
+
+    <div class="dossier-card__body">
+      <div class="dossier-card__meta">
+        <UiCinnabarTag tone="section" size="sm">{{ category }}</UiCinnabarTag>
+        <UiCinnabarTag tone="cinnabar" size="sm">{{ status }}</UiCinnabarTag>
       </div>
-      <h4 class="card-name">{{ nameEn }} <span class="zh-name">{{ nameZh }}</span></h4>
-      <p class="card-desc">{{ desc }}</p>
+      <h4 class="dossier-card__name">
+        <span class="dossier-card__name-en">{{ nameEn }}</span>
+        <span v-if="nameZh" class="dossier-card__name-zh">{{ nameZh }}</span>
+      </h4>
+      <p class="dossier-card__desc">{{ desc }}</p>
     </div>
-  </NuxtLink>
+  </UiPaperSlipCard>
 </template>
 
 <style scoped>
 .dossier-card {
-  display: flex;
-  flex-direction: column;
-  background: var(--c-bg);
-  border: 1px solid var(--c-border);
-  text-decoration: none;
-  position: relative;
+  padding: 0;
   overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  height: 100%;
 }
 
-.dossier-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--c-seal-red);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+.dossier-card :deep(.paper-slip-card__seal),
+.dossier-card :deep(.has-seal::after) {
+  z-index: 2;
 }
 
-.card-texture {
-  position: absolute;
-  inset: 0;
-  background-image: url('/images/textures/ink-wash-01.webp');
-  background-size: cover;
-  background-position: center;
-  opacity: 0.02;
-  mix-blend-mode: multiply;
-  pointer-events: none;
-  z-index: 0;
-  transition: opacity 0.4s ease;
-}
-
-.dark .card-texture {
-  mix-blend-mode: screen;
-}
-
-.dossier-card:hover .card-texture {
-  opacity: 0.05;
-}
-
-.card-image-wrap {
+.dossier-card__art-wrap {
   width: 100%;
-  height: 200px;
+  border-bottom: 1px solid var(--c-divider);
   position: relative;
-  overflow: hidden;
-  border-bottom: 1px solid var(--c-border);
+  z-index: 1;
 }
 
-.card-image {
+.dossier-card__art {
+  margin: 0;
+  display: block;
+}
+
+.dossier-card__art :deep(.image-wash-frame__inner) {
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.dossier-card__art :deep(.image-wash-frame__img) {
+  transition: transform 600ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.dossier-card:hover :deep(.image-wash-frame__img) {
+  transform: scale(1.04);
+}
+
+.dossier-card__placeholder {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.6s ease;
-}
-
-.dossier-card:hover .card-image {
-  transform: scale(1.05);
-}
-
-.card-image-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, var(--c-bg) 0%, transparent 50%);
-}
-
-.card-image-placeholder {
-  width: 100%;
-  height: 200px;
-  background: var(--c-bg-soft);
-  border-bottom: 1px solid var(--c-border);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  aspect-ratio: 4 / 5;
+  display: grid;
+  place-items: center;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--jl-section-mist) 28%, transparent), transparent),
+    var(--jl-section-paper);
+  border-bottom: 1px solid var(--c-divider);
   position: relative;
   overflow: hidden;
 }
 
-.card-image-placeholder::before {
+.dossier-card__placeholder::before {
   content: '';
   position: absolute;
   inset: 0;
   background-image: url('/images/textures/ink-wash-02.webp');
   background-size: cover;
   background-blend-mode: multiply;
-  opacity: 0.2;
+  opacity: 0.18;
+  pointer-events: none;
 }
 
-.dark .card-image-placeholder::before {
-  background-blend-mode: screen;
-}
-
-.placeholder-char {
-  font-family: var(--font-heading);
-  font-size: 5rem;
-  color: var(--c-border);
+.dossier-card__placeholder-char {
+  font-family: var(--font-zh-display);
+  font-size: clamp(4rem, 9vw, 5.4rem);
+  color: color-mix(in srgb, var(--jl-section-accent) 42%, var(--jl-section-frame));
   z-index: 1;
+  line-height: 1;
+  letter-spacing: 0;
 }
 
-.card-content {
-  padding: 1.5rem;
+.dossier-card__body {
+  padding: 1.2rem 1.3rem 1.35rem;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  gap: 0.7rem;
   position: relative;
   z-index: 1;
 }
 
-.card-meta {
+.dossier-card__meta {
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.45rem;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.15rem;
 }
 
-.category {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: var(--c-text-3);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-.status {
-  font-size: 0.65rem;
-  color: var(--c-seal-red);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border: 1px solid var(--c-seal-red-soft);
-  padding: 2px 6px;
-  border-radius: 2px;
-}
-
-.card-name {
+.dossier-card__name {
   font-family: var(--font-heading);
   font-size: 1.4rem;
+  font-weight: 500;
   color: var(--c-ink);
-  margin: 0 0 0.5rem 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
-  transition: color 0.3s ease;
+  gap: 0.18rem;
+  line-height: 1.18;
+  transition: color 240ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-.dossier-card:hover .card-name {
-  color: var(--c-seal-red);
+.dossier-card:hover .dossier-card__name {
+  color: var(--jl-section-seal);
 }
 
-.zh-name {
-  font-size: 1.1rem;
-  color: var(--c-text-3);
+.dossier-card__name-en {
+  display: block;
+}
+
+.dossier-card__name-zh {
+  font-family: var(--font-zh-display);
+  font-size: 1.05rem;
   font-weight: 400;
+  color: var(--c-text-3);
+  letter-spacing: 0.06em;
+  line-height: 1.1;
 }
 
-.card-desc {
-  font-size: 0.9rem;
+.dossier-card__desc {
+  font-size: 0.92rem;
   color: var(--c-text-2);
   margin: 0;
   line-height: 1.6;
@@ -198,5 +172,31 @@ const resolvedImage = computed(() => resolvePublicImage(props.image))
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+@media (max-width: 640px) {
+  .dossier-card__name {
+    font-size: 1.3rem;
+  }
+
+  .dossier-card__body {
+    padding: 1rem 1.1rem 1.15rem;
+  }
+
+  .dossier-card__desc {
+    font-size: 0.88rem;
+    -webkit-line-clamp: 4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dossier-card__name,
+  .dossier-card__art :deep(.image-wash-frame__img) {
+    transition: none;
+  }
+
+  .dossier-card:hover :deep(.image-wash-frame__img) {
+    transform: none;
+  }
 }
 </style>

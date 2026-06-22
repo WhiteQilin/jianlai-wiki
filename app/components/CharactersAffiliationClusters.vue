@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, resolveComponent } from 'vue'
+import BrushUnderline from '@/components/ui/BrushUnderline.vue'
 
 type ClusterMember = {
   path: string
@@ -39,7 +40,10 @@ const visibleClusters = computed(() => props.clusters.slice(0, 8))
   <section v-if="visibleClusters.length" class="affiliation-clusters" aria-labelledby="affiliation-clusters-title">
     <div class="section-heading">
       <p class="section-kicker">Affiliation Clusters</p>
-      <h2 id="affiliation-clusters-title">Board</h2>
+      <div class="section-title-wrap">
+        <h2 id="affiliation-clusters-title">Board</h2>
+        <BrushUnderline tone="section" weight="bold" width="long" />
+      </div>
     </div>
 
     <div class="cluster-board">
@@ -86,6 +90,13 @@ const visibleClusters = computed(() => props.clusters.slice(0, 8))
   margin-bottom: 1rem;
 }
 
+.section-title-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+}
+
 .section-kicker {
   margin: 0 0 0.3rem;
   color: var(--c-seal-red);
@@ -94,7 +105,7 @@ const visibleClusters = computed(() => props.clusters.slice(0, 8))
   letter-spacing: 0;
 }
 
-.section-heading h2 {
+.section-title-wrap h2 {
   margin: 0;
   color: var(--c-ink);
   font-family: var(--font-heading);
@@ -102,6 +113,7 @@ const visibleClusters = computed(() => props.clusters.slice(0, 8))
   font-weight: 500;
   line-height: 1;
   letter-spacing: 0;
+  text-wrap: balance;
 }
 
 .cluster-board {
@@ -237,7 +249,7 @@ const visibleClusters = computed(() => props.clusters.slice(0, 8))
 }
 
 @media (max-width: 640px) {
-  .section-heading h2 {
+  .section-title-wrap h2 {
     font-size: 2.15rem;
   }
 
