@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, resolveComponent } from 'vue'
+import { computed } from 'vue'
 import BrushUnderline from '@/components/ui/BrushUnderline.vue'
 
 type DossierEntry = {
@@ -19,8 +19,6 @@ const props = defineProps<{
   entries: DossierEntry[]
   existingPaths: string[]
 }>()
-
-const NuxtLinkComponent = resolveComponent('NuxtLink')
 
 const existingPathSet = computed(() => new Set(props.existingPaths))
 
@@ -54,12 +52,14 @@ const visibleEntries = computed(() => props.entries.slice(0, 6))
     </div>
 
     <div class="strip-list">
-      <component
-        :is="canLink(entry.path) ? NuxtLinkComponent : 'article'"
+      <UiPaperSlipCard
         v-for="entry in visibleEntries"
         :key="entry.path"
-        class="dossier-sheet"
         :to="canLink(entry.path) ? entry.path : undefined"
+        accent
+        seal-corner
+        lift
+        class="dossier-slip"
       >
         <span class="sheet-seal" aria-hidden="true">{{ fallbackSeal(entry) }}</span>
         <span class="sheet-body">
@@ -78,7 +78,7 @@ const visibleEntries = computed(() => props.entries.slice(0, 6))
             {{ entry.relationshipCount + entry.relatedCount }} listed ties
           </span>
         </span>
-      </component>
+      </UiPaperSlipCard>
     </div>
   </section>
 </template>
@@ -162,30 +162,12 @@ const visibleEntries = computed(() => props.entries.slice(0, 6))
   scrollbar-width: thin;
 }
 
-.dossier-sheet {
-  min-width: 220px;
-  min-height: 230px;
+.dossier-slip {
   display: grid;
   grid-template-rows: auto 1fr;
   gap: 0.9rem;
-  padding: 1rem;
-  color: inherit;
-  text-decoration: none;
-  background: color-mix(in srgb, var(--c-bg) 86%, var(--c-bg-soft));
-  border: 1px solid var(--c-border);
-  border-radius: 8px;
-  transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
-}
-
-.dossier-sheet:hover {
-  transform: translateY(-3px);
-  border-color: color-mix(in srgb, var(--c-seal-red) 42%, var(--c-border));
-  background: color-mix(in srgb, var(--c-bg) 78%, var(--c-seal-red-soft));
-}
-
-.dossier-sheet:focus-visible {
-  outline: 2px solid var(--c-seal-red);
-  outline-offset: 3px;
+  min-width: 220px;
+  min-height: 230px;
 }
 
 .sheet-seal {
@@ -273,7 +255,7 @@ const visibleEntries = computed(() => props.entries.slice(0, 6))
     font-size: 2.2rem;
   }
 
-  .dossier-sheet {
+  .dossier-slip {
     min-width: 0;
     min-height: 0;
     grid-template-columns: auto 1fr;
