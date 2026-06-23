@@ -265,8 +265,8 @@ const hasContent = computed(() => Boolean(resolvedImage.value) || mainFields.val
           size="sm"
           :dot="field.key === 'status' || field.key === 'verificationStatus'"
         >{{ field.value }}</CinnabarTag>
-        <span v-else-if="field.value && field.kind === 'badge'" class="public-badge">{{ field.value }}</span>
-        <span v-else-if="field.value && field.kind === 'chip'" class="public-chip">{{ field.value }}</span>
+        <CinnabarTag v-else-if="field.value && field.kind === 'badge'" tone="section" size="sm">{{ field.value }}</CinnabarTag>
+        <CinnabarTag v-else-if="field.value && field.kind === 'chip'" tone="ghost" size="sm">{{ field.value }}</CinnabarTag>
         <span v-else-if="field.value" class="row-value">{{ field.value }}</span>
 
         <RouteDisplayLink
@@ -319,7 +319,7 @@ const hasContent = computed(() => Boolean(resolvedImage.value) || mainFields.val
             size="sm"
             dot
           >{{ field.value }}</CinnabarTag>
-          <span v-else-if="field.value && field.kind === 'badge'" class="verification-badge">{{ field.value }}</span>
+          <CinnabarTag v-else-if="field.value && field.kind === 'badge'" tone="section" size="sm">{{ field.value }}</CinnabarTag>
           <span v-else-if="field.value" class="footer-value">{{ field.value }}</span>
         </div>
       </div>
@@ -486,35 +486,6 @@ const hasContent = computed(() => Boolean(resolvedImage.value) || mainFields.val
   line-height: 1.38;
 }
 
-.public-badge,
-.public-chip,
-.verification-badge {
-  align-self: flex-start;
-  display: inline-flex;
-  max-width: 100%;
-  color: var(--c-seal-red);
-  border: 1px solid var(--c-seal-red-soft);
-  background: color-mix(in srgb, var(--c-seal-red) 5%, transparent);
-  font-family: var(--font-heading);
-  font-size: 0.78rem;
-  line-height: 1.18;
-  padding: 0.22rem 0.48rem;
-}
-
-.public-badge {
-  transform: rotate(-1.2deg);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.public-chip {
-  color: var(--c-ink);
-  border-color: color-mix(in srgb, var(--c-border) 78%, transparent);
-  background: color-mix(in srgb, var(--c-bg-soft) 80%, transparent);
-  transform: none;
-  text-transform: none;
-}
-
 .chip-list,
 .relationship-list,
 .ranking-list {
@@ -576,20 +547,10 @@ const hasContent = computed(() => Boolean(resolvedImage.value) || mainFields.val
   padding: 0.24rem 0;
 }
 
-.footer-value,
-.verification-badge {
+.footer-value {
   color: var(--c-text-2);
   font-size: 0.72rem;
   text-align: right;
-}
-
-.verification-badge {
-  border-color: color-mix(in srgb, var(--c-border) 80%, transparent);
-  background: transparent;
-  color: var(--c-text-3);
-  font-family: var(--font-mono);
-  text-transform: uppercase;
-  transform: none;
 }
 
 @media (max-width: 1024px) {

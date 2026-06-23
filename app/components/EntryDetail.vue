@@ -10,6 +10,7 @@
 import type { RelatedGroup } from '~/composables/useRelatedEntries'
 import type { EntryRecordLike } from '~/utils/entryLinkResolver'
 import { resolvePublicImage } from '~/utils/publicMedia'
+import CinnabarTag from '~/components/ui/CinnabarTag.vue'
 
 interface TimelineNavigationRecord {
   path: string
@@ -72,6 +73,16 @@ const importanceLabel = computed(() => {
     background: 'Background',
   }
   return value ? labels[value] || value : ''
+})
+
+const importanceTone = computed<'cinnabar' | 'bronze' | 'section' | 'ghost'>(() => {
+  switch (props.page?.importance) {
+    case 'primary': return 'cinnabar'
+    case 'major': return 'bronze'
+    case 'minor': return 'section'
+    case 'background': return 'ghost'
+    default: return 'ghost'
+  }
 })
 
 function timelineRecordMeta(record?: TimelineNavigationRecord | null) {
@@ -159,9 +170,9 @@ function timelineRecordMeta(record?: TimelineNavigationRecord | null) {
             <p v-if="page?.description" class="entry-lead">{{ page.description }}</p>
           </div>
           <div class="header-badges" aria-label="Entry classification">
-            <span v-if="page?.category" class="entry-badge">{{ page.category }}</span>
-            <span v-if="page?.subcategory" class="entry-chip">{{ page.subcategory }}</span>
-            <span v-if="importanceLabel" class="entry-chip is-importance">{{ importanceLabel }}</span>
+            <CinnabarTag v-if="page?.category" tone="section" class="header-badge-tilt">{{ page.category }}</CinnabarTag>
+            <CinnabarTag v-if="page?.subcategory" tone="ghost">{{ page.subcategory }}</CinnabarTag>
+            <CinnabarTag v-if="importanceLabel" :tone="importanceTone" :dot="page?.importance === 'primary'">{{ importanceLabel }}</CinnabarTag>
           </div>
         </header>
       </ScrollReveal>
@@ -297,34 +308,9 @@ function timelineRecordMeta(record?: TimelineNavigationRecord | null) {
   max-width: 320px;
 }
 
-.entry-badge,
-.entry-chip {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2rem;
-  padding: 0.35rem 0.72rem;
-  color: var(--c-seal-red);
-  border: 1px solid var(--c-seal-red-soft);
-  background: color-mix(in srgb, var(--c-seal-red) 5%, transparent);
-  font-family: var(--font-heading);
-  font-size: 0.86rem;
-  line-height: 1.2;
-}
-
-.entry-badge {
+.header-badge-tilt {
   transform: rotate(-1deg);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.entry-chip {
-  color: var(--c-text-2);
-  border-color: color-mix(in srgb, var(--c-border) 75%, transparent);
-  background: color-mix(in srgb, var(--c-bg-soft) 80%, transparent);
-}
-
-.entry-chip.is-importance {
-  text-transform: capitalize;
+  display: inline-flex;
 }
 
 .article-layout {
@@ -560,17 +546,6 @@ function timelineRecordMeta(record?: TimelineNavigationRecord | null) {
   color: rgba(255, 255, 255, 0.72);
 }
 
-.section-timeline .entry-badge,
-.section-timeline .entry-chip {
-  border-color: rgba(212, 175, 55, 0.26);
-  background: rgba(212, 175, 55, 0.07);
-  color: rgba(240, 210, 122, 0.9);
-}
-
-.section-timeline .entry-chip {
-  color: rgba(255, 255, 255, 0.68);
-}
-
 .section-timeline :deep(.name-en) {
   font-size: clamp(2.55rem, 6vw, 4rem);
   line-height: 1.05;
@@ -677,14 +652,6 @@ function timelineRecordMeta(record?: TimelineNavigationRecord | null) {
 
 .section-timeline :deep(.infobox-row) {
   border-bottom-color: rgba(212, 175, 55, 0.13);
-}
-
-.section-timeline :deep(.public-badge),
-.section-timeline :deep(.public-chip),
-.section-timeline :deep(.verification-badge) {
-  color: rgba(240, 210, 122, 0.92);
-  border-color: rgba(212, 175, 55, 0.28);
-  background: rgba(212, 175, 55, 0.07);
 }
 
 .section-timeline :deep(.route-display-link) {
@@ -962,18 +929,6 @@ function timelineRecordMeta(record?: TimelineNavigationRecord | null) {
   background: linear-gradient(90deg, color-mix(in srgb, var(--rankings-gold) 78%, transparent), transparent);
 }
 
-.section-rankings .entry-badge {
-  color: var(--rankings-seal);
-  border-color: color-mix(in srgb, var(--rankings-seal) 36%, transparent);
-  background: color-mix(in srgb, var(--rankings-seal) 6%, transparent);
-}
-
-.section-rankings .entry-chip {
-  color: color-mix(in srgb, var(--rankings-ink) 74%, transparent);
-  border-color: color-mix(in srgb, var(--rankings-frame) 54%, transparent);
-  background: color-mix(in srgb, var(--rankings-paper) 56%, transparent);
-}
-
 .section-rankings :where(a, button):focus-visible,
 .section-rankings :deep(a:focus-visible),
 .section-rankings :deep(button:focus-visible) {
@@ -1249,22 +1204,6 @@ function timelineRecordMeta(record?: TimelineNavigationRecord | null) {
   color: var(--c-text-2);
 }
 
-.section-swordsmanship .entry-badge {
-  color: var(--sword-cinnabar);
-  border-color: var(--sword-cinnabar);
-  background: rgba(216, 90, 82, 0.1);
-}
-
-.section-swordsmanship .entry-chip {
-  color: var(--c-text-2);
-  border-color: rgba(74, 114, 132, 0.26);
-  background: rgba(14, 30, 42, 0.6);
-}
-
-.section-swordsmanship .entry-chip.is-importance {
-  color: #c8dce6;
-}
-
 .section-swordsmanship :deep(.name-en) {
   color: #dce8ef;
   text-shadow: 0 0 24px rgba(122, 180, 164, 0.12);
@@ -1432,24 +1371,6 @@ function timelineRecordMeta(record?: TimelineNavigationRecord | null) {
 
 .section-swordsmanship :deep(.row-value) {
   color: #dce8ef;
-}
-
-.section-swordsmanship :deep(.public-badge) {
-  color: var(--sword-cinnabar);
-  border-color: var(--sword-cinnabar);
-  background: rgba(216, 90, 82, 0.1);
-}
-
-.section-swordsmanship :deep(.public-chip) {
-  color: var(--c-text-1);
-  border-color: rgba(74, 114, 132, 0.26);
-  background: rgba(19, 42, 56, 0.55);
-}
-
-.section-swordsmanship :deep(.verification-badge) {
-  color: var(--sword-cinnabar);
-  border-color: var(--sword-cinnabar);
-  background: rgba(216, 90, 82, 0.08);
 }
 
 .section-swordsmanship :deep(.route-display-link) {
