@@ -19,7 +19,16 @@ defineProps<{
       <video v-if="video" autoplay loop muted playsinline class="media-content">
         <source :src="getMediaUrl(video)" type="video/mp4" />
       </video>
-      <img v-else-if="image" :src="getMediaUrl(image)" :alt="titleEn" class="media-content" />
+      <UiImageWashFrame
+        v-else-if="image"
+        :src="getMediaUrl(image)"
+        :alt="titleEn"
+        aspect="16:9"
+        wash="ink"
+        :wash-opacity="0.18"
+        :frame="false"
+        class="media-frame"
+      />
       <div class="media-overlay"></div>
     </div>
     
@@ -68,6 +77,31 @@ defineProps<{
 }
 
 .featured-section:hover .media-content {
+  filter: grayscale(20%) contrast(1.1);
+  transform: scale(1.05);
+}
+
+/* UiImageWashFrame fills the flex media region */
+.media-frame {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+.media-frame :deep(.image-wash-frame__inner) {
+  height: 100%;
+  aspect-ratio: auto;
+  border: 0;
+  background: var(--c-bg);
+  box-shadow: none;
+}
+
+.media-frame :deep(.image-wash-frame__img) {
+  filter: grayscale(80%) contrast(1.1);
+  transition: filter 0.8s ease, transform 1.5s ease;
+}
+
+.featured-section:hover .media-frame :deep(.image-wash-frame__img) {
   filter: grayscale(20%) contrast(1.1);
   transform: scale(1.05);
 }

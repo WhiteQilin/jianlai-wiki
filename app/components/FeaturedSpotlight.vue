@@ -36,11 +36,20 @@ defineProps<{
         >
           <NuxtLink :to="item.link" class="card-inner hover-lift">
             <div class="card-media">
-              <img v-if="item.image" :src="item.image" :alt="item.nameEn" class="card-image" :style="item.imagePosition ? { objectPosition: item.imagePosition } : {}" />
+              <UiImageWashFrame
+                v-if="item.image"
+                :src="item.image"
+                :alt="item.nameEn"
+                aspect="16:9"
+                wash="mist"
+                :wash-opacity="0.12"
+                :frame="false"
+                :object-position="item.imagePosition || 'top center'"
+                class="card-image"
+              />
               <div v-else class="card-fallback">
                 <span>{{ item.nameZh.charAt(0) || '无' }}</span>
               </div>
-              <div class="media-overlay"></div>
             </div>
 
             <div class="card-content">
@@ -151,11 +160,23 @@ defineProps<{
   background: var(--c-bg-soft);
 }
 
-.card-image {
+/* UiImageWashFrame fills the fixed-height media well */
+.card-media .card-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: top center;
+  margin: 0;
+}
+
+.card-media :deep(.image-wash-frame__inner) {
+  height: 100%;
+  aspect-ratio: auto;
+  border: 0;
+  border-radius: 0;
+  background: var(--c-bg-soft);
+  box-shadow: none;
+}
+
+.card-media :deep(.image-wash-frame__img) {
   transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   filter: grayscale(100%) contrast(1.2);
 }
@@ -175,13 +196,7 @@ defineProps<{
   opacity: 0.8;
 }
 
-.media-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, var(--c-bg) 0%, transparent 60%);
-}
-
-.card-inner:hover .card-image {
+.card-inner:hover .card-media :deep(.image-wash-frame__img) {
   transform: scale(1.08);
   filter: grayscale(0%) contrast(1.1) brightness(1.1);
 }
