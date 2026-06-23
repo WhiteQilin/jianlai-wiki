@@ -53,7 +53,7 @@ const hasContent = computed(() => Boolean(props.page?.sourceNotes || props.page?
       </dl>
       <div class="reference-cta">
         <p>Notice an error or have more details to add?</p>
-        <NuxtLink to="/contribute" class="contribute-link">Suggest an Edit &rarr;</NuxtLink>
+        <UiInkTextButton to="/contribute" active-mark="none">Suggest an Edit &rarr;</UiInkTextButton>
       </div>
     </div>
   </section>
@@ -139,17 +139,5 @@ const hasContent = computed(() => Boolean(props.page?.sourceNotes || props.page?
 
 .reference-cta p {
   margin: 0 0 0.5rem 0;
-}
-
-.contribute-link {
-  color: var(--c-seal-red);
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.3s ease;
-}
-
-.contribute-link:hover {
-  color: var(--c-seal-red-dark);
-  text-decoration: underline;
 }
 </style>

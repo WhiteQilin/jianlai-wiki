@@ -169,7 +169,7 @@ useSeoMeta({
           <p class="rankings-empty-seal" aria-hidden="true">榜</p>
           <h2>No ledgers entered under this register yet</h2>
           <p>The {{ activeCategory }} registry is awaiting verified inscriptions. Return to the complete celestial ledger to browse all current rankings.</p>
-          <button type="button" class="rankings-empty-action" @click="selectCategory('All')">Show all ledgers</button>
+          <UiSealButton size="sm" type="button" @click="selectCategory('All')">Show all ledgers</UiSealButton>
         </section>
       </ScrollReveal>
 
@@ -474,20 +474,6 @@ useSeoMeta({
   margin: 0;
   color: color-mix(in srgb, var(--rankings-ink) 74%, transparent);
   line-height: 1.7;
-}
-
-.rankings-empty-action {
-  min-height: 2.6rem;
-  margin-top: 0.5rem;
-  padding: 0.6rem 1rem;
-  color: var(--rankings-paper);
-  border: 1px solid var(--rankings-ink);
-  background: var(--rankings-ink);
-  cursor: pointer;
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
 }
 
 @media (max-width: 860px) {
