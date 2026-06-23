@@ -8,7 +8,7 @@ defineProps<{
   <section class="media-gallery-placeholder">
     <div class="gallery-header">
       <div class="gallery-title-group">
-        <SealBadge text="影" variant="outline" shape="square" />
+        <UiSealStamp text="影" variant="outline" size="sm" writing="horizontal" :decorative="true" />
         <h3 class="gallery-title">{{ title || 'Media Archives' }}</h3>
       </div>
       <span class="gallery-status">Pending Processing</span>

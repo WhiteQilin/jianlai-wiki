@@ -17,7 +17,7 @@ defineProps<{
     <div class="corner corner-br" aria-hidden="true"></div>
     <div class="watermark" aria-hidden="true">{{ icon || '卷' }}</div>
 
-    <SealBadge :text="icon || '卷'" variant="outline" shape="square" />
+    <UiSealStamp :text="icon || '卷'" variant="outline" size="sm" writing="horizontal" :decorative="true" />
     <OrnamentalDivider motif="ruyi" color="celadon" />
 
     <h3 class="empty-title">{{ title || 'Records awaiting inscription' }}</h3>
@@ -145,7 +145,7 @@ defineProps<{
 
 .empty-title,
 .empty-text,
-.empty-archive-state :deep(.seal-badge),
+.empty-archive-state :deep(.seal-stamp),
 .empty-archive-state :deep(.ornamental-divider) {
   position: relative;
   z-index: 1;

@@ -33,7 +33,7 @@ defineProps<{
     </div>
 
     <div class="hero-content">
-      <SealBadge v-if="titleZh" :text="titleZh.charAt(0)" variant="outline" shape="square" />
+      <UiSealStamp v-if="titleZh" :text="titleZh.charAt(0)" variant="outline" size="sm" writing="horizontal" :decorative="true" />
       <h1 class="title-en">{{ titleEn }}</h1>
       <h2 class="title-zh">{{ titleZh }}</h2>
       <OrnamentalDivider motif="jade" color="celadon" />
@@ -187,7 +187,7 @@ defineProps<{
   margin: 0 auto;
 }
 
-.hero-content :deep(.seal-badge) {
+.hero-content :deep(.seal-stamp) {
   margin-bottom: 1rem;
 }
 

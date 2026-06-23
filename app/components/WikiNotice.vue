@@ -8,7 +8,7 @@ defineProps<{
   <aside class="wiki-notice" :class="`notice-${type || 'info'}`">
     <div class="notice-icon">
       <span v-if="type === 'warning'">!</span>
-      <SealBadge v-else-if="type === 'verification'" text="印" variant="outline" shape="square" />
+      <UiSealStamp v-else-if="type === 'verification'" text="印" variant="outline" size="sm" writing="horizontal" :decorative="false" />
       <span v-else>i</span>
     </div>
     <div class="notice-content">

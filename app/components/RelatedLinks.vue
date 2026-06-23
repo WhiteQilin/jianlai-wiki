@@ -28,7 +28,7 @@ const getPortalImage = (item: RelatedLink) => item.bgImage || portalImages[item.
 <template>
   <div class="related-sections">
     <div class="related-heading">
-      <SealBadge text="引" variant="outline" shape="square" />
+      <UiSealStamp text="引" variant="outline" size="sm" writing="horizontal" :decorative="true" />
       <h3 class="related-title">Explore More</h3>
     </div>
     <span class="heading-rule" aria-hidden="true">

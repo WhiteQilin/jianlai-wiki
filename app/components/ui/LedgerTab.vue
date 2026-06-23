@@ -40,6 +40,7 @@ const toneClass = computed(() => `tone-${props.tone}`)
   --ledger-tab-frame: var(--jl-section-frame);
   --ledger-tab-seal: var(--jl-section-seal);
   --ledger-tab-mist: var(--jl-section-mist);
+  --ledger-tab-paper: var(--jl-section-paper);
 
   position: relative;
   display: inline-flex;
@@ -113,6 +114,7 @@ const toneClass = computed(() => `tone-${props.tone}`)
   --ledger-tab-frame: var(--jl-section-frame);
   --ledger-tab-seal: var(--jl-section-seal);
   --ledger-tab-mist: var(--jl-section-mist);
+  --ledger-tab-paper: var(--jl-section-paper);
 }
 
 .tone-bronze {
@@ -121,6 +123,7 @@ const toneClass = computed(() => `tone-${props.tone}`)
   --ledger-tab-frame: rgba(140, 118, 84, 0.22);
   --ledger-tab-seal: var(--jl-cinnabar-red);
   --ledger-tab-mist: var(--jl-aged-paper);
+  --ledger-tab-paper: var(--jl-paper-ivory);
 }
 
 .tone-jade {
@@ -129,6 +132,7 @@ const toneClass = computed(() => `tone-${props.tone}`)
   --ledger-tab-frame: rgba(52, 100, 93, 0.22);
   --ledger-tab-seal: var(--jl-cinnabar-red);
   --ledger-tab-mist: #edf2ef;
+  --ledger-tab-paper: #f1f5f1;
 }
 
 .tone-cinnabar {
@@ -137,6 +141,7 @@ const toneClass = computed(() => `tone-${props.tone}`)
   --ledger-tab-frame: rgba(184, 42, 42, 0.22);
   --ledger-tab-seal: var(--jl-cinnabar);
   --ledger-tab-mist: #fdf0f0;
+  --ledger-tab-paper: #fbf3f1;
 }
 
 /* Variant: compact — smaller, no border-radius, less padding */

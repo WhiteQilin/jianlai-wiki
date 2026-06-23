@@ -28,7 +28,7 @@ const hasContent = computed(() => Boolean(props.page?.sourceNotes || props.page?
 <template>
   <section v-if="hasContent" class="entry-reference-block">
     <div class="reference-heading">
-      <SealBadge text="证" variant="outline" shape="square" />
+      <UiSealStamp text="证" variant="outline" size="sm" writing="horizontal" :decorative="true" />
       <div>
         <p class="eyebrow">Source Status</p>
         <h2>Verification Notes</h2>
