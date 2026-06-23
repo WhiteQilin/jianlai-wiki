@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import LedgerTab from '~/components/ui/LedgerTab.vue'
+
 defineProps<{
   categories: string[]
   active: string
@@ -13,15 +15,16 @@ defineEmits<{
   <div class="category-tabs">
     <div class="tab-label">Filter:</div>
     <div class="tab-list">
-      <button 
-        v-for="cat in categories" 
+      <LedgerTab
+        v-for="cat in categories"
         :key="cat"
-        class="tab-btn"
-        :class="{ active: cat === active }"
+        :active="cat === active"
+        variant="compact"
+        tone="section"
         @click="$emit('update:active', cat)"
       >
         {{ cat }}
-      </button>
+      </LedgerTab>
     </div>
   </div>
 </template>
@@ -48,32 +51,6 @@ defineEmits<{
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
-}
-
-.tab-btn {
-  background: var(--c-bg-soft);
-  border: 1px solid transparent;
-  font-size: 0.9rem;
-  color: var(--c-text-2);
-  cursor: pointer;
-  padding: 0.4rem 1.2rem;
-  border-radius: 20px;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  font-family: inherit;
-}
-
-.tab-btn:hover {
-  color: var(--c-ink);
-  background: var(--c-mist-light);
-  border-color: var(--c-border);
-}
-
-.tab-btn.active {
-  color: #fff;
-  background: var(--c-ink);
-  border-color: var(--c-ink);
-  font-weight: 500;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 @media (max-width: 640px) {
