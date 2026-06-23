@@ -24,19 +24,19 @@ const issuesUrl = `${githubRepoUrl}/issues/new/choose`
         <div class="option-card">
           <h3>Report an Issue</h3>
           <p>Found a typo, broken link, or incorrect lore? Let us know so we can fix it.</p>
-          <a :href="issuesUrl" target="_blank" rel="noopener noreferrer" class="cta-button">Report Issue</a>
+          <UiSealButton :href="issuesUrl" size="md">Report Issue</UiSealButton>
         </div>
         
         <div class="option-card">
           <h3>Suggest an Edit</h3>
           <p>Have more details to add to an entry? Want to provide better citations or missing context?</p>
-          <a :href="issuesUrl" target="_blank" rel="noopener noreferrer" class="cta-button">Suggest Edit</a>
+          <UiSealButton :href="issuesUrl" size="md">Suggest Edit</UiSealButton>
         </div>
         
         <div class="option-card">
           <h3>Request a Page</h3>
           <p>Notice a missing character, artifact, or location? Request a new entry to be added.</p>
-          <a :href="issuesUrl" target="_blank" rel="noopener noreferrer" class="cta-button">Request Page</a>
+          <UiSealButton :href="issuesUrl" size="md">Request Page</UiSealButton>
         </div>
       </div>
 
@@ -103,24 +103,6 @@ const issuesUrl = `${githubRepoUrl}/issues/new/choose`
   font-size: 0.95rem;
   margin-bottom: 2rem;
   flex-grow: 1;
-}
-
-.cta-button {
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
-  background: var(--c-seal-red);
-  color: white;
-  text-decoration: none;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  border-radius: 2px;
-  transition: background-color 0.3s ease;
-}
-
-.cta-button:hover {
-  background: var(--c-seal-red-dark);
 }
 
 .guidelines {

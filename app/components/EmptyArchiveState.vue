@@ -25,7 +25,7 @@ defineProps<{
       {{ text || 'The archive table is set, the ink is drying, and these records will be entered after verification.' }}
     </p>
     <div class="empty-cta">
-      <NuxtLink to="/contribute" class="contribute-link">Help expand the archive &rarr;</NuxtLink>
+      <UiInkButton to="/contribute" tone="cinnabar">Help expand the archive &rarr;</UiInkButton>
     </div>
   </section>
 </template>
@@ -179,25 +179,6 @@ defineProps<{
   z-index: 1;
 }
 
-.contribute-link {
-  display: inline-block;
-  padding: 0.5rem 1.25rem;
-  border: 1px solid var(--c-seal-red);
-  color: var(--c-seal-red);
-  text-decoration: none;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  border-radius: 2px;
-  transition: all 0.3s ease;
-}
-
-.contribute-link:hover {
-  background: var(--c-seal-red);
-  color: white;
-}
-
 .dark .empty-archive-state {
   background:
     linear-gradient(135deg, rgba(73, 138, 142, 0.08), transparent 34%),
@@ -242,17 +223,5 @@ defineProps<{
 
 .empty-archive-state--dark-chronicle .empty-text {
   color: rgba(255, 255, 255, 0.7);
-}
-
-.empty-archive-state--dark-chronicle .contribute-link {
-  border-color: rgba(212, 175, 55, 0.5);
-  color: var(--c-gold, #d4af37);
-  background: rgba(0, 0, 0, 0.4);
-}
-
-.empty-archive-state--dark-chronicle .contribute-link:hover {
-  background: rgba(212, 175, 55, 0.15);
-  color: #fff;
-  border-color: var(--c-gold, #d4af37);
 }
 </style>
