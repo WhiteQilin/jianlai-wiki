@@ -63,7 +63,7 @@ useSeoMeta({
         <EmptyArchiveState />
       </ScrollReveal>
 
-      <InkDivider type="brush" />
+      <UiSectionDivider motif="doctrine" />
 
       <ScrollReveal animation="reveal-fade-up">
         <RelatedLinks 

@@ -68,7 +68,7 @@ useSeoMeta({
         <EmptyArchiveState />
       </ScrollReveal>
 
-      <InkDivider type="brush" />
+      <UiSectionDivider motif="seal" />
 
       <ScrollReveal animation="reveal-fade-up">
         <RelatedLinks 

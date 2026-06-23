@@ -158,7 +158,7 @@ useSeoMeta({
         </ScrollReveal>
       </section>
 
-      <InkDivider type="brush" />
+      <UiSectionDivider motif="ink" />
 
       <ScrollReveal animation="reveal-fade-up">
         <RelatedLinks
