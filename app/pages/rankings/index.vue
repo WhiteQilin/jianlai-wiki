@@ -173,7 +173,7 @@ useSeoMeta({
         </section>
       </ScrollReveal>
 
-      <InkDivider type="brush" />
+      <UiSectionDivider motif="ledger" />
 
       <ScrollReveal animation="reveal-fade-up">
         <RelatedLinks

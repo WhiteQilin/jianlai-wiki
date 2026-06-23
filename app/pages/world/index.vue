@@ -315,7 +315,7 @@ useSeoMeta({
         />
       </ScrollReveal>
 
-      <InkDivider type="brush" />
+      <UiSectionDivider motif="atlas" />
 
       <ScrollReveal animation="reveal-fade-up">
         <RelatedLinks :links="relatedLinks" />

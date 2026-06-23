@@ -455,7 +455,7 @@ useSeoMeta({
         />
       </ScrollReveal>
 
-      <InkDivider type="brush" />
+      <UiSectionDivider motif="ink" />
 
       <ScrollReveal animation="reveal-fade-up">
         <RelatedLinks :links="relatedLinks" />
