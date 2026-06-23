@@ -125,6 +125,7 @@ useSeoMeta({
           <div class="archive-heading">
             <span class="archive-kicker">Reference shelf</span>
             <h2 id="cultivation-archive-title">Cultivation archive</h2>
+            <UiBrushUnderline tone="section" weight="bold" width="long" />
             <p>All current cultivation entries remain available here without overtaking the system map above.</p>
           </div>
         </ScrollReveal>
@@ -390,6 +391,14 @@ useSeoMeta({
   letter-spacing: 0;
 }
 
+.archive-heading :deep(.brush-underline) {
+  grid-column: 1;
+  display: block;
+  width: 7.5rem;
+  height: 0.5rem;
+  margin-top: 0.5rem;
+}
+
 .archive-heading p {
   grid-column: 2;
   margin: 0;
@@ -509,7 +518,8 @@ useSeoMeta({
   }
 
   .archive-heading h2,
-  .archive-heading p {
+  .archive-heading p,
+  .archive-heading :deep(.brush-underline) {
     grid-column: auto;
   }
 }

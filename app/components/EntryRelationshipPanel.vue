@@ -49,6 +49,7 @@ const hasMoreRelationships = computed(() => structuredRelationships.value.length
       <div>
         <p class="eyebrow">Connections</p>
         <h2>Relationships & Related Entries</h2>
+        <UiBrushUnderline tone="section" weight="bold" width="long" />
       </div>
     </div>
 
@@ -105,6 +106,13 @@ const hasMoreRelationships = computed(() => structuredRelationships.value.length
   font-family: var(--font-heading);
   font-size: 1.5rem;
   font-weight: 500;
+}
+
+.panel-heading :deep(.brush-underline) {
+  display: block;
+  width: 7.5rem;
+  height: 0.5rem;
+  margin-top: 0.55rem;
 }
 
 .structured-relationships {
