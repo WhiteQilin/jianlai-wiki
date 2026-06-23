@@ -32,6 +32,7 @@ const hasContent = computed(() => Boolean(props.page?.sourceNotes || props.page?
       <div>
         <p class="eyebrow">Source Status</p>
         <h2>Verification Notes</h2>
+        <UiBrushUnderline tone="section" weight="bold" width="long" />
       </div>
     </div>
 
@@ -93,6 +94,13 @@ const hasContent = computed(() => Boolean(props.page?.sourceNotes || props.page?
   font-family: var(--font-heading);
   font-size: 1.25rem;
   font-weight: 500;
+}
+
+.reference-heading :deep(.brush-underline) {
+  display: block;
+  width: 7.5rem;
+  height: 0.5rem;
+  margin-top: 0.5rem;
 }
 
 .source-notes {

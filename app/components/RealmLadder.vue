@@ -35,6 +35,7 @@ const formatStatus = (status?: string) => status?.replace(/-/g, ' ') || ''
     <div class="ladder-heading">
       <span class="section-kicker">Realm grouping</span>
       <h2 id="qi-refiner-realm-ladder">Qi Refiner Realm Ladder</h2>
+      <UiBrushUnderline tone="section" weight="bold" width="long" />
       <p>
         These entries describe the grouped Qi Refiner ladder and should not be read as Pure Martial Artist progression.
       </p>
@@ -96,6 +97,13 @@ const formatStatus = (status?: string) => status?.replace(/-/g, ' ') || ''
   font-size: 2rem;
   font-weight: 500;
   letter-spacing: 0;
+}
+
+.ladder-heading :deep(.brush-underline) {
+  display: block;
+  width: 7.5rem;
+  height: 0.5rem;
+  margin-top: 0.5rem;
 }
 
 .ladder-heading p {

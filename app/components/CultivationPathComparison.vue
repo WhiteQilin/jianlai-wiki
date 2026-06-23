@@ -39,6 +39,7 @@ const cardClass = (title?: string) => `path-card--${(title || 'path').toLowerCas
     <div class="comparison-heading">
       <span class="section-kicker">System map</span>
       <h2 id="cultivation-path-comparison">Path comparison</h2>
+      <UiBrushUnderline tone="section" weight="bold" width="long" class="comparison-underline" />
       <p>
         The available path entries are shown before the realm ladder so each approach keeps its own frame.
       </p>
@@ -142,6 +143,14 @@ const cardClass = (title?: string) => `path-card--${(title || 'path').toLowerCas
   font-size: 2rem;
   font-weight: 500;
   letter-spacing: 0;
+}
+
+.comparison-underline {
+  grid-column: 1;
+  display: block;
+  width: 7.5rem;
+  height: 0.5rem;
+  margin-top: 0.5rem;
 }
 
 .comparison-heading p {
@@ -345,7 +354,8 @@ const cardClass = (title?: string) => `path-card--${(title || 'path').toLowerCas
   }
 
   .comparison-heading h2,
-  .comparison-heading p {
+  .comparison-heading p,
+  .comparison-underline {
     grid-column: auto;
   }
 

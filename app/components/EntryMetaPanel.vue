@@ -50,10 +50,16 @@ const hasContent = computed(() => Boolean(props.image) || facts.value.length > 0
 
 <template>
   <aside v-if="hasContent" class="entry-meta-panel">
-    <div v-if="image" class="meta-image-wrapper">
-      <img :src="image" :alt="alt || 'Entry image'" class="meta-image" />
-      <div class="image-overlay"></div>
-    </div>
+    <UiImageWashFrame
+      v-if="image"
+      :src="image"
+      :alt="alt || 'Entry image'"
+      aspect="3:2"
+      wash="mist"
+      :wash-opacity="0.1"
+      :frame="true"
+      class="meta-image"
+    />
 
     <div class="meta-content">
       <div class="meta-texture"></div>
@@ -99,27 +105,15 @@ const hasContent = computed(() => Boolean(props.image) || facts.value.length > 0
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
-.meta-image-wrapper {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  position: relative;
-  background: var(--c-bg);
-  border-bottom: 1px solid var(--c-border);
-}
-
 .meta-image {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+  margin: 0;
 }
 
-.image-overlay {
-  position: absolute;
-  inset: 0;
-  border: 4px solid var(--c-border);
-  opacity: 0.3;
-  pointer-events: none;
+.meta-image :deep(.image-wash-frame__inner) {
+  border: 0;
+  border-bottom: 1px solid var(--c-border);
+  border-radius: 0;
 }
 
 .meta-content {
