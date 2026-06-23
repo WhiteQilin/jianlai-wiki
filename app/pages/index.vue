@@ -146,7 +146,7 @@ const spotlightItems = [
       </section>
 
       <ScrollReveal animation="reveal-fade-up" class="wip-notice">
-        <div class="wip-icon"><SealBadge text="卷" variant="filled" shape="square" /></div>
+        <div class="wip-icon"><UiSealStamp text="卷" variant="filled" size="sm" writing="horizontal" :decorative="true" /></div>
         <h3 class="wip-title">The Archives are Expanding</h3>
         <p class="wip-text">Records of the Jian Lai universe are still being compiled. Many legends remain untold.</p>
         <OrnamentalButton to="https://github.com/WhiteQilin/jianlai-wiki" variant="secondary" class="hover-lift">Contribute on GitHub</OrnamentalButton>

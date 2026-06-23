@@ -4,7 +4,7 @@
  *
  * Deliberately NOT CharacterInfobox: that component is portrait-semantic
  * (3/4 aspect frame, 无 fallback, character-only naming). This sibling reuses
- * the same design tokens + SealBadge but renders only the meta a generic
+ * the same design tokens + UiSealStamp but renders only the meta a generic
  * entry actually has, and shows the image block only when an image exists.
  */
 const props = defineProps<{
@@ -72,12 +72,14 @@ const hasContent = computed(() => Boolean(props.image) || facts.value.length > 0
       <div v-if="tags && tags.length" class="meta-tags">
         <span class="fact-label">Tags</span>
         <div class="tag-list">
-          <SealBadge
+          <UiSealStamp
             v-for="tag in tags"
             :key="tag"
             :text="tag"
             variant="outline"
-            shape="rectangle"
+            size="xs"
+            writing="horizontal"
+            :decorative="false"
             class="tag-chip"
           />
         </div>
@@ -214,13 +216,12 @@ const hasContent = computed(() => Boolean(props.image) || facts.value.length > 0
   font-size: 0.7rem;
 }
 
-/* Override the vertical writing-mode of rectangle seals for horizontal tag chips */
-.tag-chip :deep(.seal-text) {
+/* Override the default seal styles for horizontal tag chips */
+.tag-chip :deep(.seal__text) {
   writing-mode: horizontal-tb;
 }
 
-.tag-chip.seal-shape-rectangle {
-  writing-mode: horizontal-tb;
+.tag-chip.seal--horizontal {
   min-height: 0;
   padding: 0.25em 0.6em;
   letter-spacing: 0.04em;

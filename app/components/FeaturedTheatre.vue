@@ -44,7 +44,7 @@ const supportingVideos = [
 <template>
   <div class="featured-theatre">
     <div class="theatre-header">
-      <SealBadge text="影" variant="outline" shape="square" />
+      <UiSealStamp text="影" variant="outline" size="sm" writing="horizontal" :decorative="true" />
       <h3 class="section-title">Cinematic Archives</h3>
       <OrnamentalDivider motif="ruyi" color="ink" />
     </div>

@@ -46,11 +46,13 @@ defineProps<{
             <div class="card-content">
               <div class="card-meta">
                 <span class="category">{{ item.category }}</span>
-                <SealBadge
+                <UiSealStamp
                   v-if="item.status === 'Main Protagonist'"
                   :text="'主角'"
                   variant="filled"
-                  shape="square"
+                  size="sm"
+                  writing="horizontal"
+                  :decorative="false"
                 />
                 <span v-else class="status">{{ item.status }}</span>
               </div>
