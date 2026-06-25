@@ -320,6 +320,58 @@ const washAssets = computed(() => getAssetsByRole('background-wash').filter((a) 
             </UiPaperSlipCard>
           </div>
         </div>
+
+        <!-- Dev-only: seal texture override preview (Stage 35D-3C) -->
+        <div class="primitive-block__stage" style="margin-top: 0;">
+          <div class="ink-button-override">
+            <p class="tone-label">sealTextureId overrides · dev-only</p>
+
+            <div class="paper-slip-card-grid">
+              <div class="ink-button-cell">
+                <span class="tone-label">default (CSS var)</span>
+                <UiPaperSlipCard seal-corner>
+                  <h3 class="card-headline">Default Seal</h3>
+                  <p class="card-body">CSS var --jl-active-seal.</p>
+                </UiPaperSlipCard>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">cinnabar-01</span>
+                <UiPaperSlipCard seal-corner seal-texture-id="asset.ui.active.seal.cinnabar-01">
+                  <h3 class="card-headline">Seal 01</h3>
+                  <p class="card-body">Manifest cinnabar-01.</p>
+                </UiPaperSlipCard>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">cinnabar-02</span>
+                <UiPaperSlipCard seal-corner seal-texture-id="asset.ui.active.seal.cinnabar-02">
+                  <h3 class="card-headline">Seal 02</h3>
+                  <p class="card-body">Manifest cinnabar-02.</p>
+                </UiPaperSlipCard>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">cinnabar-03</span>
+                <UiPaperSlipCard seal-corner seal-texture-id="asset.ui.active.seal.cinnabar-03">
+                  <h3 class="card-headline">Seal 03</h3>
+                  <p class="card-body">Manifest cinnabar-03.</p>
+                </UiPaperSlipCard>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">invalid → fallback</span>
+                <UiPaperSlipCard seal-corner seal-texture-id="asset.ui.active.seal.bad-id">
+                  <h3 class="card-headline">Bad ID</h3>
+                  <p class="card-body">Falls back to CSS var.</p>
+                </UiPaperSlipCard>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">sealCorner=false + textureId</span>
+                <UiPaperSlipCard seal-texture-id="asset.ui.active.seal.cinnabar-01">
+                  <h3 class="card-headline">No Seal Corner</h3>
+                  <p class="card-body">sealCorner false — no seal rendered.</p>
+                </UiPaperSlipCard>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <UiSectionDivider motif="doctrine" label="07 · ImageWashFrame" />
