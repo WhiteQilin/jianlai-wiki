@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<{
   tone: 'auto',
   weight: 'regular',
   width: 'medium',
-  textureId: 'asset.ui.underline.ink.thin-03',
+  textureId: '',
   textureOpacity: undefined,
 })
 

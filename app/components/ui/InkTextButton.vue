@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { getAssetById } from '~/utils/assetManifest'
 
 const props = withDefaults(defineProps<{
   to?: string
@@ -9,12 +10,23 @@ const props = withDefaults(defineProps<{
   ariaLabel?: string
   activeMark?: 'ring' | 'seal' | 'none'
   type?: 'button' | 'submit' | 'reset'
+  /** Manifest asset IDs to override individual texture layers.
+   *  Default: '' (empty) — each CSS variable falls back to its
+   *  --jl-* counterpart (Hybrid D: CSS var-first). Set a prop to
+   *  a manifest ID to swap that layer for dev/QA/prototype use.
+   *  Invalid IDs fall back gracefully to the CSS variable. */
+  brushTextureId?: string
+  ringTextureId?: string
+  sealTextureId?: string
 }>(), {
   active: false,
   pressed: false,
   disabled: false,
   activeMark: 'ring',
   type: 'button',
+  brushTextureId: '',
+  ringTextureId: '',
+  sealTextureId: '',
 })
 
 const emit = defineEmits<{
@@ -23,6 +35,27 @@ const emit = defineEmits<{
 
 const isPressed = computed(() => props.active || props.pressed)
 const markClass = computed(() => `mark-${props.activeMark}`)
+
+/** Resolve a texture URL from the manifest, or '' if no valid override.
+ *  Returns '' for empty/invalid IDs so the CSS variable takes over. */
+function resolveTextureUrl(id: string): string {
+  if (!id) return ''
+  return getAssetById(id)?.filePath ?? ''
+}
+
+/** Inline CSS custom properties injected only when a manifest override is
+ *  active for a given layer. Empty object otherwise — no inline style,
+ *  the stylesheet's --jl-* variables apply unchanged. */
+const textureVars = computed<Record<string, string>>(() => {
+  const vars: Record<string, string> = {}
+  const brushUrl = resolveTextureUrl(props.brushTextureId)
+  const ringUrl = resolveTextureUrl(props.ringTextureId)
+  const sealUrl = resolveTextureUrl(props.sealTextureId)
+  if (brushUrl) vars['--ink-text-brush'] = `url('${brushUrl}')`
+  if (ringUrl) vars['--ink-text-ring'] = `url('${ringUrl}')`
+  if (sealUrl) vars['--ink-text-seal'] = `url('${sealUrl}')`
+  return vars
+})
 </script>
 
 <template>
@@ -31,6 +64,7 @@ const markClass = computed(() => `mark-${props.activeMark}`)
     :to="to"
     class="ink-text-button"
     :class="[markClass, { 'is-active': isPressed }]"
+    :style="textureVars"
     :aria-label="ariaLabel"
     @click="emit('click', $event)"
   >
@@ -42,6 +76,7 @@ const markClass = computed(() => `mark-${props.activeMark}`)
     :type="type"
     class="ink-text-button"
     :class="[markClass, { 'is-active': isPressed, 'is-disabled': disabled }]"
+    :style="textureVars"
     :disabled="disabled"
     :aria-pressed="isPressed ? 'true' : 'false'"
     :aria-label="ariaLabel"
@@ -86,7 +121,9 @@ const markClass = computed(() => `mark-${props.activeMark}`)
 
 .ink-text-button::before {
   inset: 0.08rem -0.5rem;
-  background-image: var(--jl-hover-brush);
+  /* --ink-text-brush overrides the manifest texture; falls back to the
+     global CSS variable when the brushTextureId prop is empty. */
+  background-image: var(--ink-text-brush, var(--jl-hover-brush));
   opacity: 0;
   transform: scale(0.88, 0.74);
   transition:
@@ -99,7 +136,9 @@ const markClass = computed(() => `mark-${props.activeMark}`)
   height: 2.35rem;
   left: -0.34rem;
   top: 50%;
-  background-image: var(--jl-active-ring);
+  /* --ink-text-ring overrides the manifest texture; falls back to the
+     global CSS variable when the ringTextureId prop is empty. */
+  background-image: var(--ink-text-ring, var(--jl-active-ring));
   opacity: 0;
   transform: translateY(-50%) scale(0.82) rotate(-5deg);
   transition:
@@ -112,7 +151,9 @@ const markClass = computed(() => `mark-${props.activeMark}`)
   height: 1.05rem;
   right: -0.34rem;
   top: 0.04rem;
-  background-image: var(--jl-active-seal);
+  /* --ink-text-seal overrides the manifest texture; falls back to the
+     global CSS variable when the sealTextureId prop is empty. */
+  background-image: var(--ink-text-seal, var(--jl-active-seal));
   opacity: 0;
   transform: scale(0.84) rotate(4deg);
   transition:

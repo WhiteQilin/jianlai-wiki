@@ -592,6 +592,43 @@ const manifest: AssetManifest = {
       curatedBy: 'Stage 35D-0 audit — swordsmanship-v2 generation pass',
       notes: 'Opaque atmosphere wash. Not an alpha asset. Production-ready.',
     },
+
+    // ── Stage 35D-1H: Purchased CSS texture assets ──────────────────
+
+    // Purchased ink — title brush (consumed via --jl-title-brush)
+    {
+      id: 'asset.ui.purchased.ink.title-stroke-long-06',
+      filePath: '/images/ui/purchased/ink/ink-title-stroke-long-06.webp',
+      role: 'section-divider',
+      sectionFit: ['global'],
+      mood: 'burnished',
+      subject: 'Purchased ink title brush stroke — long horizontal ink wash',
+      aspectRatio: '3:1',
+      cropType: 'full-bleed',
+      recommendedUse: 'BrushTitle and SectionDivider motif="ink"; scaleX reveal; section header ornament',
+      avoidUse: 'Small buttons, active states, repeated tiled backgrounds',
+      priority: 'p0',
+      curatedAt: '2025-06-25',
+      curatedBy: 'Stage 35D-1H — purchased asset registration',
+      notes: 'Purchased ink asset. Clean alpha — ink-colored fringe. Production-ready. Consumed via --jl-title-brush CSS variable.',
+    },
+    // Purchased ink — divider (consumed via --jl-divider-ink)
+    {
+      id: 'asset.ui.purchased.ink.divider-thin-01',
+      filePath: '/images/ui/purchased/ink/ink-divider-thin-01.webp',
+      role: 'section-divider',
+      sectionFit: ['global'],
+      mood: 'burnished',
+      subject: 'Purchased ink divider stroke — thin horizontal ink line',
+      aspectRatio: '3:1',
+      cropType: 'full-bleed',
+      recommendedUse: 'InkDivider and quiet section separation; scaleX reveal',
+      avoidUse: 'Hover states, badges, seals, small icons',
+      priority: 'p0',
+      curatedAt: '2025-06-25',
+      curatedBy: 'Stage 35D-1H — purchased asset registration',
+      notes: 'Purchased ink asset. Clean alpha — ink-colored fringe. Production-ready. Consumed via --jl-divider-ink CSS variable.',
+    },
   ],
 }
 
