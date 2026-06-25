@@ -542,6 +542,104 @@ const washAssets = computed(() => getAssetsByRole('background-wash').filter((a) 
           </div>
         </div>
       </section>
+
+      <UiSectionDivider motif="blank" label="11 · InkHoverLink" />
+
+      <!-- 11. InkHoverLink -->
+      <section class="primitive-block" aria-labelledby="prim-ink-hover-link">
+        <header class="primitive-block__header">
+          <span class="primitive-block__index">11</span>
+          <h2 id="prim-ink-hover-link" class="primitive-block__title">InkHoverLink</h2>
+          <p class="primitive-block__desc">
+            Inline navigation link with hover brush and active mark (underline or seal). Optional texture overrides per layer.
+          </p>
+        </header>
+        <div class="primitive-block__stage">
+          <!-- Default variants -->
+          <div class="ink-text-button-row">
+            <div class="ink-button-cell">
+              <span class="tone-label">mark=underline</span>
+              <UiInkHoverLink to="/swordsmanship" active-mark="underline">Sword Manual</UiInkHoverLink>
+              <UiInkHoverLink to="/swordsmanship" active-mark="underline" active>Active</UiInkHoverLink>
+              <UiInkHoverLink to="/swordsmanship" active-mark="underline" disabled>Disabled</UiInkHoverLink>
+            </div>
+            <div class="ink-button-cell">
+              <span class="tone-label">mark=seal</span>
+              <UiInkHoverLink to="/swordsmanship" active-mark="seal">Seal Mark</UiInkHoverLink>
+              <UiInkHoverLink to="/swordsmanship" active-mark="seal" active>Active</UiInkHoverLink>
+              <UiInkHoverLink to="/swordsmanship" active-mark="seal" disabled>Disabled</UiInkHoverLink>
+            </div>
+            <div class="ink-button-cell">
+              <span class="tone-label">mark=none</span>
+              <UiInkHoverLink to="/swordsmanship" active-mark="none">No Mark</UiInkHoverLink>
+              <UiInkHoverLink to="/swordsmanship" active-mark="none" active>Active</UiInkHoverLink>
+              <UiInkHoverLink to="/swordsmanship" active-mark="none" disabled>Disabled</UiInkHoverLink>
+            </div>
+          </div>
+
+          <!-- Dev-only: texture override preview (Stage 35D-2C) -->
+          <div class="ink-button-override">
+            <p class="tone-label">textureId overrides · dev-only</p>
+
+            <div class="ink-button-override-row">
+              <div class="ink-button-cell">
+                <span class="tone-label">default (CSS var)</span>
+                <UiInkHoverLink to="/swordsmanship" active-mark="underline" active>Default Textures</UiInkHoverLink>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">brush soft-01</span>
+                <UiInkHoverLink to="/swordsmanship" active-mark="underline" active brush-texture-id="asset.ui.hover.brush.soft-01">Brush Override</UiInkHoverLink>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">brush soft-02</span>
+                <UiInkHoverLink to="/swordsmanship" active-mark="underline" active brush-texture-id="asset.ui.hover.brush.soft-02">Brush Soft 02</UiInkHoverLink>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">brush soft-04</span>
+                <UiInkHoverLink to="/swordsmanship" active-mark="underline" active brush-texture-id="asset.ui.hover.brush.soft-04">Brush Soft 04</UiInkHoverLink>
+              </div>
+            </div>
+
+            <div class="ink-button-override-row">
+              <div class="ink-button-cell">
+                <span class="tone-label">underline thin-03</span>
+                <UiInkHoverLink to="/swordsmanship" active-mark="underline" active underline-texture-id="asset.ui.underline.ink.thin-03">Thin 03 Underline</UiInkHoverLink>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">underline thin-04</span>
+                <UiInkHoverLink to="/swordsmanship" active-mark="underline" active underline-texture-id="asset.ui.underline.ink.thin-04">Thin 04 Underline</UiInkHoverLink>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">seal cinnabar-01</span>
+                <UiInkHoverLink to="/swordsmanship" active-mark="seal" active seal-texture-id="asset.ui.active.seal.cinnabar-01">Seal Override</UiInkHoverLink>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">seal cinnabar-02</span>
+                <UiInkHoverLink to="/swordsmanship" active-mark="seal" active seal-texture-id="asset.ui.active.seal.cinnabar-02">Seal 02</UiInkHoverLink>
+              </div>
+            </div>
+
+            <div class="ink-button-override-row">
+              <div class="ink-button-cell">
+                <span class="tone-label">seal cinnabar-03</span>
+                <UiInkHoverLink to="/swordsmanship" active-mark="seal" active seal-texture-id="asset.ui.active.seal.cinnabar-03">Seal 03</UiInkHoverLink>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">invalid brush → fallback</span>
+                <UiInkHoverLink to="/swordsmanship" active-mark="underline" active brush-texture-id="asset.ui.hover.brush.does-not-exist">Bad Brush ID</UiInkHoverLink>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">invalid underline → fallback</span>
+                <UiInkHoverLink to="/swordsmanship" active-mark="underline" active underline-texture-id="asset.ui.underline.ink.bad-id">Bad Underline ID</UiInkHoverLink>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">invalid seal → fallback</span>
+                <UiInkHoverLink to="/swordsmanship" active-mark="seal" active seal-texture-id="asset.ui.active.seal.bad-id">Bad Seal ID</UiInkHoverLink>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
 
     <footer class="ui-primitives-footer">
