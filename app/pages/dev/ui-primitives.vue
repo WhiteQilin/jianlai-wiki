@@ -402,6 +402,48 @@ const washAssets = computed(() => getAssetsByRole('background-wash').filter((a) 
             <UiSectionDivider motif="seal" label="End of Register" />
           </div>
         </div>
+
+        <!-- Dev-only: blade / ink texture override preview (Stage 35D-3B) -->
+        <div class="primitive-block__stage" style="margin-top: 0;">
+          <div class="ink-button-override">
+            <p class="tone-label">bladeTextureId / inkTextureId overrides · dev-only</p>
+
+            <div class="section-divider-stack">
+              <div class="section-divider-row">
+                <span class="tone-label">blade · default (CSS var slash-01)</span>
+                <UiSectionDivider motif="blade" />
+              </div>
+              <div class="section-divider-row">
+                <span class="tone-label">blade · slash-01 (explicit)</span>
+                <UiSectionDivider motif="blade" blade-texture-id="asset.swordsmanship.divider.slash-01" />
+              </div>
+              <div class="section-divider-row">
+                <span class="tone-label">blade · slash-02</span>
+                <UiSectionDivider motif="blade" blade-texture-id="asset.swordsmanship.divider.slash-02" />
+              </div>
+              <div class="section-divider-row">
+                <span class="tone-label">blade · slash-03</span>
+                <UiSectionDivider motif="blade" blade-texture-id="asset.swordsmanship.divider.slash-03" />
+              </div>
+              <div class="section-divider-row">
+                <span class="tone-label">blade · invalid → fallback</span>
+                <UiSectionDivider motif="blade" blade-texture-id="asset.swordsmanship.divider.bad-id" />
+              </div>
+              <div class="section-divider-row">
+                <span class="tone-label">ink · default (CSS var title-brush)</span>
+                <UiSectionDivider motif="ink" />
+              </div>
+              <div class="section-divider-row">
+                <span class="tone-label">ink · purchased title brush</span>
+                <UiSectionDivider motif="ink" ink-texture-id="asset.ui.purchased.ink.title-stroke-long-06" />
+              </div>
+              <div class="section-divider-row">
+                <span class="tone-label">ink · invalid → fallback</span>
+                <UiSectionDivider motif="ink" ink-texture-id="asset.ui.purchased.ink.bad-id" />
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <UiSectionDivider motif="blank" label="09 · BrushUnderline" />
