@@ -89,9 +89,9 @@
 	  --jl-active-ring: url('/images/ui/generated/hover-marks/generated-active-ring-gray-01.webp');
 	  /* manifest: asset.ui.active.seal.cinnabar-02 */
 	  --jl-active-seal: url('/images/ui/generated/hover-marks/generated-active-seal-cinnabar-02.webp');
-	  /* manifest: NOT YET REGISTERED — purchased asset, needs manifest entry in future stage */
+	  /* manifest: asset.ui.purchased.ink.title-stroke-long-06 */
 	  --jl-title-brush: url('/images/ui/purchased/ink/ink-title-stroke-long-06.webp');
-	  /* manifest: NOT YET REGISTERED — purchased asset, needs manifest entry in future stage */
+	  /* manifest: asset.ui.purchased.ink.divider-thin-01 */
 	  --jl-divider-ink: url('/images/ui/purchased/ink/ink-divider-thin-01.webp');
 }
 
