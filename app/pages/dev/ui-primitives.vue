@@ -732,6 +732,71 @@ const washAssets = computed(() => getAssetsByRole('background-wash').filter((a) 
           </div>
         </div>
       </section>
+
+      <UiSectionDivider motif="seal" label="13 · SealButton" />
+
+      <!-- 13. SealButton -->
+      <section class="primitive-block" aria-labelledby="prim-seal-button-2">
+        <header class="primitive-block__header">
+          <span class="primitive-block__index">13</span>
+          <h2 id="prim-seal-button-2" class="primitive-block__title">SealButton</h2>
+          <p class="primitive-block__desc">
+            Primary action button with cinnabar seal, irregular edge mask, and ink texture. Optional seal texture override.
+          </p>
+        </header>
+        <div class="primitive-block__stage">
+          <!-- Default variants -->
+          <div class="seal-button-row">
+            <div v-for="size in sealSizes" :key="size" class="seal-button-cell">
+              <span class="tone-label">size={{ size }}</span>
+              <UiSealButton :size="size" stamp="审" to="/rankings">Submit Verification</UiSealButton>
+            </div>
+            <div class="seal-button-cell">
+              <span class="tone-label">no stamp</span>
+              <UiSealButton :size="'md'" to="/swordsmanship">Add to Register</UiSealButton>
+            </div>
+            <div class="seal-button-cell">
+              <span class="tone-label">disabled</span>
+              <UiSealButton :size="'md'" disabled>Locked</UiSealButton>
+            </div>
+          </div>
+
+          <!-- Dev-only: texture override preview (Stage 35D-2E) -->
+          <div class="ink-button-override">
+            <p class="tone-label">sealTextureId overrides · dev-only</p>
+
+            <div class="ink-button-override-row">
+              <div class="ink-button-cell">
+                <span class="tone-label">default (SVG noise)</span>
+                <UiSealButton :size="'md'" stamp="审" to="/rankings">Default Texture</UiSealButton>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">cinnabar-01</span>
+                <UiSealButton :size="'md'" stamp="审" to="/rankings" seal-texture-id="asset.ui.active.seal.cinnabar-01">Seal 01</UiSealButton>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">cinnabar-02</span>
+                <UiSealButton :size="'md'" stamp="审" to="/rankings" seal-texture-id="asset.ui.active.seal.cinnabar-02">Seal 02</UiSealButton>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">cinnabar-03</span>
+                <UiSealButton :size="'md'" stamp="审" to="/rankings" seal-texture-id="asset.ui.active.seal.cinnabar-03">Seal 03</UiSealButton>
+              </div>
+            </div>
+
+            <div class="ink-button-override-row">
+              <div class="ink-button-cell">
+                <span class="tone-label">invalid → fallback</span>
+                <UiSealButton :size="'md'" stamp="审" to="/rankings" seal-texture-id="asset.ui.active.seal.bad-id">Bad Seal ID</UiSealButton>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">no stamp + override</span>
+                <UiSealButton :size="'md'" to="/swordsmanship" seal-texture-id="asset.ui.active.seal.cinnabar-01">No Stamp Override</UiSealButton>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
 
     <footer class="ui-primitives-footer">
