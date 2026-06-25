@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { getAssetById } from '~/utils/assetManifest'
+
 const props = withDefaults(defineProps<{
   active?: boolean
   disabled?: boolean
@@ -6,17 +9,49 @@ const props = withDefaults(defineProps<{
   ariaControls?: string
   showSeal?: boolean
   type?: 'button' | 'submit' | 'reset'
+  /** Manifest asset IDs to override individual texture layers.
+   *  Default: '' (empty) — each layer falls back to its --jl-*
+   *  counterpart (Hybrid D: CSS var-first). Set a prop to a manifest
+   *  ID to swap that layer for dev/QA/prototype use. Invalid IDs
+   *  fall back gracefully to the CSS variable. */
+  brushTextureId?: string
+  underlineTextureId?: string
+  sealTextureId?: string
 }>(), {
   active: false,
   disabled: false,
   role: 'tab',
   showSeal: true,
   type: 'button',
+  brushTextureId: '',
+  underlineTextureId: '',
+  sealTextureId: '',
 })
 
 const emit = defineEmits<{
   (event: 'click', value: MouseEvent): void
 }>()
+
+/** Resolve a texture URL from the manifest, or '' if no valid override.
+ *  Returns '' for empty/invalid IDs so the CSS variable takes over. */
+function resolveTextureUrl(id: string): string {
+  if (!id) return ''
+  return getAssetById(id)?.filePath ?? ''
+}
+
+/** Inline CSS custom properties injected only when a manifest override is
+ *  active for a given layer. Empty object otherwise — no inline style,
+ *  the stylesheet's --jl-* variables apply unchanged. */
+const textureVars = computed<Record<string, string>>(() => {
+  const vars: Record<string, string> = {}
+  const brushUrl = resolveTextureUrl(props.brushTextureId)
+  const underlineUrl = resolveTextureUrl(props.underlineTextureId)
+  const sealUrl = resolveTextureUrl(props.sealTextureId)
+  if (brushUrl) vars['--ink-tab-brush'] = `url('${brushUrl}')`
+  if (underlineUrl) vars['--ink-tab-underline'] = `url('${underlineUrl}')`
+  if (sealUrl) vars['--ink-tab-seal'] = `url('${sealUrl}')`
+  return vars
+})
 </script>
 
 <template>
@@ -24,6 +59,7 @@ const emit = defineEmits<{
     :type="type"
     class="ink-active-tab"
     :class="{ 'is-active': props.active, 'is-disabled': props.disabled, 'has-seal': props.showSeal }"
+    :style="textureVars"
     :disabled="props.disabled"
     :role="props.role"
     :aria-selected="props.role === 'tab' ? (props.active ? 'true' : 'false') : undefined"
@@ -75,7 +111,9 @@ const emit = defineEmits<{
 
 .ink-active-tab::before {
   inset: 0.12rem -0.22rem 0.18rem;
-  background-image: var(--jl-hover-brush);
+  /* --ink-tab-brush overrides the manifest texture; falls back to the
+     global CSS variable when the brushTextureId prop is empty. */
+  background-image: var(--ink-tab-brush, var(--jl-hover-brush));
   opacity: 0;
   transform: scale(0.88, 0.72);
   transition:
@@ -88,7 +126,9 @@ const emit = defineEmits<{
   right: 0.38rem;
   bottom: 0.12rem;
   height: 0.55rem;
-  background-image: var(--jl-active-underline);
+  /* --ink-tab-underline overrides the manifest texture; falls back to
+     the global CSS variable when the underlineTextureId prop is empty. */
+  background-image: var(--ink-tab-underline, var(--jl-active-underline));
   opacity: 0;
   transform: scaleX(0.58) translateY(0.08rem);
   transform-origin: center;
@@ -132,7 +172,9 @@ const emit = defineEmits<{
   width: 0.72rem;
   height: 0.72rem;
   flex: 0 0 auto;
-  background-image: var(--jl-active-seal);
+  /* --ink-tab-seal overrides the manifest texture; falls back to the
+     global CSS variable when the sealTextureId prop is empty. */
+  background-image: var(--ink-tab-seal, var(--jl-active-seal));
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;

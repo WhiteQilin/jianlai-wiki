@@ -640,6 +640,98 @@ const washAssets = computed(() => getAssetsByRole('background-wash').filter((a) 
           </div>
         </div>
       </section>
+
+      <UiSectionDivider motif="blank" label="12 · InkActiveTab" />
+
+      <!-- 12. InkActiveTab -->
+      <section class="primitive-block" aria-labelledby="prim-ink-active-tab">
+        <header class="primitive-block__header">
+          <span class="primitive-block__index">12</span>
+          <h2 id="prim-ink-active-tab" class="primitive-block__title">InkActiveTab</h2>
+          <p class="primitive-block__desc">
+            Tab button with hover brush, active underline, and optional seal. Texture overrides per layer.
+          </p>
+        </header>
+        <div class="primitive-block__stage">
+          <!-- Default variants -->
+          <div class="ink-text-button-row">
+            <div class="ink-button-cell">
+              <span class="tone-label">default</span>
+              <UiInkActiveTab>Inactive</UiInkActiveTab>
+              <UiInkActiveTab active>Active</UiInkActiveTab>
+              <UiInkActiveTab disabled>Disabled</UiInkActiveTab>
+            </div>
+            <div class="ink-button-cell">
+              <span class="tone-label">no seal</span>
+              <UiInkActiveTab :show-seal="false">No Seal</UiInkActiveTab>
+              <UiInkActiveTab :show-seal="false" active>Active</UiInkActiveTab>
+              <UiInkActiveTab :show-seal="false" disabled>Disabled</UiInkActiveTab>
+            </div>
+          </div>
+
+          <!-- Dev-only: texture override preview (Stage 35D-2D) -->
+          <div class="ink-button-override">
+            <p class="tone-label">textureId overrides · dev-only</p>
+
+            <div class="ink-button-override-row">
+              <div class="ink-button-cell">
+                <span class="tone-label">default (CSS var)</span>
+                <UiInkActiveTab active>Default Textures</UiInkActiveTab>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">brush soft-01</span>
+                <UiInkActiveTab active brush-texture-id="asset.ui.hover.brush.soft-01">Brush Override</UiInkActiveTab>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">brush soft-02</span>
+                <UiInkActiveTab active brush-texture-id="asset.ui.hover.brush.soft-02">Brush Soft 02</UiInkActiveTab>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">brush soft-04</span>
+                <UiInkActiveTab active brush-texture-id="asset.ui.hover.brush.soft-04">Brush Soft 04</UiInkActiveTab>
+              </div>
+            </div>
+
+            <div class="ink-button-override-row">
+              <div class="ink-button-cell">
+                <span class="tone-label">underline thin-03</span>
+                <UiInkActiveTab active underline-texture-id="asset.ui.underline.ink.thin-03">Thin 03 Underline</UiInkActiveTab>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">underline thin-04</span>
+                <UiInkActiveTab active underline-texture-id="asset.ui.underline.ink.thin-04">Thin 04 Underline</UiInkActiveTab>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">seal cinnabar-01</span>
+                <UiInkActiveTab active seal-texture-id="asset.ui.active.seal.cinnabar-01">Seal Override</UiInkActiveTab>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">seal cinnabar-02</span>
+                <UiInkActiveTab active seal-texture-id="asset.ui.active.seal.cinnabar-02">Seal 02</UiInkActiveTab>
+              </div>
+            </div>
+
+            <div class="ink-button-override-row">
+              <div class="ink-button-cell">
+                <span class="tone-label">seal cinnabar-03</span>
+                <UiInkActiveTab active seal-texture-id="asset.ui.active.seal.cinnabar-03">Seal 03</UiInkActiveTab>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">invalid brush → fallback</span>
+                <UiInkActiveTab active brush-texture-id="asset.ui.hover.brush.does-not-exist">Bad Brush ID</UiInkActiveTab>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">invalid underline → fallback</span>
+                <UiInkActiveTab active underline-texture-id="asset.ui.underline.ink.bad-id">Bad Underline ID</UiInkActiveTab>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">invalid seal → fallback</span>
+                <UiInkActiveTab active seal-texture-id="asset.ui.active.seal.bad-id">Bad Seal ID</UiInkActiveTab>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
 
     <footer class="ui-primitives-footer">
