@@ -444,6 +444,104 @@ const washAssets = computed(() => getAssetsByRole('background-wash').filter((a) 
           </div>
         </div>
       </section>
+
+      <UiSectionDivider motif="blank" label="10 · InkTextButton" />
+
+      <!-- 10. InkTextButton -->
+      <section class="primitive-block" aria-labelledby="prim-ink-text-button">
+        <header class="primitive-block__header">
+          <span class="primitive-block__index">10</span>
+          <h2 id="prim-ink-text-button" class="primitive-block__title">InkTextButton</h2>
+          <p class="primitive-block__desc">
+            Text-only button with hover brush and active mark (ring or seal). Optional texture overrides per layer.
+          </p>
+        </header>
+        <div class="primitive-block__stage">
+          <!-- Default variants -->
+          <div class="ink-text-button-row">
+            <div class="ink-button-cell">
+              <span class="tone-label">mark=ring</span>
+              <UiInkTextButton to="/swordsmanship" active-mark="ring">Sword Manual</UiInkTextButton>
+              <UiInkTextButton to="/swordsmanship" active-mark="ring" active>Active</UiInkTextButton>
+              <UiInkTextButton to="/swordsmanship" active-mark="ring" disabled>Disabled</UiInkTextButton>
+            </div>
+            <div class="ink-button-cell">
+              <span class="tone-label">mark=seal</span>
+              <UiInkTextButton to="/swordsmanship" active-mark="seal">Seal Mark</UiInkTextButton>
+              <UiInkTextButton to="/swordsmanship" active-mark="seal" active>Active</UiInkTextButton>
+              <UiInkTextButton to="/swordsmanship" active-mark="seal" disabled>Disabled</UiInkTextButton>
+            </div>
+            <div class="ink-button-cell">
+              <span class="tone-label">mark=none</span>
+              <UiInkTextButton to="/swordsmanship" active-mark="none">No Mark</UiInkTextButton>
+              <UiInkTextButton to="/swordsmanship" active-mark="none" active>Active</UiInkTextButton>
+              <UiInkTextButton to="/swordsmanship" active-mark="none" disabled>Disabled</UiInkTextButton>
+            </div>
+          </div>
+
+          <!-- Dev-only: texture override preview (Stage 35D-2B) -->
+          <div class="ink-button-override">
+            <p class="tone-label">textureId overrides · dev-only</p>
+
+            <div class="ink-button-override-row">
+              <div class="ink-button-cell">
+                <span class="tone-label">default (CSS var)</span>
+                <UiInkTextButton to="/swordsmanship" active-mark="ring" active>Default Textures</UiInkTextButton>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">brush soft-01</span>
+                <UiInkTextButton to="/swordsmanship" active-mark="ring" active brush-texture-id="asset.ui.hover.brush.soft-01">Brush Override</UiInkTextButton>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">brush soft-02</span>
+                <UiInkTextButton to="/swordsmanship" active-mark="ring" active brush-texture-id="asset.ui.hover.brush.soft-02">Brush Soft 02</UiInkTextButton>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">brush soft-04</span>
+                <UiInkTextButton to="/swordsmanship" active-mark="ring" active brush-texture-id="asset.ui.hover.brush.soft-04">Brush Soft 04</UiInkTextButton>
+              </div>
+            </div>
+
+            <div class="ink-button-override-row">
+              <div class="ink-button-cell">
+                <span class="tone-label">ring gray-01</span>
+                <UiInkTextButton to="/swordsmanship" active-mark="ring" active ring-texture-id="asset.ui.active.ring.gray-01">Gray Ring</UiInkTextButton>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">ring black-01</span>
+                <UiInkTextButton to="/swordsmanship" active-mark="ring" active ring-texture-id="asset.ui.active.ring.black-01">Black Ring</UiInkTextButton>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">ring cinnabar-01</span>
+                <UiInkTextButton to="/swordsmanship" active-mark="ring" active ring-texture-id="asset.ui.active.ring.cinnabar-01">Cinnabar Ring</UiInkTextButton>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">seal cinnabar-01</span>
+                <UiInkTextButton to="/swordsmanship" active-mark="seal" active seal-texture-id="asset.ui.active.seal.cinnabar-01">Seal Override</UiInkTextButton>
+              </div>
+            </div>
+
+            <div class="ink-button-override-row">
+              <div class="ink-button-cell">
+                <span class="tone-label">seal cinnabar-02</span>
+                <UiInkTextButton to="/swordsmanship" active-mark="seal" active seal-texture-id="asset.ui.active.seal.cinnabar-02">Seal 02</UiInkTextButton>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">seal cinnabar-03</span>
+                <UiInkTextButton to="/swordsmanship" active-mark="seal" active seal-texture-id="asset.ui.active.seal.cinnabar-03">Seal 03</UiInkTextButton>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">invalid brush → fallback</span>
+                <UiInkTextButton to="/swordsmanship" active-mark="ring" active brush-texture-id="asset.ui.hover.brush.does-not-exist">Bad Brush ID</UiInkTextButton>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">invalid ring → fallback</span>
+                <UiInkTextButton to="/swordsmanship" active-mark="ring" active ring-texture-id="asset.ui.active.ring.bad-id">Bad Ring ID</UiInkTextButton>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
 
     <footer class="ui-primitives-footer">
@@ -827,6 +925,13 @@ const washAssets = computed(() => getAssetsByRole('background-wash').filter((a) 
   display: flex;
   align-items: center;
   gap: 0.85rem;
+}
+
+/* 10. InkTextButton */
+.ink-text-button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem 2.4rem;
 }
 
 /* Footer */
