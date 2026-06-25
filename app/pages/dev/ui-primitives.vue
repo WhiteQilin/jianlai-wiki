@@ -124,6 +124,31 @@ const washAssets = computed(() => getAssetsByRole('background-wash').filter((a) 
               <UiInkButton :tone="tone" disabled>Struck from Record</UiInkButton>
             </div>
           </div>
+
+          <!-- Dev-only: InkButton underline texture override (Stage 35D-2A).
+               No production usage — exercises the textureId prop against the
+               manifest, plus an invalid-id fallback case. -->
+          <div class="ink-button-override">
+            <p class="tone-label">textureId override · dev-only</p>
+            <div class="ink-button-override-row">
+              <div class="ink-button-cell">
+                <span class="tone-label">default (CSS var)</span>
+                <UiInkButton to="/swordsmanship">Default Underline</UiInkButton>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">thin-03</span>
+                <UiInkButton to="/swordsmanship" texture-id="asset.ui.underline.ink.thin-03">Thin 03 Override</UiInkButton>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">thin-04</span>
+                <UiInkButton to="/swordsmanship" texture-id="asset.ui.underline.ink.thin-04">Thin 04 Override</UiInkButton>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">invalid id → fallback</span>
+                <UiInkButton to="/swordsmanship" texture-id="asset.ui.underline.ink.does-not-exist">Fallback (bad id)</UiInkButton>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -654,6 +679,20 @@ const washAssets = computed(() => getAssetsByRole('background-wash').filter((a) 
   flex-direction: column;
   gap: 0.45rem;
   align-items: flex-start;
+}
+
+/* 1. InkButton — dev-only texture override preview (Stage 35D-2A) */
+.ink-button-override {
+  margin-top: 1.4rem;
+  padding-top: 1.2rem;
+  border-top: 1px dashed var(--jl-section-frame);
+}
+
+.ink-button-override-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem 2rem;
+  margin-top: 0.6rem;
 }
 
 /* 2. SealButton */
