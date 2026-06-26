@@ -1,14 +1,40 @@
 <script setup lang="ts">
-withDefaults(defineProps<{
+import { computed } from 'vue'
+import { getAssetById } from '~/utils/assetManifest'
+
+const props = withDefaults(defineProps<{
   to?: string
   href?: string
   accent?: boolean
   sealCorner?: boolean
   lift?: boolean
+  /** Manifest asset ID to override the seal-corner texture.
+   *  Default: '' (empty) — the global --jl-active-seal CSS
+   *  variable applies unchanged (Hybrid D: CSS var-first).
+   *  Set to a manifest ID to swap the seal for dev/prototype
+   *  use. Invalid IDs fall back to the CSS variable.
+   *  Has no effect when sealCorner is false. */
+  sealTextureId?: string
 }>(), {
   accent: false,
   sealCorner: false,
   lift: false,
+  sealTextureId: '',
+})
+
+/** Resolve a texture URL from the manifest, or '' if no valid override. */
+function resolveTextureUrl(id: string): string {
+  if (!id) return ''
+  return getAssetById(id)?.filePath ?? ''
+}
+
+/** Inline CSS custom property injected only when a manifest override is
+ *  active. Empty object otherwise — no inline style, the global
+ *  --jl-active-seal variable applies unchanged. */
+const textureVars = computed<Record<string, string>>(() => {
+  const sealUrl = resolveTextureUrl(props.sealTextureId)
+  if (!sealUrl) return {}
+  return { '--paper-slip-seal': `url('${sealUrl}')` }
 })
 </script>
 
@@ -18,6 +44,7 @@ withDefaults(defineProps<{
     :to="to"
     class="paper-slip-card"
     :class="{ 'has-accent': accent, 'has-seal': sealCorner, 'is-lift': lift }"
+    :style="textureVars"
   >
     <slot />
   </NuxtLink>
@@ -27,6 +54,7 @@ withDefaults(defineProps<{
     :href="href"
     class="paper-slip-card"
     :class="{ 'has-accent': accent, 'has-seal': sealCorner, 'is-lift': lift }"
+    :style="textureVars"
   >
     <slot />
   </a>
@@ -35,6 +63,7 @@ withDefaults(defineProps<{
     v-else
     class="paper-slip-card"
     :class="{ 'has-accent': accent, 'has-seal': sealCorner, 'is-lift': lift }"
+    :style="textureVars"
   >
     <slot />
   </article>
@@ -91,7 +120,10 @@ a.paper-slip-card:focus-visible {
   border-top-color: color-mix(in srgb, var(--ps-accent) 55%, var(--ps-frame));
 }
 
-/* Seal corner — small seal mark at top-right, decorative */
+/* Seal corner — small seal mark at top-right, decorative.
+   --paper-slip-seal overrides the default seal with a manifest asset
+   when the sealTextureId prop is set; falls back to the global
+   --jl-active-seal CSS variable otherwise. */
 .paper-slip-card.has-seal::after {
   content: '';
   position: absolute;
@@ -99,7 +131,7 @@ a.paper-slip-card:focus-visible {
   right: 0.6rem;
   width: 2rem;
   height: 2rem;
-  background-image: var(--jl-active-seal);
+  background-image: var(--paper-slip-seal, var(--jl-active-seal));
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;

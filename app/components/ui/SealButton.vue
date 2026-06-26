@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { getAssetById } from '~/utils/assetManifest'
 
 const props = withDefaults(defineProps<{
   to?: string
@@ -10,12 +11,19 @@ const props = withDefaults(defineProps<{
   size?: 'sm' | 'md' | 'lg'
   stamp?: string
   type?: 'button' | 'submit' | 'reset'
+  /** Manifest asset ID to override the seal texture layer.
+   *  Default: '' (empty) — the inline SVG noise texture applies
+   *  unchanged (Hybrid D: CSS var-first). Set to a manifest ID to
+   *  swap the seal texture for dev/QA/prototype use. Invalid IDs
+   *  fall back gracefully to the default SVG noise. */
+  sealTextureId?: string
 }>(), {
   disabled: false,
   loading: false,
   size: 'md',
   stamp: '',
   type: 'button',
+  sealTextureId: '',
 })
 
 const emit = defineEmits<{
@@ -24,6 +32,22 @@ const emit = defineEmits<{
 
 const sizeClass = computed(() => `seal-button--${props.size}`)
 const hasStamp = computed(() => Boolean(props.stamp))
+
+/** Resolve a texture URL from the manifest, or '' if no valid override.
+ *  Returns '' for empty/invalid IDs so the default SVG noise takes over. */
+function resolveTextureUrl(id: string): string {
+  if (!id) return ''
+  return getAssetById(id)?.filePath ?? ''
+}
+
+/** Inline CSS custom property injected only when a manifest override is
+ *  active. Empty object otherwise — no inline style, the default SVG
+ *  noise texture applies unchanged. */
+const textureVars = computed<Record<string, string>>(() => {
+  const sealUrl = resolveTextureUrl(props.sealTextureId)
+  if (!sealUrl) return {}
+  return { '--seal-btn-texture': `url('${sealUrl}')` }
+})
 </script>
 
 <template>
@@ -32,6 +56,7 @@ const hasStamp = computed(() => Boolean(props.stamp))
     :to="to"
     class="seal-button"
     :class="[sizeClass, { 'has-stamp': hasStamp, 'is-loading': loading }]"
+    :style="textureVars"
     :aria-label="ariaLabel"
     :aria-busy="loading ? 'true' : undefined"
     @click="emit('click', $event)"
@@ -49,6 +74,7 @@ const hasStamp = computed(() => Boolean(props.stamp))
     :href="href"
     class="seal-button"
     :class="[sizeClass, { 'has-stamp': hasStamp, 'is-loading': loading }]"
+    :style="textureVars"
     :aria-label="ariaLabel"
     :aria-busy="loading ? 'true' : undefined"
     @click="emit('click', $event)"
@@ -66,6 +92,7 @@ const hasStamp = computed(() => Boolean(props.stamp))
     :type="type"
     class="seal-button"
     :class="[sizeClass, { 'has-stamp': hasStamp, 'is-loading': loading, 'is-disabled': disabled }]"
+    :style="textureVars"
     :disabled="disabled || loading"
     :aria-label="ariaLabel"
     :aria-busy="loading ? 'true' : undefined"
@@ -133,10 +160,13 @@ const hasStamp = computed(() => Boolean(props.stamp))
   z-index: 0;
 }
 
-/* Ink texture overlay */
+/* Ink texture overlay.
+   --seal-btn-texture overrides the default SVG noise with a manifest
+   asset when the sealTextureId prop is set; otherwise the inline SVG
+   noise data URI applies unchanged. */
 .seal-button__texture {
   inset: 0;
-  background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%%25" height="100%%25" filter="url(%23n)" opacity="0.22"/></svg>');
+  background-image: var(--seal-btn-texture, url('data:image/svg+xml;utf8,<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%25" height="100%25" filter="url(%23n)" opacity="0.22"/></svg>'));
   background-size: 128px 128px;
   opacity: 0.2;
   mix-blend-mode: multiply;

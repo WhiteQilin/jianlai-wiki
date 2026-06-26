@@ -320,6 +320,58 @@ const washAssets = computed(() => getAssetsByRole('background-wash').filter((a) 
             </UiPaperSlipCard>
           </div>
         </div>
+
+        <!-- Dev-only: seal texture override preview (Stage 35D-3C) -->
+        <div class="primitive-block__stage" style="margin-top: 0;">
+          <div class="ink-button-override">
+            <p class="tone-label">sealTextureId overrides · dev-only</p>
+
+            <div class="paper-slip-card-grid">
+              <div class="ink-button-cell">
+                <span class="tone-label">default (CSS var)</span>
+                <UiPaperSlipCard seal-corner>
+                  <h3 class="card-headline">Default Seal</h3>
+                  <p class="card-body">CSS var --jl-active-seal.</p>
+                </UiPaperSlipCard>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">cinnabar-01</span>
+                <UiPaperSlipCard seal-corner seal-texture-id="asset.ui.active.seal.cinnabar-01">
+                  <h3 class="card-headline">Seal 01</h3>
+                  <p class="card-body">Manifest cinnabar-01.</p>
+                </UiPaperSlipCard>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">cinnabar-02</span>
+                <UiPaperSlipCard seal-corner seal-texture-id="asset.ui.active.seal.cinnabar-02">
+                  <h3 class="card-headline">Seal 02</h3>
+                  <p class="card-body">Manifest cinnabar-02.</p>
+                </UiPaperSlipCard>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">cinnabar-03</span>
+                <UiPaperSlipCard seal-corner seal-texture-id="asset.ui.active.seal.cinnabar-03">
+                  <h3 class="card-headline">Seal 03</h3>
+                  <p class="card-body">Manifest cinnabar-03.</p>
+                </UiPaperSlipCard>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">invalid → fallback</span>
+                <UiPaperSlipCard seal-corner seal-texture-id="asset.ui.active.seal.bad-id">
+                  <h3 class="card-headline">Bad ID</h3>
+                  <p class="card-body">Falls back to CSS var.</p>
+                </UiPaperSlipCard>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">sealCorner=false + textureId</span>
+                <UiPaperSlipCard seal-texture-id="asset.ui.active.seal.cinnabar-01">
+                  <h3 class="card-headline">No Seal Corner</h3>
+                  <p class="card-body">sealCorner false — no seal rendered.</p>
+                </UiPaperSlipCard>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <UiSectionDivider motif="doctrine" label="07 · ImageWashFrame" />
@@ -400,6 +452,48 @@ const washAssets = computed(() => getAssetsByRole('background-wash').filter((a) 
           <div class="section-divider-row">
             <span class="tone-label">motif=seal · label</span>
             <UiSectionDivider motif="seal" label="End of Register" />
+          </div>
+        </div>
+
+        <!-- Dev-only: blade / ink texture override preview (Stage 35D-3B) -->
+        <div class="primitive-block__stage" style="margin-top: 0;">
+          <div class="ink-button-override">
+            <p class="tone-label">bladeTextureId / inkTextureId overrides · dev-only</p>
+
+            <div class="section-divider-stack">
+              <div class="section-divider-row">
+                <span class="tone-label">blade · default (CSS var slash-01)</span>
+                <UiSectionDivider motif="blade" />
+              </div>
+              <div class="section-divider-row">
+                <span class="tone-label">blade · slash-01 (explicit)</span>
+                <UiSectionDivider motif="blade" blade-texture-id="asset.swordsmanship.divider.slash-01" />
+              </div>
+              <div class="section-divider-row">
+                <span class="tone-label">blade · slash-02</span>
+                <UiSectionDivider motif="blade" blade-texture-id="asset.swordsmanship.divider.slash-02" />
+              </div>
+              <div class="section-divider-row">
+                <span class="tone-label">blade · slash-03</span>
+                <UiSectionDivider motif="blade" blade-texture-id="asset.swordsmanship.divider.slash-03" />
+              </div>
+              <div class="section-divider-row">
+                <span class="tone-label">blade · invalid → fallback</span>
+                <UiSectionDivider motif="blade" blade-texture-id="asset.swordsmanship.divider.bad-id" />
+              </div>
+              <div class="section-divider-row">
+                <span class="tone-label">ink · default (CSS var title-brush)</span>
+                <UiSectionDivider motif="ink" />
+              </div>
+              <div class="section-divider-row">
+                <span class="tone-label">ink · purchased title brush</span>
+                <UiSectionDivider motif="ink" ink-texture-id="asset.ui.purchased.ink.title-stroke-long-06" />
+              </div>
+              <div class="section-divider-row">
+                <span class="tone-label">ink · invalid → fallback</span>
+                <UiSectionDivider motif="ink" ink-texture-id="asset.ui.purchased.ink.bad-id" />
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -537,6 +631,261 @@ const washAssets = computed(() => getAssetsByRole('background-wash').filter((a) 
               <div class="ink-button-cell">
                 <span class="tone-label">invalid ring → fallback</span>
                 <UiInkTextButton to="/swordsmanship" active-mark="ring" active ring-texture-id="asset.ui.active.ring.bad-id">Bad Ring ID</UiInkTextButton>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <UiSectionDivider motif="blank" label="11 · InkHoverLink" />
+
+      <!-- 11. InkHoverLink -->
+      <section class="primitive-block" aria-labelledby="prim-ink-hover-link">
+        <header class="primitive-block__header">
+          <span class="primitive-block__index">11</span>
+          <h2 id="prim-ink-hover-link" class="primitive-block__title">InkHoverLink</h2>
+          <p class="primitive-block__desc">
+            Inline navigation link with hover brush and active mark (underline or seal). Optional texture overrides per layer.
+          </p>
+        </header>
+        <div class="primitive-block__stage">
+          <!-- Default variants -->
+          <div class="ink-text-button-row">
+            <div class="ink-button-cell">
+              <span class="tone-label">mark=underline</span>
+              <UiInkHoverLink to="/swordsmanship" active-mark="underline">Sword Manual</UiInkHoverLink>
+              <UiInkHoverLink to="/swordsmanship" active-mark="underline" active>Active</UiInkHoverLink>
+              <UiInkHoverLink to="/swordsmanship" active-mark="underline" disabled>Disabled</UiInkHoverLink>
+            </div>
+            <div class="ink-button-cell">
+              <span class="tone-label">mark=seal</span>
+              <UiInkHoverLink to="/swordsmanship" active-mark="seal">Seal Mark</UiInkHoverLink>
+              <UiInkHoverLink to="/swordsmanship" active-mark="seal" active>Active</UiInkHoverLink>
+              <UiInkHoverLink to="/swordsmanship" active-mark="seal" disabled>Disabled</UiInkHoverLink>
+            </div>
+            <div class="ink-button-cell">
+              <span class="tone-label">mark=none</span>
+              <UiInkHoverLink to="/swordsmanship" active-mark="none">No Mark</UiInkHoverLink>
+              <UiInkHoverLink to="/swordsmanship" active-mark="none" active>Active</UiInkHoverLink>
+              <UiInkHoverLink to="/swordsmanship" active-mark="none" disabled>Disabled</UiInkHoverLink>
+            </div>
+          </div>
+
+          <!-- Dev-only: texture override preview (Stage 35D-2C) -->
+          <div class="ink-button-override">
+            <p class="tone-label">textureId overrides · dev-only</p>
+
+            <div class="ink-button-override-row">
+              <div class="ink-button-cell">
+                <span class="tone-label">default (CSS var)</span>
+                <UiInkHoverLink to="/swordsmanship" active-mark="underline" active>Default Textures</UiInkHoverLink>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">brush soft-01</span>
+                <UiInkHoverLink to="/swordsmanship" active-mark="underline" active brush-texture-id="asset.ui.hover.brush.soft-01">Brush Override</UiInkHoverLink>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">brush soft-02</span>
+                <UiInkHoverLink to="/swordsmanship" active-mark="underline" active brush-texture-id="asset.ui.hover.brush.soft-02">Brush Soft 02</UiInkHoverLink>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">brush soft-04</span>
+                <UiInkHoverLink to="/swordsmanship" active-mark="underline" active brush-texture-id="asset.ui.hover.brush.soft-04">Brush Soft 04</UiInkHoverLink>
+              </div>
+            </div>
+
+            <div class="ink-button-override-row">
+              <div class="ink-button-cell">
+                <span class="tone-label">underline thin-03</span>
+                <UiInkHoverLink to="/swordsmanship" active-mark="underline" active underline-texture-id="asset.ui.underline.ink.thin-03">Thin 03 Underline</UiInkHoverLink>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">underline thin-04</span>
+                <UiInkHoverLink to="/swordsmanship" active-mark="underline" active underline-texture-id="asset.ui.underline.ink.thin-04">Thin 04 Underline</UiInkHoverLink>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">seal cinnabar-01</span>
+                <UiInkHoverLink to="/swordsmanship" active-mark="seal" active seal-texture-id="asset.ui.active.seal.cinnabar-01">Seal Override</UiInkHoverLink>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">seal cinnabar-02</span>
+                <UiInkHoverLink to="/swordsmanship" active-mark="seal" active seal-texture-id="asset.ui.active.seal.cinnabar-02">Seal 02</UiInkHoverLink>
+              </div>
+            </div>
+
+            <div class="ink-button-override-row">
+              <div class="ink-button-cell">
+                <span class="tone-label">seal cinnabar-03</span>
+                <UiInkHoverLink to="/swordsmanship" active-mark="seal" active seal-texture-id="asset.ui.active.seal.cinnabar-03">Seal 03</UiInkHoverLink>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">invalid brush → fallback</span>
+                <UiInkHoverLink to="/swordsmanship" active-mark="underline" active brush-texture-id="asset.ui.hover.brush.does-not-exist">Bad Brush ID</UiInkHoverLink>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">invalid underline → fallback</span>
+                <UiInkHoverLink to="/swordsmanship" active-mark="underline" active underline-texture-id="asset.ui.underline.ink.bad-id">Bad Underline ID</UiInkHoverLink>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">invalid seal → fallback</span>
+                <UiInkHoverLink to="/swordsmanship" active-mark="seal" active seal-texture-id="asset.ui.active.seal.bad-id">Bad Seal ID</UiInkHoverLink>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <UiSectionDivider motif="blank" label="12 · InkActiveTab" />
+
+      <!-- 12. InkActiveTab -->
+      <section class="primitive-block" aria-labelledby="prim-ink-active-tab">
+        <header class="primitive-block__header">
+          <span class="primitive-block__index">12</span>
+          <h2 id="prim-ink-active-tab" class="primitive-block__title">InkActiveTab</h2>
+          <p class="primitive-block__desc">
+            Tab button with hover brush, active underline, and optional seal. Texture overrides per layer.
+          </p>
+        </header>
+        <div class="primitive-block__stage">
+          <!-- Default variants -->
+          <div class="ink-text-button-row">
+            <div class="ink-button-cell">
+              <span class="tone-label">default</span>
+              <UiInkActiveTab>Inactive</UiInkActiveTab>
+              <UiInkActiveTab active>Active</UiInkActiveTab>
+              <UiInkActiveTab disabled>Disabled</UiInkActiveTab>
+            </div>
+            <div class="ink-button-cell">
+              <span class="tone-label">no seal</span>
+              <UiInkActiveTab :show-seal="false">No Seal</UiInkActiveTab>
+              <UiInkActiveTab :show-seal="false" active>Active</UiInkActiveTab>
+              <UiInkActiveTab :show-seal="false" disabled>Disabled</UiInkActiveTab>
+            </div>
+          </div>
+
+          <!-- Dev-only: texture override preview (Stage 35D-2D) -->
+          <div class="ink-button-override">
+            <p class="tone-label">textureId overrides · dev-only</p>
+
+            <div class="ink-button-override-row">
+              <div class="ink-button-cell">
+                <span class="tone-label">default (CSS var)</span>
+                <UiInkActiveTab active>Default Textures</UiInkActiveTab>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">brush soft-01</span>
+                <UiInkActiveTab active brush-texture-id="asset.ui.hover.brush.soft-01">Brush Override</UiInkActiveTab>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">brush soft-02</span>
+                <UiInkActiveTab active brush-texture-id="asset.ui.hover.brush.soft-02">Brush Soft 02</UiInkActiveTab>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">brush soft-04</span>
+                <UiInkActiveTab active brush-texture-id="asset.ui.hover.brush.soft-04">Brush Soft 04</UiInkActiveTab>
+              </div>
+            </div>
+
+            <div class="ink-button-override-row">
+              <div class="ink-button-cell">
+                <span class="tone-label">underline thin-03</span>
+                <UiInkActiveTab active underline-texture-id="asset.ui.underline.ink.thin-03">Thin 03 Underline</UiInkActiveTab>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">underline thin-04</span>
+                <UiInkActiveTab active underline-texture-id="asset.ui.underline.ink.thin-04">Thin 04 Underline</UiInkActiveTab>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">seal cinnabar-01</span>
+                <UiInkActiveTab active seal-texture-id="asset.ui.active.seal.cinnabar-01">Seal Override</UiInkActiveTab>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">seal cinnabar-02</span>
+                <UiInkActiveTab active seal-texture-id="asset.ui.active.seal.cinnabar-02">Seal 02</UiInkActiveTab>
+              </div>
+            </div>
+
+            <div class="ink-button-override-row">
+              <div class="ink-button-cell">
+                <span class="tone-label">seal cinnabar-03</span>
+                <UiInkActiveTab active seal-texture-id="asset.ui.active.seal.cinnabar-03">Seal 03</UiInkActiveTab>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">invalid brush → fallback</span>
+                <UiInkActiveTab active brush-texture-id="asset.ui.hover.brush.does-not-exist">Bad Brush ID</UiInkActiveTab>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">invalid underline → fallback</span>
+                <UiInkActiveTab active underline-texture-id="asset.ui.underline.ink.bad-id">Bad Underline ID</UiInkActiveTab>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">invalid seal → fallback</span>
+                <UiInkActiveTab active seal-texture-id="asset.ui.active.seal.bad-id">Bad Seal ID</UiInkActiveTab>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <UiSectionDivider motif="seal" label="13 · SealButton" />
+
+      <!-- 13. SealButton -->
+      <section class="primitive-block" aria-labelledby="prim-seal-button-2">
+        <header class="primitive-block__header">
+          <span class="primitive-block__index">13</span>
+          <h2 id="prim-seal-button-2" class="primitive-block__title">SealButton</h2>
+          <p class="primitive-block__desc">
+            Primary action button with cinnabar seal, irregular edge mask, and ink texture. Optional seal texture override.
+          </p>
+        </header>
+        <div class="primitive-block__stage">
+          <!-- Default variants -->
+          <div class="seal-button-row">
+            <div v-for="size in sealSizes" :key="size" class="seal-button-cell">
+              <span class="tone-label">size={{ size }}</span>
+              <UiSealButton :size="size" stamp="审" to="/rankings">Submit Verification</UiSealButton>
+            </div>
+            <div class="seal-button-cell">
+              <span class="tone-label">no stamp</span>
+              <UiSealButton :size="'md'" to="/swordsmanship">Add to Register</UiSealButton>
+            </div>
+            <div class="seal-button-cell">
+              <span class="tone-label">disabled</span>
+              <UiSealButton :size="'md'" disabled>Locked</UiSealButton>
+            </div>
+          </div>
+
+          <!-- Dev-only: texture override preview (Stage 35D-2E) -->
+          <div class="ink-button-override">
+            <p class="tone-label">sealTextureId overrides · dev-only</p>
+
+            <div class="ink-button-override-row">
+              <div class="ink-button-cell">
+                <span class="tone-label">default (SVG noise)</span>
+                <UiSealButton :size="'md'" stamp="审" to="/rankings">Default Texture</UiSealButton>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">cinnabar-01</span>
+                <UiSealButton :size="'md'" stamp="审" to="/rankings" seal-texture-id="asset.ui.active.seal.cinnabar-01">Seal 01</UiSealButton>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">cinnabar-02</span>
+                <UiSealButton :size="'md'" stamp="审" to="/rankings" seal-texture-id="asset.ui.active.seal.cinnabar-02">Seal 02</UiSealButton>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">cinnabar-03</span>
+                <UiSealButton :size="'md'" stamp="审" to="/rankings" seal-texture-id="asset.ui.active.seal.cinnabar-03">Seal 03</UiSealButton>
+              </div>
+            </div>
+
+            <div class="ink-button-override-row">
+              <div class="ink-button-cell">
+                <span class="tone-label">invalid → fallback</span>
+                <UiSealButton :size="'md'" stamp="审" to="/rankings" seal-texture-id="asset.ui.active.seal.bad-id">Bad Seal ID</UiSealButton>
+              </div>
+              <div class="ink-button-cell">
+                <span class="tone-label">no stamp + override</span>
+                <UiSealButton :size="'md'" to="/swordsmanship" seal-texture-id="asset.ui.active.seal.cinnabar-01">No Stamp Override</UiSealButton>
               </div>
             </div>
           </div>

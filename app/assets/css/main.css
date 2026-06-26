@@ -81,18 +81,22 @@
   --jl-section-ornament-opacity: 0.24;
   --jl-section-brush-opacity: 0.2;
 
-	  /* manifest: asset.ui.hover.brush.soft-02 */
-	  --jl-hover-brush: url('/images/ui/generated/hover-marks/generated-hover-brush-soft-02.webp');
-	  /* manifest: asset.ui.underline.ink.thin-03 */
+		  /* manifest: asset.ui.hover.brush.soft-02 */
+		  --jl-hover-brush: url('/images/ui/generated/hover-marks/generated-hover-brush-soft-02.webp');
+		  /* manifest: asset.ui.hover.brush.soft-01 */
+		  --jl-hover-brush-soft-01: url('/images/ui/generated/hover-marks/generated-hover-brush-soft-01.webp');
+		  /* manifest: asset.ui.underline.ink.thin-03 */
 	  --jl-active-underline: url('/images/ui/generated/hover-marks/generated-underline-ink-thin-03.webp');
 	  /* manifest: asset.ui.active.ring.gray-01 */
 	  --jl-active-ring: url('/images/ui/generated/hover-marks/generated-active-ring-gray-01.webp');
 	  /* manifest: asset.ui.active.seal.cinnabar-02 */
 	  --jl-active-seal: url('/images/ui/generated/hover-marks/generated-active-seal-cinnabar-02.webp');
-	  /* manifest: asset.ui.purchased.ink.title-stroke-long-06 */
-	  --jl-title-brush: url('/images/ui/purchased/ink/ink-title-stroke-long-06.webp');
-	  /* manifest: asset.ui.purchased.ink.divider-thin-01 */
-	  --jl-divider-ink: url('/images/ui/purchased/ink/ink-divider-thin-01.webp');
+		  /* manifest: asset.ui.purchased.ink.title-stroke-long-06 */
+		  --jl-title-brush: url('/images/ui/purchased/ink/ink-title-stroke-long-06.webp');
+		  /* manifest: asset.ui.purchased.ink.divider-thin-01 */
+		  --jl-divider-ink: url('/images/ui/purchased/ink/ink-divider-thin-01.webp');
+		  /* manifest: asset.swordsmanship.divider.slash-01 */
+		  --jl-blade-divider: url('/images/ui/generated/swordsmanship-v2/swordsmanship-divider-slash-01.webp');
 }
 
 :where([data-jl-section], .jl-section-theme) {
