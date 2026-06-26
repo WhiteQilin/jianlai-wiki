@@ -276,7 +276,7 @@ const recordNumber = (index: number) => String(index + 1).padStart(2, '0')
   border-bottom: 1px solid rgba(32, 63, 77, 0.09);
   background:
     linear-gradient(90deg, rgba(239, 246, 241, 0.74), rgba(239, 246, 241, 0.34)),
-    url('/images/ui/generated/hover-marks/generated-hover-brush-soft-01.webp');
+    var(--jl-hover-brush-soft-01);
   background-repeat: no-repeat;
   background-size: 100% 100%, 0 100%;
   background-position: center, left center;
