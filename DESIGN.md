@@ -263,7 +263,84 @@ Three button families serve different contexts: OrnamentalButton (hero CTAs), In
 
 **The Seal Texture Rule.** SealBadge uses SVG feTurbulence noise at 15% opacity to simulate ink-on-paper texture. This is applied to seal badges only; never use the noise texture as a generic background treatment.
 
-## 6. Do's and Don'ts
+## 6. Section Cinematic Identity System
+
+**Why this exists.** The Factions archive-ledger direction was rejected because it collapsed into a conservative, static, generic table of rows — indistinguishable in silhouette from any other section's archive. The scholarly / cinematic / reverent brand foundation (PRODUCT.md) is unchanged, but it is no longer sufficient on its own to stop a section redesign from defaulting to parchment archive surfaces. This doctrine makes section-specific cinematic composition an explicit, required part of the design system — not an exception to it.
+
+### Definition
+
+Before implementation, **every major section redesign must define and approve** all six of the following. A section redesign that cannot answer these six has not started.
+
+- **Core metaphor** — the real-world object the section *is* (a war table, an atlas, a reliquary cabinet, a doctrine wall). Not a color, not a primitive.
+- **Visual mechanic** — the structural device that makes the section feel like that metaphor (great-power plates orbiting a triad; a vertical chronicle rail; a radical-index lookup). The mechanic is the concept.
+- **Image strategy** — whether the section is image-led, and if so, what kind of imagery fits the concept (see "Image-Led Composition" below).
+- **Layout silhouette** — the page's distinctive shape at a far zoom, with all text blurred (see "The Silhouette Test").
+- **Motion language** — which motions the section earns and why (see §7 Motion, and the brand "Earned motion" principle).
+- **Typography mood** — how the section uses the system's font roles to carry its metaphor (heavier display for carved signage, italic serif for secondaries, mono for registry labels, etc.).
+
+**A section redesign begins from concept and composition, not primitive adoption.** A section that begins by "adopting the design primitives" without an approved visual mechanic has no concept to express — it is reskinning the old layout with new tokens. That is the failure mode this doctrine exists to prevent.
+
+### Approved Section Identities
+
+Each section has a canonical metaphor. These are the default concepts for section redesigns; deviating requires an explicit, approved alternative concept of equal distinctiveness.
+
+| Section | Metaphor |
+|---|---|
+| Timeline | Chronicle Rail |
+| Swordsmanship | Blade Path / Manual Zones |
+| Factions | 天下势力盘 / Sect Power Board / Political War Table |
+| World | Atlas / Gazetteer Map |
+| Characters | Dossier / Identity Register |
+| Artifacts | Reliquary Cabinet |
+| Teachings | Doctrine Tablet Wall |
+| Pantheon | Divine Court / Office Registry |
+| Glossary | Scholar Lexicon / Radical Index |
+
+### Named Rules
+
+**The Silhouette Test.** A page must still feel distinct from every other section if all its text is blurred. If the layout reduces to *hero + tabs + equal cards + footer*, it has failed the test regardless of how well the primitives are applied. The visual mechanic must produce a recognizable silhouette — plates on a field, a vertical rail, a cabinet of drawers, a layered map — before any typography or token work begins.
+
+**Archive Is Not The Default.** Archive / register / table treatments belong only where the section concept demands them (Glossary's radical index, the appendix register on a board page, a verbatim citation list). They must not become the default layout for every section. When a section's metaphor is not archive-shaped, reaching for a ledger of rows is the conservative trap — reject it and return to the approved visual mechanic.
+
+**Primitive Adoption Is Not Redesign.** Primitives (brush titles, seal stamps, cinnabar tags, ink underlines, section tokens) *support* the visual concept; they do not *create* it. Do not begin Stage 35E section work with primitive adoption unless the section's visual mechanic is already approved. A redesign whose plan is "adopt the primitives across the existing layout" is a reskin, not a redesign.
+
+**Image-Led Composition.** Important section pages may use strong official / cinematic art as **structural composition**, not only as subtle texture or a 15%-opacity wash. An image may anchor the page's identity when it fits the section concept:
+- **Factions:** halls, courts, political assemblies, mountain gates, war tables, walled cities, dynastic capitals.
+- **Character-focused sections:** portraiture is permitted.
+- **Not permitted as section atmosphere:** lone character close-ups on non-character sections, random spiritual tunnels, generic landscapes with no power / institutional context, washed placeholders where a real image belongs.
+
+When a section is image-led, the image must be sourced or commissioned to fit the concept; a placeholder that fights the page concept (e.g. a lone-wanderer landscape on a political board) is a defect, not a stopgap.
+
+### Approved New-Doctrine Section: Factions / 天下势力盘
+
+Factions is the first section migrated under this doctrine. Its concept is approved:
+
+- **Core metaphor:** 天下势力盘 / Sect Power Board — a political war table.
+- **Visual mechanic:** great powers as large political plates (a central triad of paramount powers, an orbit field of secondary powers, a satellite band of lesser powers), with an alliance / relationship web and mountain-gate territory plates, and a compact register demoted to appendix.
+- **Identity rules (enforced):**
+  - Dark political war-table board field.
+  - Great powers rendered as large political plates, not rows.
+  - Alliance lanes / relationship web, not chip-dumped cards.
+  - Mountain-gate territories as registered seat plates, not mini lists.
+  - Compact register as appendix only; it must not define the page identity.
+  - No seal spam — seals are authority marks on the paramount powers, not a decorative rack.
+  - No repeated ledger rows above the fold.
+  - No beige archive default — the section's dark board field is intentional.
+  - No generic card grid.
+
+This concept replaces the rejected Factions archive-ledger. It is the reference implementation for how the Section Cinematic Identity System is applied to a real section.
+
+## 7. Motion
+
+This system uses motion semantically. The brand foundation's "Earned motion" principle (PRODUCT.md Design Principle 5) governs all animation: every animation has a semantic reason, and if removing it loses no meaning, it should not exist.
+
+- **Reveal motion** marks content hierarchy (fade-up, blur-clear, line-draw reveals via `useScrollReveal`).
+- **Entrance motion** groups related items (staggered plate rises, orbit rises, lane rises on section-defining compositions).
+- **Atmospheric motion** is permitted on image-led sections (slow hero-drift parallax, seal-pulse on paramount elements) when it supports the section's visual mechanic and is gated by `@media (prefers-reduced-motion: reduce)`.
+
+**The Reduced-Motion Rule (non-negotiable).** Every animation must have a `@media (prefers-reduced-motion: reduce)` alternative (instant transition or crossfade). No motion is decorative-only; all motion can be removed without losing content or meaning. This is also a PRODUCT.md accessibility commitment.
+
+## 8. Do's and Don'ts
 
 ### Do:
 - **Do** use cinnabar-seal (#b82a2a) as the primary accent on ≤10% of any screen. Its rarity is authority.
@@ -276,6 +353,9 @@ Three button families serve different contexts: OrnamentalButton (hero CTAs), In
 - **Do** include text labels alongside color-only indicators (badges, status, tags) for color blindness accessibility.
 - **Do** use semantic HTML landmarks (<header>, <nav>, <main>, <footer>) and proper heading hierarchy.
 - **Do** test all section accent colors under deuteranopia, protanopia, and tritanopia simulations.
+- **Do** begin every major section redesign from an approved concept — core metaphor, visual mechanic, image strategy, layout silhouette, motion language, typography mood (see §6 Section Cinematic Identity System). A section with no approved visual mechanic has not started.
+- **Do** pass The Silhouette Test (§6): a page blurred of all text must still feel distinct from every other section.
+- **Do** use strong official / cinematic art as structural composition on image-led sections when the art fits the section concept. A real image that fits the metaphor beats a washed texture that doesn't.
 
 ### Don't:
 - **Don't** use generic SaaS dashboard layouts — no app-shell patterns, no sidebar navigation, no data tables as default presentation. (PRODUCT.md anti-reference: "Generic SaaS dashboards")
@@ -285,10 +365,13 @@ Three button families serve different contexts: OrnamentalButton (hero CTAs), In
 - **Don't** use identical card grids — same-sized cards with icon + heading + text repeated endlessly. (PRODUCT.md anti-reference: "Glossy card grids")
 - **Don't** use anime attack effects — no energy beams, no speed lines, no particle explosions as decorative elements. (PRODUCT.md anti-reference: "Anime attack effects")
 - **Don't** animate for animation's sake. No bounce/elastic easing. No parallax that fights the reader. (PRODUCT.md anti-reference: "Over-animation")
-- **Don't** replace readable prose with canvas/WebGL/visual effects. The wiki is text-first. (PRODUCT.md anti-reference: "Canvas/WebGL replacing content")
+- **Don't** let canvas/WebGL/visual effects *replace* readable prose. The wiki is text-first; visual effects enhance, never replace, content. (PRODUCT.md anti-reference: "Canvas/WebGL replacing content".) This is a content-preservation rule, **not** a technology ban. CSS, SVG, WebGL, and Tres.js are all permitted when they (a) support an approved section visual mechanic (§6), (b) remain accessible (keyboard, screen-reader, reduced-motion safe), and (c) preserve readable text content. What is banned is using a visual effect *instead of* content — not the technology itself.
 - **Don't** apply the calligraphy accent font to body copy or any text longer than 5 words.
 - **Don't** use shadow depth for elevation hierarchy. Use tonal layering (paper tints, mist values).
 - **Don't** mix section theme tokens on the same screen. Each section is a self-contained chapter.
 - **Don't** use border-radius above 6px on cards or containers. Buttons and chips use their own radius scale.
 - **Don't** ship elements with default shadows. Shadows are hover/state responses only.
 - **Don't** use `text-shadow` on nav labels in non-timeline contexts. The timeline header variant is the only exception.
+- **Don't** default a section to an archive / register / table of rows unless that section's concept is archive-shaped (see §6 "Archive Is Not The Default"). Reaching for a ledger when the metaphor is a board, a map, or a cabinet is the conservative trap.
+- **Don't** begin section redesign work with primitive adoption (see §6 "Primitive Adoption Is Not Redesign"). Adopting brush titles, seal stamps, and section tokens across an existing layout is a reskin, not a redesign — the visual mechanic must be approved first.
+- **Don't** use imagery that fights the section concept — lone character close-ups on non-character sections, random spiritual tunnels, or generic landscapes with no power/institutional context as section atmosphere (see §6 "Image-Led Composition").
