@@ -46,6 +46,7 @@ const fallbackSeal = (faction: FactionSummary) => faction.seal || faction.chines
 
     <div v-if="visibleRecords.length" class="association-list">
       <article v-for="record in visibleRecords" :key="record.faction.path" class="association-card">
+        <!-- Card header — faction identity -->
         <header class="association-header">
           <NuxtLink v-if="canOpen(record.faction.path)" :to="record.faction.path" class="faction-seal-link">
             <UiSealStamp :text="fallbackSeal(record.faction)" variant="outline" size="sm" writing="horizontal" :decorative="true" />
@@ -61,9 +62,14 @@ const fallbackSeal = (faction: FactionSummary) => faction.seal || faction.chines
           <span class="association-number">{{ record.associationCount }}</span>
         </header>
 
+        <!-- Three-column relationship board -->
         <div class="association-columns">
-          <div class="association-column declared">
-            <span class="column-label">Declared leader</span>
+          <!-- Column 1: Declared leader — authoritative, top-down -->
+          <div class="association-column col-leader">
+            <span class="column-label">
+              <span class="column-icon" aria-hidden="true">&#x2191;</span>
+              Declared leader
+            </span>
             <div v-if="record.declaredLeaders.length" class="chip-set">
               <RouteDisplayLink
                 v-for="leader in record.declaredLeaders.slice(0, 3)"
@@ -75,8 +81,12 @@ const fallbackSeal = (faction: FactionSummary) => faction.seal || faction.chines
             <span v-else class="empty-note">None recorded</span>
           </div>
 
-          <div class="association-column declared">
-            <span class="column-label">Declared members</span>
+          <!-- Column 2: Declared members — organizational roster -->
+          <div class="association-column col-members">
+            <span class="column-label">
+              <span class="column-icon" aria-hidden="true">&#x2192;</span>
+              Declared members
+            </span>
             <div v-if="record.declaredMembers.length" class="chip-set">
               <RouteDisplayLink
                 v-for="member in record.declaredMembers.slice(0, 5)"
@@ -91,8 +101,12 @@ const fallbackSeal = (faction: FactionSummary) => faction.seal || faction.chines
             <span v-else class="empty-note">None recorded</span>
           </div>
 
-          <div class="association-column inverse">
-            <span class="column-label">Character affiliations</span>
+          <!-- Column 3: Character affiliations — bottom-up, organic -->
+          <div class="association-column col-affiliations">
+            <span class="column-label">
+              <span class="column-icon" aria-hidden="true">&#x2198;</span>
+              Character affiliations
+            </span>
             <div v-if="record.inverseAffiliations.length" class="chip-set">
               <RouteDisplayLink
                 v-for="affiliation in record.inverseAffiliations.slice(0, 6)"
@@ -147,30 +161,36 @@ const fallbackSeal = (faction: FactionSummary) => faction.seal || faction.chines
 
 .association-list {
   display: grid;
-  gap: 0.75rem;
+  gap: 0.7rem;
 }
 
+/* ============================================================
+   ASSOCIATION CARD — relationship dossier
+   ============================================================ */
 .association-card {
   min-width: 0;
-  padding: 0.9rem;
-  border: 1px solid var(--c-border);
-  border-radius: 8px;
+  padding: 0.85rem;
+  border: 1px solid color-mix(in srgb, var(--c-ink) 14%, var(--c-border));
+  border-radius: 6px;
   background:
-    linear-gradient(135deg, color-mix(in srgb, var(--c-bg) 86%, transparent), color-mix(in srgb, var(--c-bg-soft) 88%, transparent)),
+    linear-gradient(140deg, color-mix(in srgb, var(--c-bg) 84%, transparent), color-mix(in srgb, var(--c-bg-soft) 86%, transparent)),
     url('/images/textures/ink-wash-02.webp');
   background-size: auto, cover;
   background-blend-mode: normal, multiply;
 }
 
+/* ============================================================
+   CARD HEADER
+   ============================================================ */
 .association-header {
   min-width: 0;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: 0.65rem;
+  gap: 0.6rem;
   align-items: center;
-  padding-bottom: 0.75rem;
-  margin-bottom: 0.75rem;
-  border-bottom: 1px solid var(--c-divider);
+  padding-bottom: 0.65rem;
+  margin-bottom: 0.65rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--c-ink) 12%, transparent);
 }
 
 .faction-seal-link {
@@ -208,7 +228,7 @@ const fallbackSeal = (faction: FactionSummary) => faction.seal || faction.chines
   min-width: 0;
   color: var(--c-ink);
   font-family: var(--font-heading);
-  font-size: 1.12rem;
+  font-size: 1.08rem;
   font-weight: 500;
   line-height: 1.16;
   text-decoration: none;
@@ -222,15 +242,9 @@ const fallbackSeal = (faction: FactionSummary) => faction.seal || faction.chines
 .faction-title small {
   color: var(--c-text-3);
   font-family: var(--font-zh-display);
-  font-size: 1rem;
+  font-size: 0.96rem;
   line-height: 1.1;
   letter-spacing: 0;
-}
-
-.faction-seal:focus-visible,
-.faction-title a:focus-visible {
-  outline: 2px solid var(--c-seal-red);
-  outline-offset: 3px;
 }
 
 .association-number {
@@ -243,48 +257,100 @@ const fallbackSeal = (faction: FactionSummary) => faction.seal || faction.chines
   font-variant-numeric: tabular-nums;
 }
 
+/* ============================================================
+   THREE-COLUMN RELATIONSHIP BOARD
+   ============================================================ */
 .association-columns {
   display: grid;
-  gap: 0.55rem;
+  gap: 0.5rem;
 }
 
 .association-column {
   min-width: 0;
   display: grid;
-  gap: 0.45rem;
-  padding: 0.65rem;
-  border: 1px solid var(--c-divider);
-  border-radius: 5px;
-  background: color-mix(in srgb, var(--c-bg) 76%, transparent);
+  gap: 0.4rem;
+  padding: 0.55rem 0.6rem;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--c-bg) 72%, transparent);
 }
 
-.association-column.inverse {
+/* Column 1: Declared leader — authoritative cinnabar accent */
+.col-leader {
+  border-left: 2px solid color-mix(in srgb, var(--c-seal-red) 50%, transparent);
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--c-seal-red) 3%, transparent), transparent 50%),
+    color-mix(in srgb, var(--c-bg) 72%, transparent);
+}
+
+/* Column 2: Declared members — organizational jade accent */
+.col-members {
   border-left: 2px solid color-mix(in srgb, var(--faction-jade, var(--c-teal-accent)) 50%, transparent);
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--faction-jade, var(--c-teal-accent)) 3%, transparent), transparent 50%),
+    color-mix(in srgb, var(--c-bg) 72%, transparent);
 }
 
-.association-column.declared {
-  border-left: 2px solid color-mix(in srgb, var(--c-seal-red) 42%, transparent);
+/* Column 3: Character affiliations — organic bronze accent */
+.col-affiliations {
+  border-left: 2px solid color-mix(in srgb, var(--c-bronze) 48%, transparent);
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--c-bronze) 3%, transparent), transparent 50%),
+    color-mix(in srgb, var(--c-bg) 72%, transparent);
 }
 
 .column-label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
   color: var(--c-text-3);
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.62rem;
   line-height: 1.35;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.column-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  font-size: 0.68rem;
+  line-height: 1;
+  border-radius: 2px;
+}
+
+.col-leader .column-icon {
+  color: var(--c-seal-red);
+  border: 1px solid color-mix(in srgb, var(--c-seal-red) 28%, transparent);
+  background: color-mix(in srgb, var(--c-seal-red) 6%, transparent);
+}
+
+.col-members .column-icon {
+  color: var(--faction-jade, var(--c-teal-accent));
+  border: 1px solid color-mix(in srgb, var(--faction-jade, var(--c-teal-accent)) 28%, transparent);
+  background: color-mix(in srgb, var(--faction-jade, var(--c-teal-accent)) 6%, transparent);
+}
+
+.col-affiliations .column-icon {
+  color: var(--c-bronze);
+  border: 1px solid color-mix(in srgb, var(--c-bronze) 28%, transparent);
+  background: color-mix(in srgb, var(--c-bronze) 6%, transparent);
 }
 
 .chip-set {
   min-width: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.38rem;
+  gap: 0.35rem;
 }
 
 .more-chip,
 .empty-note {
   color: var(--c-text-3);
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   line-height: 1.35;
 }
 
@@ -305,7 +371,7 @@ const fallbackSeal = (faction: FactionSummary) => faction.seal || faction.chines
   }
 
   .association-card {
-    padding: 0.78rem;
+    padding: 0.75rem;
   }
 
   .association-header {

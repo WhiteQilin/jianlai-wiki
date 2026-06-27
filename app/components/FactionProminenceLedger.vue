@@ -43,6 +43,33 @@ const formatToken = (value?: string) => {
     .join(' ')
 }
 
+// --- Political hierarchy ranking ---
+// Paramount: first 2–3 primary entries (verified ones prioritized by sort order).
+// Primary: remaining primary entries.
+// Major: all major entries.
+type RowRank = 'paramount' | 'primary' | 'major'
+
+const rowRank = computed<Map<string, RowRank>>(() => {
+  const map = new Map<string, RowRank>()
+  const PARAMOUNT_CAP = 3
+
+  let paramountCount = 0
+  for (const entry of props.entries) {
+    const imp = (entry.importance || '').trim().toLowerCase()
+    if (imp === 'primary' && paramountCount < PARAMOUNT_CAP) {
+      map.set(entry.path, 'paramount')
+      paramountCount++
+    } else if (imp === 'primary') {
+      map.set(entry.path, 'primary')
+    } else {
+      map.set(entry.path, 'major')
+    }
+  }
+  return map
+})
+
+const getRank = (entry: FactionEntry): RowRank => rowRank.value.get(entry.path) ?? 'major'
+
 // Tone mapping for importance / verification chips.
 // Primary → jade (the section's own accent), major → section, minor/background → ghost.
 type Tone = 'section' | 'jade' | 'bronze' | 'ghost' | 'cinnabar'
@@ -105,9 +132,20 @@ function normalizeKey(value?: string) {
         v-for="entry in entries"
         :key="entry.path"
         class="ledger-row"
+        :class="`rank--${getRank(entry)}`"
         role="listitem"
       >
-        <NuxtLink v-if="canOpen(entry.path)" :to="entry.path" class="row-seal-link" :aria-label="entry.title">
+        <!-- Paramount: larger carved seal with cinnabar registry marker -->
+        <div v-if="getRank(entry) === 'paramount'" class="paramount-seal-block">
+          <NuxtLink v-if="canOpen(entry.path)" :to="entry.path" class="row-seal-link" :aria-label="entry.title">
+            <UiSealStamp :text="fallbackSeal(entry)" variant="carved" size="md" writing="horizontal" :decorative="true" />
+          </NuxtLink>
+          <UiSealStamp v-else :text="fallbackSeal(entry)" variant="ghost" size="md" writing="horizontal" :decorative="true" class="row-seal" />
+          <span class="paramount-marker" aria-label="Primary register">Primary Register</span>
+        </div>
+
+        <!-- Primary: standard outline seal -->
+        <NuxtLink v-else-if="canOpen(entry.path)" :to="entry.path" class="row-seal-link" :aria-label="entry.title">
           <UiSealStamp :text="fallbackSeal(entry)" variant="outline" size="sm" writing="horizontal" :decorative="true" />
         </NuxtLink>
         <UiSealStamp v-else :text="fallbackSeal(entry)" variant="ghost" size="sm" writing="horizontal" :decorative="true" class="row-seal" />
@@ -249,6 +287,9 @@ function normalizeKey(value?: string) {
   gap: 0.6rem;
 }
 
+/* ============================================================
+   ROW BASE
+   ============================================================ */
 .ledger-row {
   min-width: 0;
   display: grid;
@@ -263,6 +304,91 @@ function normalizeKey(value?: string) {
   box-shadow: 0 16px 36px color-mix(in srgb, var(--faction-jade, #2f5c53) 7%, transparent);
 }
 
+/* ============================================================
+   RANK: PARAMOUNT — strongest political weight
+   ============================================================ */
+.ledger-row.rank--paramount {
+  padding: 1.35rem 1.15rem;
+  border-left-width: 3px;
+  border-left-color: color-mix(in srgb, var(--c-seal-red) 62%, var(--faction-jade, #2f5c53));
+  border-top-color: color-mix(in srgb, var(--c-seal-red) 18%, var(--c-border));
+  border-bottom-color: color-mix(in srgb, var(--c-seal-red) 18%, var(--c-border));
+  border-right-color: color-mix(in srgb, var(--c-seal-red) 18%, var(--c-border));
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--c-paper-alt) 78%, transparent), color-mix(in srgb, var(--c-bg) 86%, transparent)),
+    url('/images/textures/ink-wash-01.webp');
+  background-size: auto, cover;
+  background-blend-mode: normal, multiply;
+  box-shadow:
+    0 18px 42px color-mix(in srgb, var(--c-seal-red) 8%, transparent),
+    0 4px 12px color-mix(in srgb, var(--faction-jade, #2f5c53) 10%, transparent);
+}
+
+/* Paramount seal block — larger seal + registry marker */
+.paramount-seal-block {
+  display: grid;
+  gap: 0.35rem;
+  justify-items: center;
+}
+
+.paramount-marker {
+  color: var(--c-seal-red);
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  line-height: 1.25;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: 0.12rem 0.35rem;
+  border: 1px solid color-mix(in srgb, var(--c-seal-red) 28%, transparent);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--c-seal-red) 5%, transparent);
+}
+
+/* Paramount title — slightly larger */
+.ledger-row.rank--paramount .row-title strong {
+  font-size: 1.4rem;
+}
+
+.ledger-row.rank--paramount .row-title small {
+  font-size: 1.28rem;
+}
+
+/* ============================================================
+   RANK: PRIMARY — elevated but not paramount
+   ============================================================ */
+.ledger-row.rank--primary {
+  padding: 1.05rem 1rem;
+  border-left-width: 2px;
+  border-left-color: color-mix(in srgb, var(--faction-jade, var(--c-teal-accent)) 58%, transparent);
+}
+
+/* ============================================================
+   RANK: MAJOR — standard weight, more compact
+   ============================================================ */
+.ledger-row.rank--major {
+  padding: 0.78rem 0.9rem;
+  border-left-width: 1px;
+  border-left-color: color-mix(in srgb, var(--c-text-3) 28%, transparent);
+  background: color-mix(in srgb, var(--c-bg) 82%, var(--c-bg-soft));
+  box-shadow: none;
+}
+
+.ledger-row.rank--major .row-title strong {
+  font-size: 1.14rem;
+}
+
+.ledger-row.rank--major .row-title small {
+  font-size: 1.06rem;
+}
+
+.ledger-row.rank--major .row-description {
+  font-size: 0.86rem;
+}
+
+/* ============================================================
+   SEAL LINKS
+   ============================================================ */
 .row-seal-link {
   display: grid;
   place-items: center;
@@ -412,6 +538,22 @@ a.row-title:hover {
   .ledger-row {
     grid-template-columns: 1fr;
     gap: 0.75rem;
+  }
+
+  .ledger-row.rank--paramount {
+    padding: 1.1rem 0.95rem;
+  }
+
+  .ledger-row.rank--primary {
+    padding: 0.9rem 0.85rem;
+  }
+
+  .ledger-row.rank--major {
+    padding: 0.7rem 0.8rem;
+  }
+
+  .paramount-seal-block {
+    justify-items: start;
   }
 
   .row-seal-link,

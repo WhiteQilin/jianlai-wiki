@@ -61,7 +61,7 @@ function importanceChipTone(value?: string): Tone {
         Mountain gate seats
       </UiBrushTitle>
       <p>
-        Grouped by authored headquarters fields as seats or registered locations only. Region text is shown as supporting copy where present.
+        Grouped by authored headquarters fields as seats or registered locations. Region text is shown as supporting copy where present.
       </p>
     </div>
 
@@ -72,7 +72,11 @@ function importanceChipTone(value?: string): Tone {
         class="seat-group"
         :class="{ 'is-unplaced': group.isUnplaced }"
       >
+        <!-- Gazetteer-style location header -->
         <header class="group-header">
+          <div class="group-jurisdiction-mark" aria-hidden="true">
+            <span class="jurisdiction-icon">&#x2316;</span>
+          </div>
           <div class="group-title">
             <span class="group-label" :class="{ pending: group.link?.isMissingRoute || group.isUnplaced }">
               <RouteDisplayLink
@@ -83,11 +87,14 @@ function importanceChipTone(value?: string): Tone {
               <span v-else>{{ group.label }}</span>
             </span>
             <small v-if="group.chinese">{{ group.chinese }}</small>
-            <small>{{ group.isUnplaced ? 'No headquarters field recorded' : 'Seat / registered location' }}</small>
+            <small>
+              {{ group.isUnplaced ? 'No headquarters field recorded' : 'Gazetted seat — registered jurisdiction' }}
+            </small>
           </div>
           <span class="group-count">{{ group.count }}</span>
         </header>
 
+        <!-- Member rows — compact, gazetteer-styled -->
         <div class="seat-members">
           <NuxtLink
             v-for="entry in group.entries.slice(0, 6)"
@@ -95,9 +102,9 @@ function importanceChipTone(value?: string): Tone {
             :to="entry.path"
             class="seat-member"
           >
-              <span class="member-seal" aria-hidden="true">
-                <UiSealStamp :text="fallbackSeal(entry)" variant="outline" size="xs" writing="horizontal" :decorative="true" />
-              </span>
+            <span class="member-seal" aria-hidden="true">
+              <UiSealStamp :text="fallbackSeal(entry)" variant="outline" size="xs" writing="horizontal" :decorative="true" />
+            </span>
             <span class="member-main">
               <span class="member-title">
                 <strong>{{ entry.title }}</strong>
@@ -145,78 +152,71 @@ function importanceChipTone(value?: string): Tone {
 
 .seat-groups {
   display: grid;
-  gap: 0.8rem;
+  gap: 0.7rem;
 }
 
+/* ============================================================
+   SEAT GROUP — gazetteer jurisdiction card
+   ============================================================ */
 .seat-group {
   position: relative;
   min-width: 0;
   overflow: hidden;
-  padding: 0.95rem;
-  border: 1px solid var(--c-border);
-  border-radius: 8px;
+  padding: 0.85rem 0.85rem 0.85rem 1.05rem;
+  border: 1px solid color-mix(in srgb, var(--faction-jade, var(--c-teal-accent)) 18%, var(--c-border));
+  border-radius: 6px;
   background:
-    linear-gradient(150deg, color-mix(in srgb, var(--c-paper-alt) 76%, transparent), color-mix(in srgb, var(--c-bg-soft) 88%, transparent)),
+    linear-gradient(160deg, color-mix(in srgb, var(--c-paper-alt) 72%, transparent), color-mix(in srgb, var(--c-bg-soft) 86%, transparent)),
     url('/images/textures/ink-wash-01.webp');
   background-size: auto, cover;
   background-blend-mode: normal, multiply;
 }
 
+/* Jurisdiction left rule — jade gradient */
 .seat-group::before {
   content: '';
   position: absolute;
   inset: 0 auto 0 0;
   width: 3px;
-  background: linear-gradient(180deg, var(--faction-jade, var(--c-teal-accent)), color-mix(in srgb, var(--c-seal-red) 62%, transparent));
-  opacity: 0.78;
+  background: linear-gradient(180deg, var(--faction-jade, var(--c-teal-accent)), color-mix(in srgb, var(--c-seal-red) 66%, transparent));
+  opacity: 0.72;
 }
 
 .seat-group.is-unplaced::before {
-  background: color-mix(in srgb, var(--c-bronze) 64%, transparent);
+  background: linear-gradient(180deg, var(--c-bronze), color-mix(in srgb, var(--c-text-3) 44%, transparent));
+  opacity: 0.55;
 }
 
+/* ============================================================
+   GROUP HEADER — location as gazetted jurisdiction
+   ============================================================ */
 .group-header {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 0.75rem;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.6rem;
   align-items: start;
-  margin-bottom: 0.85rem;
+  margin-bottom: 0.7rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--faction-jade, var(--c-teal-accent)) 20%, transparent);
 }
 
-.group-title {
-  min-width: 0;
+.group-jurisdiction-mark {
   display: grid;
-  gap: 0.24rem;
+  place-items: center;
+  width: 1.65rem;
+  height: 1.65rem;
+  margin-top: 0.1rem;
+  color: var(--faction-jade, var(--c-teal-accent));
+  border: 1px solid color-mix(in srgb, var(--faction-jade, var(--c-teal-accent)) 30%, transparent);
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--faction-jade, var(--c-teal-accent)) 5%, transparent);
 }
 
-.group-label {
-  min-width: 0;
-  color: var(--c-ink);
-  font-family: var(--font-heading);
-  font-size: 1.16rem;
-  font-weight: 500;
-  line-height: 1.18;
-  overflow-wrap: anywhere;
-}
-
-.group-label.pending {
-  color: var(--c-text-2);
-}
-
-.group-title small {
-  color: var(--c-text-3);
+.jurisdiction-icon {
   font-family: var(--font-mono);
-  font-size: 0.68rem;
-  line-height: 1.35;
-}
-
-.group-title small:first-of-type {
-  color: var(--c-text-2);
-  font-family: var(--font-zh-display);
-  font-size: 1.08rem;
-  line-height: 1.1;
-  letter-spacing: 0;
+  font-size: 0.75rem;
+  line-height: 1;
 }
 
 .group-count {
@@ -233,31 +233,74 @@ function importanceChipTone(value?: string): Tone {
   font-variant-numeric: tabular-nums;
 }
 
+.group-title {
+  min-width: 0;
+  display: grid;
+  gap: 0.18rem;
+}
+
+.group-label {
+  min-width: 0;
+  color: var(--c-ink);
+  font-family: var(--font-heading);
+  font-size: 1.08rem;
+  font-weight: 500;
+  line-height: 1.18;
+  overflow-wrap: anywhere;
+}
+
+.group-label.pending {
+  color: var(--c-text-2);
+}
+
+.group-title small {
+  color: var(--c-text-3);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  line-height: 1.35;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.group-title small:first-of-type {
+  color: var(--c-text-2);
+  font-family: var(--font-zh-display);
+  font-size: 1.04rem;
+  line-height: 1.1;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* ============================================================
+   MEMBER ROWS — compact gazetteer entries
+   ============================================================ */
 .seat-members {
   position: relative;
   display: grid;
-  gap: 0.45rem;
+  gap: 0.35rem;
 }
 
 .seat-member {
   min-width: 0;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  gap: 0.55rem;
+  gap: 0.5rem;
   align-items: center;
-  padding: 0.55rem;
+  padding: 0.4rem 0.5rem;
   color: inherit;
   text-decoration: none;
-  border: 1px solid var(--c-divider);
-  border-radius: 5px;
-  background: color-mix(in srgb, var(--c-bg) 76%, transparent);
+  border: 1px solid transparent;
+  border-left: 2px solid color-mix(in srgb, var(--c-text-3) 18%, transparent);
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--c-bg) 68%, transparent);
   transition: border-color 0.24s cubic-bezier(0.32, 0.72, 0, 1), background 0.24s cubic-bezier(0.32, 0.72, 0, 1), transform 0.24s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .seat-member:hover {
   transform: translateX(3px);
-  border-color: color-mix(in srgb, var(--faction-jade, var(--c-teal-accent)) 34%, var(--c-divider));
-  background: color-mix(in srgb, var(--faction-jade-soft, var(--c-bronze-soft)) 42%, var(--c-bg));
+  border-color: color-mix(in srgb, var(--faction-jade, var(--c-teal-accent)) 30%, var(--c-divider));
+  border-left-color: var(--faction-jade, var(--c-teal-accent));
+  background: color-mix(in srgb, var(--faction-jade-soft, var(--c-bronze-soft)) 38%, var(--c-bg));
 }
 
 .seat-member:focus-visible {
@@ -273,21 +316,21 @@ function importanceChipTone(value?: string): Tone {
 .member-main {
   min-width: 0;
   display: grid;
-  gap: 0.25rem;
+  gap: 0.18rem;
 }
 
 .member-title {
   min-width: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem 0.55rem;
+  gap: 0.2rem 0.5rem;
   align-items: baseline;
 }
 
 .member-title strong {
   color: var(--c-ink);
   font-family: var(--font-heading);
-  font-size: 1rem;
+  font-size: 0.92rem;
   font-weight: 500;
   line-height: 1.18;
   overflow-wrap: anywhere;
@@ -295,16 +338,19 @@ function importanceChipTone(value?: string): Tone {
 
 .member-title small {
   color: var(--c-text-3);
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   line-height: 1.2;
 }
 
 .member-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem;
+  gap: 0.28rem;
 }
 
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
 @media (max-width: 760px) {
   .seat-heading {
     grid-template-columns: 1fr;
@@ -314,11 +360,22 @@ function importanceChipTone(value?: string): Tone {
 
 @media (max-width: 480px) {
   .seat-group {
-    padding: 0.85rem;
+    padding: 0.75rem;
+  }
+
+  .group-header {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.5rem;
+  }
+
+  .group-count {
+    grid-column: 1 / -1;
+    justify-self: start;
   }
 
   .seat-member {
     align-items: start;
+    padding: 0.35rem 0.45rem;
   }
 
   .seat-member:hover {

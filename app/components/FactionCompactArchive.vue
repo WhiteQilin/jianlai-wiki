@@ -82,6 +82,7 @@ watch(
 
 <template>
   <section class="compact-archive" aria-labelledby="compact-archive-title">
+    <!-- Register header with ruled line -->
     <div class="archive-heading">
       <UiBrushTitle as="h2" kicker="Compact Archive" class="archive-title">
         All registered institutions
@@ -89,6 +90,7 @@ watch(
       <span class="archive-count">{{ filteredEntries.length }} / {{ entries.length }}</span>
     </div>
 
+    <!-- Category filter tabs -->
     <div class="category-rule" aria-label="Faction category filters">
       <UiLedgerTab
         v-for="category in categoryFilters"
@@ -102,13 +104,26 @@ watch(
       </UiLedgerTab>
     </div>
 
+    <!-- Register table — inscribed index -->
     <div v-if="filteredEntries.length" class="archive-table" role="list">
+      <!-- Column header rule -->
+      <div class="archive-col-header" aria-hidden="true">
+        <span class="col-h-seal">Seal</span>
+        <span class="col-h-name">Institution name</span>
+        <span class="col-h-cat">Category</span>
+        <span class="col-h-meta">Status</span>
+        <span class="col-h-seat">Registered seat</span>
+      </div>
+
       <article
-        v-for="entry in filteredEntries"
+        v-for="(entry, index) in filteredEntries"
         :key="entry.path"
         class="archive-row"
         role="listitem"
       >
+        <!-- Row index number — register-style -->
+        <span class="row-index" aria-hidden="true">{{ index + 1 }}</span>
+
         <NuxtLink v-if="canOpen(entry.path)" :to="entry.path" class="row-seal-link" :aria-label="entry.title">
           <UiSealStamp :text="fallbackSeal(entry)" variant="outline" size="xs" writing="horizontal" :decorative="true" />
         </NuxtLink>
@@ -152,6 +167,9 @@ watch(
   margin-top: clamp(2.7rem, 6vw, 4.75rem);
 }
 
+/* ============================================================
+   REGISTER HEADING
+   ============================================================ */
 .archive-heading {
   display: flex;
   align-items: end;
@@ -174,6 +192,9 @@ watch(
   white-space: nowrap;
 }
 
+/* ============================================================
+   CATEGORY FILTER RULE
+   ============================================================ */
 .category-rule {
   display: flex;
   flex-wrap: wrap;
@@ -184,27 +205,86 @@ watch(
   border-bottom: 1px solid var(--c-divider);
 }
 
-.archive-table {
+/* ============================================================
+   COLUMN HEADER — register-style ruled header
+   ============================================================ */
+.archive-col-header {
   display: grid;
-  gap: 0.45rem;
+  grid-template-columns: 2rem auto minmax(0, 1fr) minmax(7rem, 0.15fr) minmax(10rem, 0.2fr) minmax(12rem, 0.25fr);
+  gap: 0.75rem;
+  align-items: end;
+  padding: 0.35rem 0.85rem 0.5rem;
+  border-bottom: 2px solid color-mix(in srgb, var(--c-ink) 18%, transparent);
+  margin-bottom: 0.15rem;
 }
 
+.col-h-seal,
+.col-h-name,
+.col-h-cat,
+.col-h-meta,
+.col-h-seat {
+  color: var(--c-text-3);
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  line-height: 1.35;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.col-h-seal {
+  text-align: center;
+}
+
+.col-h-meta {
+  text-align: right;
+}
+
+.col-h-seat {
+  text-align: right;
+}
+
+/* ============================================================
+   REGISTER TABLE
+   ============================================================ */
+.archive-table {
+  display: grid;
+  gap: 0.35rem;
+}
+
+/* ============================================================
+   REGISTER ROW — inscribed index entry
+   ============================================================ */
 .archive-row {
   min-width: 0;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) minmax(7rem, 0.15fr) minmax(10rem, 0.2fr) minmax(12rem, 0.25fr);
+  grid-template-columns: 2rem auto minmax(0, 1fr) minmax(7rem, 0.15fr) minmax(10rem, 0.2fr) minmax(12rem, 0.25fr);
   gap: 0.75rem;
   align-items: center;
-  padding: 0.72rem 0.85rem;
+  padding: 0.55rem 0.75rem;
   color: inherit;
-  border: 1px solid var(--c-divider);
-  border-left: 2px solid color-mix(in srgb, var(--faction-jade, var(--c-teal-accent)) 46%, transparent);
-  border-radius: 6px;
+  border: 1px solid transparent;
+  border-bottom: 1px solid color-mix(in srgb, var(--c-ink) 7%, transparent);
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--c-bg) 76%, transparent);
+  transition: border-color 0.24s cubic-bezier(0.32, 0.72, 0, 1), background 0.24s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.archive-row:hover {
+  border-color: color-mix(in srgb, var(--faction-jade, var(--c-teal-accent)) 22%, var(--c-divider));
   background:
-    linear-gradient(90deg, color-mix(in srgb, var(--c-paper-alt) 66%, transparent), color-mix(in srgb, var(--c-bg-soft) 78%, transparent)),
-    url('/images/textures/ink-wash-02.webp');
-  background-size: auto, cover;
-  background-blend-mode: normal, multiply;
+    linear-gradient(90deg, color-mix(in srgb, var(--faction-jade, var(--c-teal-accent)) 3%, transparent), transparent 60%),
+    color-mix(in srgb, var(--c-bg) 76%, transparent);
+}
+
+/* Row index — register numbering */
+.row-index {
+  color: var(--c-text-3);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  line-height: 1;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.6;
 }
 
 .row-seal-link {
@@ -232,14 +312,14 @@ watch(
 .row-main {
   min-width: 0;
   display: grid;
-  gap: 0.25rem;
+  gap: 0.15rem;
 }
 
 .row-title-line {
   min-width: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.3rem 0.65rem;
+  gap: 0.3rem 0.6rem;
   align-items: baseline;
 }
 
@@ -248,7 +328,7 @@ watch(
   min-width: 0;
   color: var(--c-ink);
   font-family: var(--font-heading);
-  font-size: 1.12rem;
+  font-size: 1.04rem;
   font-weight: 500;
   line-height: 1.15;
   text-decoration: none;
@@ -262,15 +342,15 @@ watch(
 .row-title-line small {
   color: var(--c-text-2);
   font-family: var(--font-zh-display);
-  font-size: 1.08rem;
+  font-size: 1rem;
   line-height: 1.1;
   letter-spacing: 0;
 }
 
 .row-description {
   color: var(--c-text-2);
-  font-size: 0.84rem;
-  line-height: 1.45;
+  font-size: 0.8rem;
+  line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
@@ -285,7 +365,7 @@ watch(
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 0.3rem;
+  gap: 0.25rem;
 }
 
 .row-seat {
@@ -295,7 +375,7 @@ watch(
   overflow-wrap: anywhere;
   color: var(--c-text-3);
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   line-height: 1.35;
 }
 
@@ -305,15 +385,22 @@ watch(
   background: color-mix(in srgb, var(--c-bg-soft) 54%, transparent);
 }
 
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
 @media (max-width: 980px) {
-  .archive-row {
-    grid-template-columns: auto minmax(0, 1fr) auto;
+  .archive-col-header {
+    display: none;
   }
 
-  .row-category,
+  .archive-row {
+    grid-template-columns: 2rem auto minmax(0, 1fr) auto;
+  }
+
+  .row-category-tag,
   .row-meta,
   .row-seat {
-    grid-column: 2 / -1;
+    grid-column: 3 / -1;
     justify-self: start;
     text-align: left;
   }
@@ -331,14 +418,14 @@ watch(
 
   .archive-row {
     align-items: start;
-    grid-template-columns: auto minmax(0, 1fr);
-    padding: 0.75rem;
+    grid-template-columns: 1.5rem auto minmax(0, 1fr);
+    padding: 0.6rem 0.65rem;
   }
 
-  .row-category,
+  .row-category-tag,
   .row-meta,
   .row-seat {
-    grid-column: 2;
+    grid-column: 3;
   }
 }
 </style>
