@@ -39,15 +39,27 @@ const formatToken = (value?: string) => {
     .map((part) => `${part.charAt(0).toUpperCase()}${part.slice(1)}`)
     .join(' ')
 }
+
+// Tone for importance chip — Primary → jade, Major → section, others → ghost.
+type Tone = 'section' | 'jade' | 'bronze' | 'ghost' | 'cinnabar'
+function importanceChipTone(value?: string): Tone {
+  switch ((value || '').trim().toLowerCase()) {
+    case 'primary':
+      return 'jade'
+    case 'major':
+      return 'section'
+    default:
+      return 'ghost'
+  }
+}
 </script>
 
 <template>
   <section class="seat-ledger" aria-labelledby="seat-ledger-title">
     <div class="seat-heading">
-      <div>
-        <p class="seat-kicker">Registered Seats</p>
-        <h2 id="seat-ledger-title">Mountain gate seats</h2>
-      </div>
+      <UiBrushTitle as="h2" kicker="Registered Seats" class="seat-title">
+        Mountain gate seats
+      </UiBrushTitle>
       <p>
         Grouped by authored headquarters fields as seats or registered locations only. Region text is shown as supporting copy where present.
       </p>
@@ -83,16 +95,18 @@ const formatToken = (value?: string) => {
             :to="entry.path"
             class="seat-member"
           >
-            <span class="member-seal" aria-hidden="true">{{ fallbackSeal(entry) }}</span>
+              <span class="member-seal" aria-hidden="true">
+                <UiSealStamp :text="fallbackSeal(entry)" variant="outline" size="xs" writing="horizontal" :decorative="true" />
+              </span>
             <span class="member-main">
               <span class="member-title">
                 <strong>{{ entry.title }}</strong>
                 <small v-if="entry.chinese">{{ entry.chinese }}</small>
               </span>
               <span class="member-meta">
-                <span>{{ entry.category || 'Faction' }}</span>
-                <span>{{ formatToken(entry.importance) }}</span>
-                <span v-if="entry.region">{{ entry.region }}</span>
+                <UiCinnabarTag tone="ghost" size="sm">{{ entry.category || 'Faction' }}</UiCinnabarTag>
+                <UiCinnabarTag :tone="importanceChipTone(entry.importance)" size="sm">{{ formatToken(entry.importance) }}</UiCinnabarTag>
+                <UiCinnabarTag v-if="entry.region" tone="bronze" size="sm">{{ entry.region }}</UiCinnabarTag>
               </span>
             </span>
           </NuxtLink>
@@ -117,23 +131,8 @@ const formatToken = (value?: string) => {
   margin-bottom: 1.1rem;
 }
 
-.seat-kicker {
-  margin: 0 0 0.35rem;
-  color: var(--faction-jade, var(--c-teal-accent));
-  font-family: var(--font-mono);
-  font-size: 0.76rem;
-  line-height: 1.35;
-  letter-spacing: 0;
-}
-
-.seat-heading h2 {
-  margin: 0;
-  color: var(--c-ink);
-  font-family: var(--font-heading);
-  font-size: clamp(2rem, 4vw, 2.72rem);
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: 0;
+.seat-title {
+  max-width: none;
 }
 
 .seat-heading p {
@@ -267,16 +266,8 @@ const formatToken = (value?: string) => {
 }
 
 .member-seal {
-  width: 2rem;
-  aspect-ratio: 1;
   display: grid;
   place-items: center;
-  color: var(--c-seal-red);
-  border: 1px solid color-mix(in srgb, var(--c-seal-red) 58%, transparent);
-  border-radius: 3px;
-  font-family: var(--font-zh-display);
-  font-size: 0.95rem;
-  line-height: 1;
 }
 
 .member-main {
@@ -312,14 +303,6 @@ const formatToken = (value?: string) => {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
-  color: var(--c-text-3);
-  font-family: var(--font-mono);
-  font-size: 0.66rem;
-  line-height: 1.3;
-}
-
-.member-meta span {
-  overflow-wrap: anywhere;
 }
 
 @media (max-width: 760px) {

@@ -43,22 +43,60 @@ const formatToken = (value?: string) => {
     .join(' ')
 }
 
+// Tone mapping for importance / verification chips.
+// Primary → jade (the section's own accent), major → section, minor/background → ghost.
+type Tone = 'section' | 'jade' | 'bronze' | 'ghost' | 'cinnabar'
+const importanceTone = (value?: string): Tone => {
+  switch (normalizeKey(value)) {
+    case 'primary':
+      return 'jade'
+    case 'major':
+      return 'section'
+    case 'minor':
+      return 'ghost'
+    case 'background':
+      return 'ghost'
+    default:
+      return 'ghost'
+  }
+}
+
+// Verified → jade (settled), to-be-verified → ghost (neutral), disputed → cinnabar (rare), speculative → bronze.
+const verificationTone = (value?: string): Tone => {
+  switch (normalizeKey(value)) {
+    case 'verified':
+      return 'jade'
+    case 'disputed':
+      return 'cinnabar'
+    case 'speculative':
+      return 'bronze'
+    case 'to-be-verified':
+    default:
+      return 'ghost'
+  }
+}
+
+function normalizeKey(value?: string) {
+  return (value || '').trim().toLowerCase()
+}
+
 </script>
 
 <template>
   <section class="prominence-ledger" aria-labelledby="prominence-ledger-title">
     <div class="ledger-heading">
-      <p class="ledger-kicker">Prominence Ledger</p>
-      <div>
-        <h2 id="prominence-ledger-title">Primary and major institutions</h2>
+      <UiBrushTitle as="h2" kicker="Prominence Ledger" class="prominence-title">
+        Primary and major institutions
+      </UiBrushTitle>
+      <div class="prominence-sub">
         <p>
           Editorial rows for records marked primary or major in frontmatter, preserving authored categories and verification states.
         </p>
-      </div>
-      <div v-if="prominenceGroups.length" class="prominence-counts" aria-label="Prominence group counts">
-        <span v-for="group in prominenceGroups" :key="group.value">
-          {{ group.label }} <strong>{{ group.count }}</strong>
-        </span>
+        <div v-if="prominenceGroups.length" class="prominence-counts" aria-label="Prominence group counts">
+          <span v-for="group in prominenceGroups" :key="group.value">
+            {{ group.label }} <strong>{{ group.count }}</strong>
+          </span>
+        </div>
       </div>
     </div>
 
@@ -69,10 +107,10 @@ const formatToken = (value?: string) => {
         class="ledger-row"
         role="listitem"
       >
-        <NuxtLink v-if="canOpen(entry.path)" :to="entry.path" class="row-seal" :aria-label="entry.title">
-          {{ fallbackSeal(entry) }}
+        <NuxtLink v-if="canOpen(entry.path)" :to="entry.path" class="row-seal-link" :aria-label="entry.title">
+          <UiSealStamp :text="fallbackSeal(entry)" variant="outline" size="sm" writing="horizontal" :decorative="true" />
         </NuxtLink>
-        <span v-else class="row-seal">{{ fallbackSeal(entry) }}</span>
+        <UiSealStamp v-else :text="fallbackSeal(entry)" variant="ghost" size="sm" writing="horizontal" :decorative="true" class="row-seal" />
 
         <div class="row-main">
           <header class="row-header">
@@ -84,7 +122,7 @@ const formatToken = (value?: string) => {
               <strong>{{ entry.title }}</strong>
               <small v-if="entry.chinese">{{ entry.chinese }}</small>
             </span>
-            <span class="row-kind">{{ entry.factionType || entry.category || 'Faction' }}</span>
+            <UiCinnabarTag tone="ghost" size="sm" class="row-kind-tag">{{ entry.factionType || entry.category || 'Faction' }}</UiCinnabarTag>
           </header>
 
           <p v-if="entry.description" class="row-description">{{ entry.description }}</p>
@@ -92,11 +130,11 @@ const formatToken = (value?: string) => {
           <div class="row-fields">
             <div class="field-pair">
               <span>Importance</span>
-              <strong>{{ formatToken(entry.importance) }}</strong>
+              <UiCinnabarTag :tone="importanceTone(entry.importance)" size="sm">{{ formatToken(entry.importance) }}</UiCinnabarTag>
             </div>
             <div class="field-pair">
               <span>Verification</span>
-              <strong>{{ formatToken(entry.verificationStatus) }}</strong>
+              <UiCinnabarTag :tone="verificationTone(entry.verificationStatus)" size="sm">{{ formatToken(entry.verificationStatus) }}</UiCinnabarTag>
             </div>
             <div v-if="entry.headquartersLink" class="field-pair field-link">
               <span>Registered seat</span>
@@ -154,36 +192,26 @@ const formatToken = (value?: string) => {
 
 .ledger-heading {
   display: grid;
-  grid-template-columns: minmax(9rem, 0.34fr) minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
   gap: clamp(1rem, 3vw, 2rem);
-  align-items: end;
+  align-items: start;
   margin-bottom: 1.25rem;
 }
 
-.ledger-kicker {
-  align-self: start;
-  margin: 0;
-  color: var(--faction-jade, var(--c-teal-accent));
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  line-height: 1.35;
-  letter-spacing: 0;
+.prominence-title {
+  max-width: none;
 }
 
-.ledger-heading h2 {
-  margin: 0;
-  color: var(--c-ink);
-  font-family: var(--font-heading);
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: 0;
-  text-wrap: balance;
+.prominence-sub {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: clamp(1rem, 3vw, 2rem);
+  align-items: end;
 }
 
-.ledger-heading p {
+.prominence-sub p {
   max-width: 52rem;
-  margin: 0.72rem 0 0;
+  margin: 0;
   color: var(--c-text-2);
   font-size: 0.98rem;
   line-height: 1.65;
@@ -235,28 +263,28 @@ const formatToken = (value?: string) => {
   box-shadow: 0 16px 36px color-mix(in srgb, var(--faction-jade, #2f5c53) 7%, transparent);
 }
 
-.row-seal {
-  width: 3.15rem;
-  aspect-ratio: 1;
+.row-seal-link {
   display: grid;
   place-items: center;
-  color: var(--c-seal-red);
   text-decoration: none;
-  border: 1.5px solid currentColor;
-  border-radius: 4px;
-  background: color-mix(in srgb, var(--c-seal-red) 4%, transparent);
-  font-family: var(--font-zh-display);
-  font-size: 1.5rem;
-  line-height: 1;
-  transition: transform 0.24s cubic-bezier(0.32, 0.72, 0, 1), background 0.24s cubic-bezier(0.32, 0.72, 0, 1);
+  transition: transform 0.24s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-a.row-seal:hover {
+.row-seal-link:hover {
   transform: translateY(-2px);
-  background: color-mix(in srgb, var(--c-seal-red) 8%, transparent);
 }
 
-.row-seal:focus-visible,
+.row-seal-link:focus-visible {
+  outline: 2px solid var(--c-seal-red);
+  outline-offset: 3px;
+}
+
+.row-seal {
+  display: grid;
+  place-items: center;
+}
+
+.row-seal-link:focus-visible,
 .row-title:focus-visible {
   outline: 2px solid var(--c-seal-red);
   outline-offset: 3px;
@@ -305,18 +333,9 @@ a.row-title:hover {
   letter-spacing: 0;
 }
 
-.row-kind {
+.row-kind-tag {
   justify-self: end;
   max-width: 13rem;
-  padding: 0.22rem 0.45rem;
-  color: var(--c-text-3);
-  border: 1px solid var(--c-divider);
-  border-radius: 4px;
-  background: color-mix(in srgb, var(--c-bg) 70%, transparent);
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  line-height: 1.35;
-  text-align: right;
   overflow-wrap: anywhere;
 }
 
@@ -357,15 +376,6 @@ a.row-title:hover {
   line-height: 1.3;
 }
 
-.field-pair strong {
-  color: var(--c-ink);
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  font-weight: 500;
-  line-height: 1.35;
-  overflow-wrap: anywhere;
-}
-
 .field-link {
   font-size: 0.84rem;
 }
@@ -378,7 +388,7 @@ a.row-title:hover {
 }
 
 @media (max-width: 1100px) {
-  .ledger-heading {
+  .prominence-sub {
     grid-template-columns: 1fr;
     gap: 0.55rem;
   }
@@ -404,9 +414,9 @@ a.row-title:hover {
     gap: 0.75rem;
   }
 
+  .row-seal-link,
   .row-seal {
-    width: 2.75rem;
-    font-size: 1.25rem;
+    place-items: start;
   }
 
   .row-header,

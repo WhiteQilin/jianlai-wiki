@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { getAssetById } from '~/utils/assetManifest'
 
 const props = defineProps<{
   title: string
@@ -11,6 +12,13 @@ const props = defineProps<{
   primaryCount: number
   representativeSeals: string[]
 }>()
+
+// Resolve the curated hero-atmosphere asset for Factions from the manifest.
+// Used as a subtle atmosphere layer, never a loud poster (DESIGN §5.1.1).
+const heroAtmosphereUrl = computed(() => {
+  const asset = getAssetById('asset.banner-factions-hero')
+  return asset?.filePath ?? ''
+})
 
 const ledgerStats = computed(() => [
   {
@@ -38,6 +46,12 @@ const sealMarks = computed(() => {
   <section class="faction-registry-hero" aria-labelledby="faction-registry-title">
     <div class="hero-paper-grain" aria-hidden="true"></div>
     <div class="hero-ink-wash" aria-hidden="true"></div>
+    <div
+      v-if="heroAtmosphereUrl"
+      class="hero-atmosphere"
+      aria-hidden="true"
+      :style="{ backgroundImage: `url('${heroAtmosphereUrl}')` }"
+    ></div>
 
     <div class="hero-inner">
       <div class="hero-copy">
@@ -65,7 +79,16 @@ const sealMarks = computed(() => {
     </div>
 
     <div class="seal-rack" aria-label="Representative seals">
-      <span v-for="(seal, index) in sealMarks" :key="`${seal}-${index}`" class="seal-mark">{{ seal }}</span>
+      <UiSealStamp
+        v-for="(seal, index) in sealMarks"
+        :key="`${seal}-${index}`"
+        :text="seal"
+        variant="outline"
+        size="sm"
+        writing="horizontal"
+        :decorative="true"
+        class="seal-mark"
+      />
     </div>
   </section>
 </template>
@@ -108,6 +131,20 @@ const sealMarks = computed(() => {
   background-size: auto, auto, auto, auto, cover;
   background-blend-mode: normal, normal, normal, normal, multiply;
   opacity: 0.88;
+}
+
+/* Curated hero atmosphere asset from the manifest — subtle wash, never a loud poster.
+   Opacity kept at 0.16–0.24 per DESIGN §5.1.1. */
+.hero-atmosphere {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-size: cover;
+  background-position: center 30%;
+  background-repeat: no-repeat;
+  opacity: 0.2;
+  pointer-events: none;
+  filter: saturate(0.85) contrast(0.95);
 }
 
 .hero-inner {
@@ -263,23 +300,16 @@ const sealMarks = computed(() => {
   display: grid;
   grid-template-columns: repeat(4, 3.7rem);
   gap: 0.55rem;
-  opacity: 0.18;
+  opacity: 0.42;
   transform: rotate(-4deg);
   pointer-events: none;
 }
 
-.seal-mark {
+.seal-mark :deep(.seal-stamp) {
   width: 3.7rem;
   aspect-ratio: 1;
   display: grid;
   place-items: center;
-  color: var(--c-seal-red);
-  border: 2px solid currentColor;
-  border-radius: 4px;
-  font-family: var(--font-zh-display);
-  font-size: 2rem;
-  line-height: 1;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c-seal-red) 18%, transparent);
 }
 
 @media (max-width: 900px) {
@@ -298,11 +328,11 @@ const sealMarks = computed(() => {
     right: 1rem;
     top: calc(var(--header-height) + 0.75rem);
     grid-template-columns: repeat(4, 2.7rem);
+    opacity: 0.32;
   }
 
-  .seal-mark {
+  .seal-mark :deep(.seal-stamp) {
     width: 2.7rem;
-    font-size: 1.45rem;
   }
 }
 
@@ -351,12 +381,11 @@ const sealMarks = computed(() => {
   .seal-rack {
     grid-template-columns: repeat(4, 2.2rem);
     gap: 0.35rem;
-    opacity: 0.1;
+    opacity: 0.18;
   }
 
-  .seal-mark {
+  .seal-mark :deep(.seal-stamp) {
     width: 2.2rem;
-    font-size: 1.18rem;
   }
 }
 </style>

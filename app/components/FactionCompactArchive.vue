@@ -46,6 +46,32 @@ const formatToken = (value?: string) => {
     .join(' ')
 }
 
+// Tone helpers for importance / verification chips.
+type Tone = 'section' | 'jade' | 'bronze' | 'ghost' | 'cinnabar'
+function importanceChipTone(value?: string): Tone {
+  switch ((value || '').trim().toLowerCase()) {
+    case 'primary':
+      return 'jade'
+    case 'major':
+      return 'section'
+    default:
+      return 'ghost'
+  }
+}
+
+function verificationChipTone(value?: string): Tone {
+  switch ((value || '').trim().toLowerCase()) {
+    case 'verified':
+      return 'jade'
+    case 'disputed':
+      return 'cinnabar'
+    case 'speculative':
+      return 'bronze'
+    default:
+      return 'ghost'
+  }
+}
+
 watch(
   () => props.categoryFilters,
   (filters) => {
@@ -57,24 +83,23 @@ watch(
 <template>
   <section class="compact-archive" aria-labelledby="compact-archive-title">
     <div class="archive-heading">
-      <div>
-        <p class="archive-kicker">Compact Archive</p>
-        <h2 id="compact-archive-title">All registered institutions</h2>
-      </div>
+      <UiBrushTitle as="h2" kicker="Compact Archive" class="archive-title">
+        All registered institutions
+      </UiBrushTitle>
       <span class="archive-count">{{ filteredEntries.length }} / {{ entries.length }}</span>
     </div>
 
     <div class="category-rule" aria-label="Faction category filters">
-      <button
+      <UiLedgerTab
         v-for="category in categoryFilters"
         :key="category"
-        type="button"
-        class="category-tab"
-        :class="{ active: category === activeCategory }"
+        :active="category === activeCategory"
+        :tone="category === activeCategory ? 'jade' : 'section'"
+        variant="compact"
         @click="activeCategory = category"
       >
         {{ category }}
-      </button>
+      </UiLedgerTab>
     </div>
 
     <div v-if="filteredEntries.length" class="archive-table" role="list">
@@ -84,10 +109,10 @@ watch(
         class="archive-row"
         role="listitem"
       >
-        <NuxtLink v-if="canOpen(entry.path)" :to="entry.path" class="row-seal" :aria-label="entry.title">
-          {{ fallbackSeal(entry) }}
+        <NuxtLink v-if="canOpen(entry.path)" :to="entry.path" class="row-seal-link" :aria-label="entry.title">
+          <UiSealStamp :text="fallbackSeal(entry)" variant="outline" size="xs" writing="horizontal" :decorative="true" />
         </NuxtLink>
-        <span v-else class="row-seal">{{ fallbackSeal(entry) }}</span>
+        <UiSealStamp v-else :text="fallbackSeal(entry)" variant="ghost" size="xs" writing="horizontal" :decorative="true" class="row-seal" />
 
         <span class="row-main">
           <span class="row-title-line">
@@ -98,11 +123,11 @@ watch(
           <span v-if="entry.description" class="row-description">{{ entry.description }}</span>
         </span>
 
-        <span class="row-category">{{ entry.category || entry.factionType || 'Faction' }}</span>
+        <UiCinnabarTag tone="ghost" size="sm" class="row-category-tag">{{ entry.category || entry.factionType || 'Faction' }}</UiCinnabarTag>
 
         <span class="row-meta">
-          <span>{{ formatToken(entry.importance) }}</span>
-          <span>{{ formatToken(entry.verificationStatus) }}</span>
+          <UiCinnabarTag :tone="importanceChipTone(entry.importance)" size="sm">{{ formatToken(entry.importance) }}</UiCinnabarTag>
+          <UiCinnabarTag :tone="verificationChipTone(entry.verificationStatus)" size="sm">{{ formatToken(entry.verificationStatus) }}</UiCinnabarTag>
         </span>
 
         <span class="row-seat">
@@ -137,23 +162,8 @@ watch(
   border-top: 1px solid var(--c-divider);
 }
 
-.archive-kicker {
-  margin: 0 0 0.32rem;
-  color: var(--faction-jade, var(--c-teal-accent));
-  font-family: var(--font-mono);
-  font-size: 0.76rem;
-  line-height: 1.35;
-  letter-spacing: 0;
-}
-
-.archive-heading h2 {
-  margin: 0;
-  color: var(--c-ink);
-  font-family: var(--font-heading);
-  font-size: clamp(2rem, 4vw, 2.8rem);
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: 0;
+.archive-title {
+  max-width: none;
 }
 
 .archive-count {
@@ -172,36 +182,6 @@ watch(
   padding: 0.75rem 0;
   border-top: 1px solid var(--c-divider);
   border-bottom: 1px solid var(--c-divider);
-}
-
-.category-tab {
-  min-height: 2rem;
-  padding: 0.35rem 0.65rem;
-  color: var(--c-text-2);
-  background: color-mix(in srgb, var(--c-bg) 72%, transparent);
-  border: 1px solid var(--c-divider);
-  border-radius: 4px;
-  font: inherit;
-  font-size: 0.82rem;
-  line-height: 1.2;
-  cursor: pointer;
-  transition: color 0.24s cubic-bezier(0.32, 0.72, 0, 1), border-color 0.24s cubic-bezier(0.32, 0.72, 0, 1), background 0.24s cubic-bezier(0.32, 0.72, 0, 1);
-}
-
-.category-tab:hover {
-  color: var(--c-ink);
-  border-color: color-mix(in srgb, var(--faction-jade, var(--c-teal-accent)) 36%, var(--c-border));
-}
-
-.category-tab.active {
-  color: var(--c-bg);
-  background: var(--faction-jade, var(--c-ink));
-  border-color: var(--faction-jade, var(--c-ink));
-}
-
-.category-tab:focus-visible {
-  outline: 2px solid var(--c-seal-red);
-  outline-offset: 3px;
 }
 
 .archive-table {
@@ -227,31 +207,26 @@ watch(
   background-blend-mode: normal, multiply;
 }
 
-.row-seal {
-  width: 2.35rem;
-  aspect-ratio: 1;
+.row-seal-link {
   display: grid;
   place-items: center;
-  color: var(--c-seal-red);
   text-decoration: none;
-  border: 1px solid color-mix(in srgb, var(--c-seal-red) 64%, transparent);
-  border-radius: 3px;
-  background: color-mix(in srgb, var(--c-bg) 72%, transparent);
-  font-family: var(--font-zh-display);
-  font-size: 1rem;
-  line-height: 1;
-  transition: background 0.24s cubic-bezier(0.32, 0.72, 0, 1), transform 0.24s cubic-bezier(0.32, 0.72, 0, 1);
+  transition: transform 0.24s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-a.row-seal:hover {
+.row-seal-link:hover {
   transform: translateY(-1px);
-  background: color-mix(in srgb, var(--c-seal-red) 7%, transparent);
 }
 
-.row-seal:focus-visible,
+.row-seal-link:focus-visible,
 .row-title-line a:focus-visible {
   outline: 2px solid var(--c-seal-red);
   outline-offset: 3px;
+}
+
+.row-seal {
+  display: grid;
+  place-items: center;
 }
 
 .row-main {
@@ -302,17 +277,7 @@ a.row-seal:hover {
   overflow: hidden;
 }
 
-.row-category,
-.row-meta,
-.row-seat {
-  min-width: 0;
-  color: var(--c-text-3);
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  line-height: 1.35;
-}
-
-.row-category {
+.row-category-tag {
   overflow-wrap: anywhere;
 }
 
@@ -323,19 +288,15 @@ a.row-seal:hover {
   gap: 0.3rem;
 }
 
-.row-meta span {
-  max-width: 100%;
-  padding: 0.2rem 0.4rem;
-  border: 1px solid var(--c-divider);
-  border-radius: 3px;
-  background: color-mix(in srgb, var(--c-bg) 72%, transparent);
-  overflow-wrap: anywhere;
-}
-
 .row-seat {
+  min-width: 0;
   justify-self: end;
   text-align: right;
   overflow-wrap: anywhere;
+  color: var(--c-text-3);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  line-height: 1.35;
 }
 
 .archive-empty {

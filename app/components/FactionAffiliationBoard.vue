@@ -38,20 +38,19 @@ const fallbackSeal = (faction: FactionSummary) => faction.seal || faction.chines
 <template>
   <section class="affiliation-board" aria-labelledby="affiliation-board-title">
     <div class="board-heading">
-      <div>
-        <p class="board-kicker">Recorded Associations</p>
-        <h2 id="affiliation-board-title">Named relationships</h2>
-      </div>
+      <UiBrushTitle as="h2" kicker="Recorded Associations" class="board-title">
+        Named relationships
+      </UiBrushTitle>
       <span class="board-count">{{ associationTotal }}</span>
     </div>
 
     <div v-if="visibleRecords.length" class="association-list">
       <article v-for="record in visibleRecords" :key="record.faction.path" class="association-card">
         <header class="association-header">
-          <NuxtLink v-if="canOpen(record.faction.path)" :to="record.faction.path" class="faction-seal">
-            {{ fallbackSeal(record.faction) }}
+          <NuxtLink v-if="canOpen(record.faction.path)" :to="record.faction.path" class="faction-seal-link">
+            <UiSealStamp :text="fallbackSeal(record.faction)" variant="outline" size="sm" writing="horizontal" :decorative="true" />
           </NuxtLink>
-          <span v-else class="faction-seal">{{ fallbackSeal(record.faction) }}</span>
+          <UiSealStamp v-else :text="fallbackSeal(record.faction)" variant="ghost" size="sm" writing="horizontal" :decorative="true" class="faction-seal" />
 
           <div class="faction-title">
             <NuxtLink v-if="canOpen(record.faction.path)" :to="record.faction.path">{{ record.faction.title }}</NuxtLink>
@@ -128,23 +127,8 @@ const fallbackSeal = (faction: FactionSummary) => faction.seal || faction.chines
   margin-bottom: 1rem;
 }
 
-.board-kicker {
-  margin: 0 0 0.35rem;
-  color: var(--c-seal-red);
-  font-family: var(--font-mono);
-  font-size: 0.76rem;
-  line-height: 1.35;
-  letter-spacing: 0;
-}
-
-.board-heading h2 {
-  margin: 0;
-  color: var(--c-ink);
-  font-family: var(--font-heading);
-  font-size: clamp(2rem, 4vw, 2.72rem);
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: 0;
+.board-title {
+  max-width: none;
 }
 
 .board-count {
@@ -189,18 +173,26 @@ const fallbackSeal = (faction: FactionSummary) => faction.seal || faction.chines
   border-bottom: 1px solid var(--c-divider);
 }
 
-.faction-seal {
-  width: 2.35rem;
-  aspect-ratio: 1;
+.faction-seal-link {
   display: grid;
   place-items: center;
-  color: var(--c-seal-red);
   text-decoration: none;
-  border: 1px solid color-mix(in srgb, var(--c-seal-red) 60%, transparent);
-  border-radius: 3px;
-  font-family: var(--font-zh-display);
-  font-size: 1.05rem;
-  line-height: 1;
+  transition: transform 0.24s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.faction-seal-link:hover {
+  transform: translateY(-1px);
+}
+
+.faction-seal-link:focus-visible,
+.faction-title a:focus-visible {
+  outline: 2px solid var(--c-seal-red);
+  outline-offset: 3px;
+}
+
+.faction-seal {
+  display: grid;
+  place-items: center;
 }
 
 .faction-title {
